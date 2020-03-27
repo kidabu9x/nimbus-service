@@ -1,0 +1,21 @@
+version: '3'
+services:
+  api:
+    hostname: nimbus-public.local
+    container_name: nimbus-api
+    ports:
+      - 48080:8080
+    build: api
+    depends_on:
+      - mysql
+    env_file:
+      - .env
+    environment:
+      ENVIRONMENT: docker
+
+  mysql:
+    hostname: mysql.local
+    container_name: nimbus-mysql
+    build: docker/images/mysql
+    ports:
+      - 43320:3306
