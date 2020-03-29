@@ -1,33 +1,10 @@
 steps:
-  # Build the latest version.
+  - name: maven:3.6.0-jdk-8-alpine
+    entrypoint: 'mvn'
+    args: ['package', '-DskipTests']
   - name: 'gcr.io/cloud-builders/docker'
-    args:
-      - 'build'
-      - '--tag=gcr.io/$PROJECT_ID/mvn'
-      - '.'
-
-  # Minimally invoke Maven.
-  - name: 'gcr.io/$PROJECT_ID/mvn'
-    args: ['--version']
-
-  # Run maven builds.
-  - name: 'gcr.io/$PROJECT_ID/mvn'
-    args: ['clean', 'install']
-
-  # Run Docker build
-  - name: 'docker/compose:1.19.0'
-    args: ['up', '-d']
-
-  # Tag to docker
+    args: ['build', '-t', 'asia.gcr.io/nimbus-devops/${_JOB_NAME}-migration:${_IMAGE_TAG}', 'common']
   - name: 'gcr.io/cloud-builders/docker'
-    args: ['build', '--tag=gcr.io/$PROJECT_ID/$REPO_NAME', '.']
-
-  - name: "gcr.io/cloud-builders/gke-deploy"
-    args:
-      - run
-      - --filename=[KUBERNETES_CONFIG_FILE]
-      - --image=gcr.io/[PROJECT_ID]/[IMAGE]:[TAG]
-      - --location=${_CLOUDSDK_COMPUTE_ZONE}
-      - --cluster=${_CLOUDSDK_CONTAINER_CLUSTER}
-
-images: ['gcr.io/$PROJECT_ID/$REPO_NAME']
+    args: ['build', '-t', 'asia.gcr.io/nimbus-devops/${_JOB_NAME}-public:${_IMAGE_TAG}', 'api']
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ["push", "asia.gcr.io/vinid-devops/${_JOB_NAME}-public:${_IMAGE_TAG}"]

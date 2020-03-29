@@ -1,0 +1,161 @@
+###Before Script###
+.before_script: &before_script |
+
+  function k8s_auth() {
+    if [[ "$$NONPROD_GKE_DEPLOYER_KEY" == "" ]]; then
+      echo "Authentication Failure"
+      exit 1
+    fi
+    export GKE_DEPLOYER_KEY_PATH=/tmp/gke-deployer.json
+    echo $NONPROD_GKE_DEPLOYER_KEY > $GKE_DEPLOYER_KEY_PATH
+    gcloud auth activate-service-account --key-file $GKE_DEPLOYER_KEY_PATH
+    gcloud container clusters get-credentials main --region asia-east1 --project nimbus-service-nonprod
+    echo "K8S CLUSTER: `kubectl config current-context`"
+  }
+
+before_script:
+  - *before_script
+include:
+  - project: 'devops/gitlab-ci-templates'
+    ref: master
+    file: "/common/libs.yml"
+  - project: 'devops/gitlab-ci-templates'
+    ref: master
+    file: "before-script-templates.yml"
+
+image: asia.gcr.io/nimbus-devops/k8s-deployer:latest
+
+variables:
+  MAVEN_OPTS: "-Dmaven.repo.local=.m2"
+  GIT_SUBMODULE_STRATEGY: recursive
+  IMAGE_TAG: $CI_COMMIT_SHORT_SHA
+  CI_PROJECT_NAME: nimbus-service
+
+cache:
+  paths:
+    - .m2/
+
+stages:
+  - build
+  - deploy
+  - tag
+  - request deploy to production
+  - patch
+  - notify
+
+maven build:
+  stage: build
+  image: maven:3.6.0-jdk-8-alpine
+  before_script:
+    - ''
+  script: "mvn $MAVEN_OPTS install -B"
+  only:
+    refs:
+      - develop
+      - qaqc
+      - uat
+      - master
+  except:
+    - tags
+
+docker build:
+  stage: build
+  only:
+    refs:
+      - develop
+      - qaqc
+      - uat
+      - master
+  except:
+    variables:
+      - $TYPE == "patch"
+  script:
+    - export GCR_PUSHER_KEY_PATH=/tmp/gcr-pusher.json
+    - echo $GCR_PUSHER_KEY > $GCR_PUSHER_KEY_PATH
+    - gcloud auth activate-service-account --key-file $GCR_PUSHER_KEY_PATH
+    - gcloud builds submit  --config=cloudbuild.yaml --substitutions=_JOB_NAME=${CI_PROJECT_NAME},_IMAGE_TAG=${IMAGE_TAG}
+
+deploy nimbus-public to dev:
+  stage: deploy
+  only:
+    - develop
+  variables:
+    HOST: api.nimbus.com.vn
+    ENVIRONMENT: dev
+    SERVICE_PATH: /nimbus-public
+    GCP_PROJECT_ID: $DEV_GCP_PROJECT_ID
+    GKE_CLUSTER_NAME: main
+    GKE_DEPLOYER_KEY: $NONPROD_GKE_DEPLOYER_KEY
+    JOB_NAME: $CI_PROJECT_NAME-public
+    ZONE: asia-east1
+  script:
+    - k8s_auth
+    - cd api/deploy/k8s/dev && bash deploy-dev.sh
+
+deploy nimbus-public to uat:
+  stage: deploy
+  only:
+    - uat
+  variables:
+    HOST: api.nimbus.com.vn
+    ENVIRONMENT: uat
+    SERVICE_PATH: /nimbus-public
+    GCP_PROJECT_ID: $DEV_GCP_PROJECT_ID
+    GKE_CLUSTER_NAME: main
+    GKE_DEPLOYER_KEY: $NONPROD_GKE_DEPLOYER_KEY
+    JOB_NAME: $CI_PROJECT_NAME-public
+    ZONE: asia-east1
+  script:
+    - k8s_auth
+    - cd api/deploy/k8s/uat && bash deploy-uat.sh
+
+#tag image when we have milestone release
+tag image:
+  stage: tag
+  image: asia.gcr.io/nimbus-devops/k8s-deployer:latest
+  only:
+    - tags
+  script: |
+    export GCR_PUSHER_KEY_PATH=/tmp/gcr-pusher.json
+    echo $GCR_PUSHER_KEY > $GCR_PUSHER_KEY_PATH
+    gcloud auth activate-service-account --key-file $GCR_PUSHER_KEY_PATH
+
+    gcloud container images add-tag asia.gcr.io/nimbus-devops/$CI_PROJECT_NAME-public:$IMAGE_TAG asia.gcr.io/nimbus-devops/$CI_PROJECT_NAME-public:$CI_COMMIT_TAG --quiet
+
+#request deploy to production
+request deploy nimbus public to production:
+  image: asia.gcr.io/nimbus-devops/k8s-deployer:latest
+  stage: request deploy to production
+  variables:
+    CI_PROJECT_NAME: nimbus-public
+  only:
+    - tags
+  when: manual
+  script:
+    - bash ./deployment-templates/scripts/request-deploy.sh
+
+failure notify:
+  stage: notify
+  when: on_failure
+  only:
+    refs:
+      - develop
+      - uat
+  except:
+    variables:
+      - $TYPE == "patch"
+  script:
+    - failure-notify
+
+success notify:
+  stage: notify
+  when: on_success
+  only:
+    refs:
+      - develop
+      - uat
+  except:
+    variables:
+      - $TYPE == "patch"
+  script:
+    - echo "All deployed job success"
