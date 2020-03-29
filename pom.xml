@@ -48,7 +48,7 @@
         <mockito.version>2.25.1</mockito.version>
         <reactor-string.version>1.0.1.RELEASE</reactor-string.version>
         <common-io.version>2.6</common-io.version>
-        <spring-webflux>5.1.7.RELEASE</spring-webflux>
+        <spring-webflux>5.1.14.RELEASE</spring-webflux>
         <mock-server.version>3.10.8</mock-server.version>
         <jose4j.version>0.6.5</jose4j.version>
         <redis-client.version>2.9.0</redis-client.version>
