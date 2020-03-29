@@ -1,10 +1,25 @@
 steps:
-  - name: maven:3.6.0-jdk-8-alpine
-    entrypoint: 'mvn'
-    args: ['package', '-DskipTests']
+  # Build the latest version.
   - name: 'gcr.io/cloud-builders/docker'
-    args: ['build', '-t', 'asia.gcr.io/nimbus-devops/${_JOB_NAME}-migration:${_IMAGE_TAG}', 'common']
+    args:
+      - 'build'
+      - '--tag=gcr.io/$PROJECT_ID/mvn'
+      - '.'
+
+  # Minimally invoke Maven.
+  - name: 'gcr.io/$PROJECT_ID/mvn'
+    args: ['--version']
+
+  # Run maven builds.
+  - name: 'gcr.io/$PROJECT_ID/mvn'
+    args: ['clean', 'install']
+
+  # Run Docker build
+  - name: 'docker/compose:1.19.0'
+    args: ['up', '-d']
+
+  # Tag to docker
   - name: 'gcr.io/cloud-builders/docker'
-    args: ['build', '-t', 'asia.gcr.io/nimbus-devops/${_JOB_NAME}-public:${_IMAGE_TAG}', 'api']
-  - name: 'gcr.io/cloud-builders/docker'
-    args: ["push", "asia.gcr.io/vinid-devops/${_JOB_NAME}-public:${_IMAGE_TAG}"]
+    args: ['build', '--tag=gcr.io/$PROJECT_ID/$REPO_NAME', '.']
+
+images: ['gcr.io/$PROJECT_ID/$REPO_NAME']
