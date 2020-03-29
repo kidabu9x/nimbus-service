@@ -1,3 +1,7 @@
 ARG MAVEN_VERSION=latest
 FROM maven:${MAVEN_VERSION}
-ENTRYPOINT ["mvn"]
+
+COPY docker/bootstrap.sh bin/bootstrap.sh
+RUN chmod a+x bin/bootstrap.sh
+
+ENTRYPOINT ["bin/bootstrap.sh"]
