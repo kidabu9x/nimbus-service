@@ -22,4 +22,12 @@ steps:
   - name: 'gcr.io/cloud-builders/docker'
     args: ['build', '--tag=gcr.io/$PROJECT_ID/$REPO_NAME', '.']
 
+  - name: "gcr.io/cloud-builders/gke-deploy"
+    args:
+      - run
+      - --filename=[KUBERNETES_CONFIG_FILE]
+      - --image=gcr.io/[PROJECT_ID]/[IMAGE]:[TAG]
+      - --location=${_CLOUDSDK_COMPUTE_ZONE}
+      - --cluster=${_CLOUDSDK_CONTAINER_CLUSTER}
+
 images: ['gcr.io/$PROJECT_ID/$REPO_NAME']
