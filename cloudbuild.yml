@@ -1,6 +1,13 @@
 steps:
+  # Run maven builds.
+  - name: 'asia.gcr.io/$PROJECT_ID/mvn'
+    args: ['clean', 'install']
+
+  # Run Docker build
   - name: 'docker/compose:1.19.0'
     args: ['up', '-d']
+
   - name: 'asia.gcr.io/cloud-builders/docker'
-    args: ['tag', 'workspace_app:latest', 'asia.gcr.io/$PROJECT_ID/$REPO_NAME:$COMMIT_SHA']
-images: ['asia.gcr.io/$PROJECT_ID/$REPO_NAME:$COMMIT_SHA']
+    args: ['build', '-t', 'asia.gcr.io/$PROJECT_ID/$REPO_NAME:$COMMIT_SHA', '.']
+
+images: [ 'asia.gcr.io/$PROJECT_ID/mvn', 'asia.gcr.io/$PROJECT_ID/$REPO_NAME:$COMMIT_SHA']
