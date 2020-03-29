@@ -1,13 +1,25 @@
 steps:
+  # Build the latest version.
+  - name: 'gcr.io/cloud-builders/docker'
+    args:
+      - 'build'
+      - '--tag=gcr.io/$PROJECT_ID/mvn'
+      - '.'
+
+  # Minimally invoke Maven.
+  - name: 'gcr.io/$PROJECT_ID/mvn'
+    args: ['--version']
+
   # Run maven builds.
-  - name: 'gcr.io/cloud-builders/mvn'
+  - name: 'gcr.io/$PROJECT_ID/mvn'
     args: ['clean', 'install']
 
   # Run Docker build
   - name: 'docker/compose:1.19.0'
     args: ['up', '-d']
 
+  # Tag to docker
   - name: 'gcr.io/cloud-builders/docker'
     args: ['build', '--tag=gcr.io/$PROJECT_ID/$REPO_NAME', '.']
 
-images: ['asia.gcr.io/$PROJECT_ID/$REPO_NAME']
+images: ['gcr.io/$PROJECT_ID/$REPO_NAME']
