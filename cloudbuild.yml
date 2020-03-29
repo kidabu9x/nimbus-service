@@ -1,6 +1,6 @@
 steps:
   # Run maven builds.
-  - name: 'asia.gcr.io/cloud-builders/mvn'
+  - name: 'gcr.io/cloud-builders/mvn'
     args: ['clean', 'install']
 
   # Run Docker build
