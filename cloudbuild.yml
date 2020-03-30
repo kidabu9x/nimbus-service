@@ -1,11 +1,12 @@
 steps:
   # Run maven build
-  - name: 'gcr.io/cloud-builders/mvn'
-    args: ['clean', 'install']
+  - name: maven:3.6.0-jdk-8-alpine
+    entrypoint: 'mvn'
+    args: ['package', '-DskipTests']
 
   # Run docker build
   - name: 'gcr.io/cloud-builders/docker'
-    args: ['build', '--tag=gcr.io/$PROJECT_ID/$REPO_NAME', '.']
+    args: ['build', '--tag=gcr.io/$PROJECT_ID/$REPO_NAME', 'api']
 
   - name: "gcr.io/cloud-builders/gke-deploy"
     args:
@@ -14,5 +15,3 @@ steps:
       - --image=gcr.io/$PROJECT_ID/$REPO_NAME
       - --location=asia-southeast1-b
       - --cluster=your-first-cluster-1
-
-images: ['gcr.io/$PROJECT_ID/$REPO_NAME']
