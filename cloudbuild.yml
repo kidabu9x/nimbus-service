@@ -8,11 +8,12 @@ steps:
   - name: 'gcr.io/cloud-builders/docker'
     args: ['build', '--tag=gcr.io/$PROJECT_ID/$REPO_NAME', 'api']
 
-  - name: "gcr.io/cloud-builders/gke-deploy"
-    args:
-      - run
-      - --filename=deployment.yml
-      - --image=gcr.io/$PROJECT_ID/$REPO_NAME:latest
-      - --location=asia-southeast1-b
-      - --cluster=your-first-cluster-1
+#  - name: "gcr.io/cloud-builders/gke-deploy"
+#    args:
+#      - run
+#      - --filename=deployment.yml
+#      - --image=gcr.io/$PROJECT_ID/$REPO_NAME:latest
+#      - --location=asia-southeast1-b
+#      - --cluster=your-first-cluster-1
+
 images: ["gcr.io/$PROJECT_ID/$REPO_NAME"]
