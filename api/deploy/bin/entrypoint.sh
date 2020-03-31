@@ -12,3 +12,4 @@ java -Xms32m \
     -Denv=$ENVIRONMENT \
     -Dmode=DEPLOY \
     -jar app.jar
+

@@ -2,7 +2,6 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: nimbus-service
-  namespace: default
 spec:
   progressDeadlineSeconds: 120
   replicas: 1
@@ -39,15 +38,14 @@ apiVersion: autoscaling/v2beta1
 kind: HorizontalPodAutoscaler
 metadata:
   name: nimbus-service
-  namespace: default
 spec:
-  maxReplicas: 2
   metrics:
     - resource:
         name: cpu
         targetAverageUtilization: 75
       type: Resource
   minReplicas: 1
+  maxReplicas: 2
   scaleTargetRef:
     apiVersion: extensions/v1beta1
     kind: Deployment
@@ -59,15 +57,11 @@ metadata:
   labels:
     name: nimbus-service
   name: nimbus-service
-  namespace: default
 spec:
-  clusterIP: 10.0.4.65
   ports:
     - name: http
       port: 80
-      protocol: TCP
       targetPort: 8080
   selector:
     name: nimbus-service
-  sessionAffinity: None
   type: ClusterIP
