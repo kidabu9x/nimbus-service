@@ -1,13 +1,13 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: nimbus-service
+  name: $REPO_NAME
 spec:
   progressDeadlineSeconds: 120
   replicas: 1
   selector:
     matchLabels:
-      name: nimbus-service
+      name: $REPO_NAME
   strategy:
     rollingUpdate:
       maxSurge: 1
@@ -16,17 +16,17 @@ spec:
   template:
     metadata:
       labels:
-        name: nimbus-service
+        name: $REPO_NAME
         team: nimbus
-      name: nimbus-service
+      name: $REPO_NAME
     spec:
       containers:
         - env:
             - name: ENVIRONMENT
-              value: uat
-          image: gcr.io/nimbus-non-prod/nimbus-service:latest
+              value: $ENVIRONMENT
+          image: gcr.io/$PROJECT_ID/$REPO_NAME:$COMMIT_SHA
           imagePullPolicy: Always
-          name: nimbus-service
+          name: $REPO_NAME
           ports:
             - containerPort: 8080
               name: http
@@ -37,7 +37,7 @@ spec:
 apiVersion: autoscaling/v2beta1
 kind: HorizontalPodAutoscaler
 metadata:
-  name: nimbus-service
+  name: $REPO_NAME
 spec:
   metrics:
     - resource:
@@ -49,19 +49,19 @@ spec:
   scaleTargetRef:
     apiVersion: extensions/v1beta1
     kind: Deployment
-    name: nimbus-service
+    name: $REPO_NAME
 ---
 apiVersion: v1
 kind: Service
 metadata:
   labels:
-    name: nimbus-service
-  name: nimbus-service
+    name: $REPO_NAME
+  name: $REPO_NAME
 spec:
   ports:
     - name: http
       port: 80
       targetPort: 8080
   selector:
-    name: nimbus-service
+    name: $REPO_NAME
   type: ClusterIP
