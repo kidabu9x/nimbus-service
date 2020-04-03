@@ -1,0 +1,28 @@
+<configuration>
+
+    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%d{HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <logger name="com.mchange.v2" level="warn"/>
+    <logger name="io.netty" level="warn"/>
+    <logger name="io.vertx" level="info"/>
+    <logger name="com.zaxxer" level="info"/>
+    <logger name="io.sentry" level="info"/>
+    <logger name="org.hibernate.tuple" level="warn"/>
+    <logger name="org.hibernate.hql" level="warn"/>
+    <logger name="org.hibernate" level="info"/>
+    <logger name="org.springframework.orm.jpa" level="warn"/>
+    <logger name="org.springframework" level="info"/>
+    <logger name="org.synchronoss.cloud.nio.multipart" level="info"/>
+    <logger name="reactor.netty" level="info"/>
+    <logger name="io.lettuce" level="info"/>
+    <logger name="org.apache.kafka" level="warn"/>
+
+    <root level="debug">
+        <appender-ref ref="STDOUT"/>
+    </root>
+
+</configuration>

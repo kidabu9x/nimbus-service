@@ -4,10 +4,21 @@ steps:
     entrypoint: 'mvn'
     args: ['package', '-DskipTests']
 
-  # Run docker build
-  - id: docker-build
+  - id: docker-build-migration
     name: 'gcr.io/cloud-builders/docker'
-    args: ['build', '--tag=gcr.io/$PROJECT_ID/$REPO_NAME', 'api']
+    args: ['build', '--tag=gcr.io/$PROJECT_ID/$REPO_NAME-migration', 'common']
+
+  - id: docker-build-api
+    name: 'gcr.io/cloud-builders/docker'
+    args: ['build', '--tag=gcr.io/$PROJECT_ID/$REPO_NAME-api', 'api']
+
+  - id: docker-push-migration
+    name: 'gcr.io/cloud-builders/docker'
+    args: ["push", "gcr.io/$PROJECT_ID/$REPO_NAME-migration"]
+
+  - id: docker-push-api
+    name: 'gcr.io/cloud-builders/docker'
+    args: ["push", "asia.gcr.io/$PROJECT_ID/$REPO_NAME-api"]
 
 #  - name: "gcr.io/cloud-builders/gke-deploy"
 #    args:
@@ -17,4 +28,4 @@ steps:
 #      - --location=asia-southeast1-b
 #      - --cluster=your-first-cluster-1
 
-images: ["gcr.io/$PROJECT_ID/$REPO_NAME"]
+#images: ["gcr.io/$PROJECT_ID/$REPO_NAME-api", "gcr.io/$PROJECT_ID/$REPO_NAME-migration"]
