@@ -4,28 +4,24 @@ import lombok.Getter;
 import lombok.Setter;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
-import vn.com.nimbus.common.data.domain.constant.BlogStatus;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
-import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import java.time.LocalDateTime;
-import java.util.List;
 import java.util.Set;
 
 @Entity
-@Table(name = "blogs")
-@Getter
 @Setter
-public class Blogs {
+@Getter
+@Table(name = "categories")
+public class Categories {
     @Id
     @Column(name = "id", unique = true)
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -37,13 +33,6 @@ public class Blogs {
     @Column(name = "slug", unique = true)
     private String slug;
 
-    @Column(name = "status")
-    @Enumerated(EnumType.STRING)
-    private BlogStatus status;
-
-    @Column(name = "extra_data")
-    private String extraData;
-
     @Column(name = "created_at", updatable = false)
     @CreatedDate
     private LocalDateTime createdAt;
@@ -52,12 +41,8 @@ public class Blogs {
     @LastModifiedDate
     private LocalDateTime updatedAt;
 
-    @OneToMany(mappedBy = "blog", cascade = CascadeType.ALL)
-    private Set<BlogContents> contents;
-
-    @ManyToMany(mappedBy = "blogs")
-    private List<Tags> tags;
-
-    @ManyToMany(mappedBy = "blogs")
-    private List<Categories> categories;
+    @ManyToMany
+    @JoinTable(name = "blog_category", joinColumns = @JoinColumn(name = "blog_id"),
+            inverseJoinColumns = @JoinColumn(name = "category_id"))
+    private Set<Blogs> blogs;
 }

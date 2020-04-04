@@ -35,12 +35,10 @@ CREATE TABLE IF NOT EXISTS blog_contents
     CONSTRAINT blog_contents_blogs_id_fk FOREIGN KEY (blog_id) references blogs (id)
 );
 
-CREATE TABLE IF NOT EXISTS blog_authors
+CREATE TABLE IF NOT EXISTS blog_user
 (
     blog_id int not null,
     user_id int not null,
-    created_at DATETIME null,
-    updated_at DATETIME null,
     CONSTRAINT blog_authors_pk
         PRIMARY KEY (blog_id, user_id),
     CONSTRAINT blog_authors_blogs_id_fk
@@ -52,24 +50,20 @@ CREATE TABLE IF NOT EXISTS blog_authors
 CREATE TABLE tags
 (
     id int auto_increment,
-    content varchar(255) not null,
-    slug varchar(255) not null,
+    title varchar(50) not null,
+    slug varchar(50) not null,
     created_at DATETIME null,
     updated_at DATETIME null,
     CONSTRAINT tags_pk
         PRIMARY KEY (id)
 );
 
-CREATE UNIQUE INDEX tags_content_uindex ON tags (content);
-
 CREATE UNIQUE INDEX tags_slug_uindex ON tags (slug);
 
-CREATE TABLE blog_tag_mappings
+CREATE TABLE blog_tag
 (
     tag_id int not null,
     blog_id int not null,
-    created_at DATETIME null,
-    updated_at DATETIME null,
     CONSTRAINT blog_tag_mappings_pk
         PRIMARY KEY (tag_id, blog_id),
     CONSTRAINT blog_tag_mappings_blogs_id_fk
@@ -91,12 +85,10 @@ create table categories
         PRIMARY KEY (id)
 );
 
-create table blog_category_mappings
+create table blog_category
 (
     blog_id     int      not null,
     category_id int      not null,
-    created_at  datetime null,
-    updated_at  datetime null,
     primary key (blog_id, category_id),
     constraint blog_category_mappings_blogs_id_fk
         foreign key (blog_id) references blogs (id),
