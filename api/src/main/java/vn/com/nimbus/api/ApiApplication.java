@@ -6,7 +6,7 @@ import org.springframework.context.annotation.ComponentScan;
 import vn.com.nimbus.api.config.ApiConfigLoader;
 import vn.com.nimbus.common.BaseApplication;
 import vn.com.nimbus.common.config.SetupConfig;
-import vn.com.nimbus.common.constant.ServiceType;
+import vn.com.nimbus.common.model.constant.ServiceType;
 
 import java.io.InputStream;
 

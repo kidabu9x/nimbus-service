@@ -79,7 +79,7 @@ public class AppConfig {
     }
 
     @Bean(name = "haDatasource")
-    public DataSource haDatasource() throws IOException {
+    public DataSource haDatasource() {
         return new LazyConnectionDataSourceProxy(dynamicDataSource());
     }
 
@@ -113,7 +113,7 @@ public class AppConfig {
             entityManagerFactoryBean.setDataSource(haDatasource());
         else entityManagerFactoryBean.setDataSource(masterDataSource());
         entityManagerFactoryBean.setPersistenceProviderClass(HibernatePersistenceProvider.class);
-        entityManagerFactoryBean.setPackagesToScan("net.vinid.common.data.domain");
+        entityManagerFactoryBean.setPackagesToScan("vn.com.nimbus.common.data.domain");
         entityManagerFactoryBean.setJpaProperties(hibProperties());
         entityManagerFactoryBean.setJpaVendorAdapter(getHibernateJpaVendorAdapter());
 
