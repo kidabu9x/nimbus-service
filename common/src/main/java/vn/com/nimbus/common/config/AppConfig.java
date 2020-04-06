@@ -138,7 +138,7 @@ public class AppConfig {
     public HibernateJpaVendorAdapter getHibernateJpaVendorAdapter() {
         HibernateJpaVendorAdapter hjva = new HibernateJpaVendorAdapter();
         hjva.setDatabasePlatform("org.hibernate.dialect.MySQLDialect");
-        //hjva.setShowSql(true);
+//        hjva.setShowSql(true);
         return hjva;
     }
 }

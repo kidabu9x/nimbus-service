@@ -5,7 +5,7 @@ services:
     container_name: nimbus-api
     ports:
       - 48080:8080
-    build: api
+    build: api-internal
     depends_on:
       - mysql
     env_file:

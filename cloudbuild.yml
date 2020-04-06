@@ -18,7 +18,7 @@ steps:
 
   - id: docker-push-api
     name: 'gcr.io/cloud-builders/docker'
-    args: ["push", "asia.gcr.io/$PROJECT_ID/$REPO_NAME-api"]
+    args: ["push", "gcr.io/$PROJECT_ID/$REPO_NAME-api"]
 
 #  - name: "gcr.io/cloud-builders/gke-deploy"
 #    args:

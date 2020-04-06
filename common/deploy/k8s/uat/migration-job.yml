@@ -1,0 +1,16 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: $JOB_NAME
+spec:
+  template:
+    spec:
+      containers:
+        - name: $JOB_NAME-migration
+          image: gcr.io/nimbus-non-prod/nimbus-service-migration:${IMAGE_TAG}
+          envFrom:
+            - configMapRef:
+                name: nimbus-service-common
+      restartPolicy: Never
+      imagePullSecrets:
+        - name: docker-image-pull-secret

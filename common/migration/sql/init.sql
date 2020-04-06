@@ -19,6 +19,7 @@ CREATE TABLE IF NOT EXISTS blogs
     title      varchar(255)                                                 NOT NULL,
     slug       varchar(255)                                                 NOT NULL,
     status     enum ('DELETED', 'PUBLISHED', 'DISABLED') default 'DISABLED' NOT NULL,
+    thumbnail  varchar(255)                                                 NULL,
     created_at datetime                                                     NULL,
     updated_at datetime                                                     NULL,
     extra_data json                                                         NULL,

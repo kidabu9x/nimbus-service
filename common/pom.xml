@@ -53,5 +53,10 @@
             <artifactId>logstash-logback-encoder</artifactId>
         </dependency>
 
+        <dependency>
+            <groupId>com.github.slugify</groupId>
+            <artifactId>slugify</artifactId>
+        </dependency>
+
     </dependencies>
 </project>

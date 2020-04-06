@@ -56,6 +56,9 @@ public class AppExceptionCode {
     public static final vn.com.nimbus.common.exception.AppExceptionCode INVALID_BILLS = newErrorCode(4001102, "Invalid Bill List");
     public static final vn.com.nimbus.common.exception.AppExceptionCode CUSTOMER_CODE_TOO_SHORT = newErrorCode(4001103, "Customer code too short. Min length 2");
     public static final vn.com.nimbus.common.exception.AppExceptionCode FIRST_OR_LAST_NAME_CANT_BE_EMPTY = newErrorCode(4001103, "first name or last name must be valid");
+    public static final vn.com.nimbus.common.exception.AppExceptionCode BLOG_TITLE_TOO_LONG = newErrorCode(4001103, "Blog title is too long. Must be shorter than 255 characters");
+    public static final vn.com.nimbus.common.exception.AppExceptionCode UNSUPPORTED_CONTENT_TYPE = newErrorCode(4001103, "Content type is unsupported");
+    public static final vn.com.nimbus.common.exception.AppExceptionCode UNSUPPORTED_BLOG_STATUS = newErrorCode(4001103, "Content type is unsupported");
 
 
     public static final vn.com.nimbus.common.exception.AppExceptionCode UN_AUTHORIZED = newErrorCode(4011100, "Unauthorized");
@@ -67,6 +70,9 @@ public class AppExceptionCode {
     public static final vn.com.nimbus.common.exception.AppExceptionCode ACCOUNT_INFO_SOMETHING_WENT_WRONG = newErrorCode(4001127, "Technical errors from account information");
     public static final vn.com.nimbus.common.exception.AppExceptionCode CHECKOUT_SOMETHING_WENT_WRONG = newErrorCode(4001128, "Technical errors from checkout");
 
+    public static final vn.com.nimbus.common.exception.AppExceptionCode BLOG_NOT_FOUND = newErrorCode(4041100, "Blog not found");
+    public static final vn.com.nimbus.common.exception.AppExceptionCode USER_NOT_FOUND = newErrorCode(4041101, "User not found");
+    public static final vn.com.nimbus.common.exception.AppExceptionCode BLOG_CONTENT_NOT_FOUND = newErrorCode(4041102, "Blog content not found");
 
     public static final vn.com.nimbus.common.exception.AppExceptionCode EMAIL_HAS_EXISTS = newErrorCode(4091100, "email already exists");
 

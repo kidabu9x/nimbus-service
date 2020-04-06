@@ -5,6 +5,7 @@ import net.logstash.logback.marker.Markers;
 import org.apache.logging.log4j.util.Strings;
 import org.slf4j.Marker;
 import org.springframework.http.MediaType;
+import org.springframework.util.StringUtils;
 import org.springframework.web.server.ServerWebExchange;
 import vn.com.nimbus.common.model.constant.KeyConstant;
 import vn.com.nimbus.common.utils.AppUtils;
@@ -42,22 +43,27 @@ public class BaseFilter {
             deviceOS = "ORIGINAL_OS";
         }
 
+        String userId = AppUtils.headerOption(headers, KeyConstant.X_USER_ID);
+        if (StringUtils.isEmpty(userId)) {
+            userId = "1";
+        }
+
         Map<String, String> headerMark = new HashMap<>();
         headerMark.put(KeyConstant.X_REQUEST_ID, requestId);
 
-
         Marker marker = Markers.appendEntries(headerMark);
 
-        buildHeaderResponse(serverWebExchange, requestId, deviceId, deviceSessionId, appVersion, deviceOS);
+        buildHeaderResponse(serverWebExchange, requestId, deviceId, deviceSessionId, appVersion, deviceOS, userId);
         return marker;
     }
 
 
-    private void buildHeaderResponse(ServerWebExchange serverWebExchange, String requestId, String deviceId, String deviceSessionId, String appVersion, String deviceOS) {
+    private void buildHeaderResponse(ServerWebExchange serverWebExchange, String requestId, String deviceId, String deviceSessionId, String appVersion, String deviceOS, String userId) {
         serverWebExchange.getResponse().getHeaders().add(KeyConstant.X_REQUEST_ID, requestId);
         serverWebExchange.getResponse().getHeaders().add(KeyConstant.X_DEVICE_ID, deviceId);
         serverWebExchange.getResponse().getHeaders().add(KeyConstant.X_DEVICE_SESSION_ID, deviceSessionId);
         serverWebExchange.getResponse().getHeaders().add(KeyConstant.X_DEVICE_VERSION, appVersion);
         serverWebExchange.getResponse().getHeaders().add(KeyConstant.X_DEVICE_OS, deviceOS);
+        serverWebExchange.getResponse().getHeaders().add(KeyConstant.X_USER_ID, userId);
     }
 }

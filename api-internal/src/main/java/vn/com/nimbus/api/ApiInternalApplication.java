@@ -12,16 +12,16 @@ import java.io.InputStream;
 
 @SpringBootApplication
 @ComponentScan(basePackages = {"vn.com.nimbus"})
-public class ApiApplication extends BaseApplication {
+public class ApiInternalApplication extends BaseApplication {
     public static void main(String[] args) {
         loadCommonConfig();
         loadApiConfig(env);
-        SpringApplication.run(ApiApplication.class, args);
+        SpringApplication.run(ApiInternalApplication.class, args);
     }
 
     private static void loadApiConfig(String env) {
         SetupConfig setupConfig = new SetupConfig();
-        InputStream inputStreamConfig = setupConfig.serviceInputStream(env, ApiApplication.class, ServiceType.API);
+        InputStream inputStreamConfig = setupConfig.serviceInputStream(env, ApiInternalApplication.class, ServiceType.API);
         ApiConfigLoader.getInstance().initializeConfigLoader(inputStreamConfig);
         setupConfig.configLogging(env);
     }

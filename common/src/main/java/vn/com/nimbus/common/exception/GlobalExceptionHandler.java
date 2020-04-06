@@ -31,6 +31,7 @@ public class GlobalExceptionHandler implements ErrorWebExceptionHandler {
 
     @ExceptionHandler({AppException.class, MethodArgumentNotValidException.class, HttpClientException.class, AppSecurityException.class, AppValidatorException.class, Exception.class})
     public final ResponseEntity handleException(Exception ex) {
+        ex.printStackTrace();
         log.warn(ex.getMessage());
         BaseResponseAdapter responseAdapter;
         AppExceptionCode exceptionCode;

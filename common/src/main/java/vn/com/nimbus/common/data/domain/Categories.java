@@ -4,9 +4,12 @@ import lombok.Getter;
 import lombok.Setter;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EntityListeners;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -21,6 +24,7 @@ import java.util.Set;
 @Setter
 @Getter
 @Table(name = "categories")
+@EntityListeners(AuditingEntityListener.class)
 public class Categories {
     @Id
     @Column(name = "id", unique = true)
@@ -41,8 +45,8 @@ public class Categories {
     @LastModifiedDate
     private LocalDateTime updatedAt;
 
-    @ManyToMany
-    @JoinTable(name = "blog_category", joinColumns = @JoinColumn(name = "blog_id"),
-            inverseJoinColumns = @JoinColumn(name = "category_id"))
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(name = "blog_category", joinColumns = @JoinColumn(name = "category_id"),
+            inverseJoinColumns = @JoinColumn(name = "blog_id"))
     private Set<Blogs> blogs;
 }
