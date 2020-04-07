@@ -69,7 +69,9 @@ jobs:
       GKE_DEPLOYER_KEY: $GKE_DEPLOYER_KEY
       JOB_NAME: $GITHUB_REPOSITORY-api-internal
       ZONE: $GKE_ZONE
-    run: cd api-internal/deploy/k8s/uat && bash deploy-uat.sh
+    steps:
+      - name: run gke deploy
+        run: cd api-internal/deploy/k8s/uat && bash deploy-uat.sh
 
   run_migration_in_uat:
     runs-on: ubuntu-latest
@@ -81,4 +83,6 @@ jobs:
       GKE_DEPLOYER_KEY: $GKE_DEPLOYER_KEY
       JOB_NAME: $GITHUB_REPOSITORY-migration
       ZONE: $GKE_ZONE
-    run: cd common/deploy/k8s/uat && bash deploy-uat.sh
+    steps:
+      - name: run gke deploy
+        run: cd common/deploy/k8s/uat && bash deploy-uat.sh
