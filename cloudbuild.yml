@@ -6,26 +6,16 @@ steps:
 
   - id: docker-build-migration
     name: 'gcr.io/cloud-builders/docker'
-    args: ['build', '--tag=gcr.io/$PROJECT_ID/$REPO_NAME-migration', 'common']
+    args: ['build', '--tag=gcr.io/${_JOB_ID}/${_JOB_NAME}-migration:${_IMAGE_TAG}', 'common']
 
-  - id: docker-build-api
+  - id: docker-build-api-internal
     name: 'gcr.io/cloud-builders/docker'
-    args: ['build', '--tag=gcr.io/$PROJECT_ID/$REPO_NAME-api', 'api']
+    args: ['build', '--tag=gcr.io/${_JOB_ID}/${_JOB_NAME}-api-internal:${_IMAGE_TAG}', 'api-internal']
 
   - id: docker-push-migration
     name: 'gcr.io/cloud-builders/docker'
-    args: ["push", "gcr.io/$PROJECT_ID/$REPO_NAME-migration"]
+    args: ["push", "gcr.io/${_JOB_ID}/${_JOB_NAME}-migration:${_IMAGE_TAG}"]
 
-  - id: docker-push-api
+  - id: docker-push-api-internal
     name: 'gcr.io/cloud-builders/docker'
-    args: ["push", "gcr.io/$PROJECT_ID/$REPO_NAME-api"]
-
-#  - name: "gcr.io/cloud-builders/gke-deploy"
-#    args:
-#      - run
-#      - --filename=deployment.yml
-#      - --image=gcr.io/$PROJECT_ID/$REPO_NAME:latest
-#      - --location=asia-southeast1-b
-#      - --cluster=your-first-cluster-1
-
-#images: ["gcr.io/$PROJECT_ID/$REPO_NAME-api", "gcr.io/$PROJECT_ID/$REPO_NAME-migration"]
+    args: ["push", "gcr.io/${_JOB_ID}/${_JOB_NAME}-api-internal:${_IMAGE_TAG}"]
