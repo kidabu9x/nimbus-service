@@ -50,8 +50,8 @@ jobs:
           gcloud --quiet auth configure-docker
 
       - name: authorize gke
-          run: |-
-            gcloud container clusters get-credentials "$GKE_CLUSTER" --zone "$GKE_ZONE"
+        run: |-
+          gcloud container clusters get-credentials "$GKE_CLUSTER" --zone "$GKE_ZONE"
 
       - name: run cloudbuild
         run: |-
