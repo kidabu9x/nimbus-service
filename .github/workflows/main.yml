@@ -15,7 +15,6 @@ env:
   GKE_ZONE: asia-southeast1-b
   MAVEN_OPTS: "-Dmaven.repo.local=.m2"
   JOB_ORIGINAL_NAME: nimbus-service
-  IMAGE_TAG: $GITHUB_SHA
 
 jobs:
   maven_build:
@@ -73,6 +72,7 @@ jobs:
       GKE_DEPLOYER_KEY: ${{ secrets.NONPROD_GKE_SA_KEY }}
       JOB_NAME: nimbus-service-api-internal
       ZONE: $GKE_ZONE
+      IMAGE_TAG: ${{ github.sha }}
     steps:
       - uses: actions/checkout@v2
 
@@ -110,6 +110,7 @@ jobs:
       GKE_DEPLOYER_KEY: ${{ secrets.NONPROD_GKE_SA_KEY }}
       JOB_NAME: nimbus-service-migration
       ZONE: $GKE_ZONE
+      IMAGE_TAG: ${{ github.sha }}
     steps:
       - uses: actions/checkout@v2
       # Setup gcloud CLI
