@@ -15,7 +15,8 @@ env:
   GKE_ZONE: asia-southeast1-b
   MAVEN_OPTS: "-Dmaven.repo.local=.m2"
   JOB_ORIGINAL_NAME: nimbus-service
-  
+  IMAGE_TAG: $GITHUB_SHA
+
 jobs:
   maven_build:
     runs-on: ubuntu-latest
