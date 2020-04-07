@@ -24,7 +24,7 @@ spec:
         - env:
             - name: ENVIRONMENT
               value: $ENVIRONMENT
-          image: gcr.io/$PROJECT_ID/$JOB_NAME:$IMAGE_TAG
+          image: gcr.io/$GCP_PROJECT_ID/$JOB_NAME:$IMAGE_TAG
           imagePullPolicy: Always
           name: $JOB_NAME
           ports:
