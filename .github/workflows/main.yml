@@ -29,11 +29,6 @@ jobs:
         run: |-
           mvn $MAVEN_OPTS clean package
 
-  authorize_gcloud:
-    runs-on: ubuntu-latest
-    steps:
-
-
   docker_build:
     runs-on: ubuntu-latest
     needs: [maven_build, authorize_gcloud]
