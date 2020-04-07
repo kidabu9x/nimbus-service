@@ -14,7 +14,9 @@ env:
   PROJECT_ID: ${{ secrets.NONPROD_GKE_PROJECT }}
   GKE_CLUSTER: main
   GKE_ZONE: asia-southeast1-b
-  IMAGE: lastest
+  GKE_DEPLOYER_KEY: ${{ secrets.NONPROD_GKE_SA_KEY }}
+  IMAGE_TAG: $GITHUB_SHA
+  MAVEN_OPTS: "-Dmaven.repo.local=.m2"
 
 jobs:
   maven_build:
@@ -26,7 +28,8 @@ jobs:
         with:
           java-version: 1.8
       - name: build
-        run: "mvn $MAVEN_OPTS clean package"
+        run: |-
+          mvn $MAVEN_OPTS clean package
 
   docker_build:
     runs-on: ubuntu-latest
@@ -39,7 +42,7 @@ jobs:
         with:
           version: '286.0.0'
           service_account_email: ${{ secrets.NONPROD_GKE_SA_EMAIL }}
-          service_account_key: ${{ secrets.NONPROD_GKE_SA_KEY }}
+          service_account_key: $GKE_DEPLOYER_KEY
           project_id: $PROJECT_ID
 
       # Configure Docker to use the gcloud command-line tool as a credential
@@ -51,7 +54,7 @@ jobs:
         run: |-
           gcloud builds submit \
           --config=cloudbuild.yaml \
-          --substitutions=_JOB_NAME=$GITHUB_REPOSITORY,_IMAGE_TAG=$GITHUB_SHA,_JOB_ID=$PROJECT_ID \
+          --substitutions=_JOB_NAME=$GITHUB_REPOSITORY,_IMAGE_TAG=$IMAGE_TAG,_JOB_ID=$PROJECT_ID \
 
   deploy_nimbus_internal_to_uat:
     runs-on: ubuntu-latest
@@ -63,7 +66,7 @@ jobs:
       SERVICE_PATH: /nimbus-internal
       GCP_PROJECT_ID: $PROJECT_ID
       GKE_CLUSTER_NAME: $GKE_CLUSTER
-      GKE_DEPLOYER_KEY: ${{ secrets.NONPROD_GKE_SA_KEY }}
+      GKE_DEPLOYER_KEY: $GKE_DEPLOYER_KEY
       JOB_NAME: $GITHUB_REPOSITORY-api-internal
       ZONE: $GKE_ZONE
     run: cd api-internal/deploy/k8s/uat && bash deploy-uat.sh
@@ -75,7 +78,7 @@ jobs:
     env:
       GCP_PROJECT_ID: $PROJECT_ID
       GKE_CLUSTER_NAME: $GKE_CLUSTER
-      GKE_DEPLOYER_KEY: ${{ secrets.NONPROD_GKE_SA_KEY }}
+      GKE_DEPLOYER_KEY: $GKE_DEPLOYER_KEY
       JOB_NAME: $GITHUB_REPOSITORY-migration
       ZONE: $GKE_ZONE
     run: cd common/deploy/k8s/uat && bash deploy-uat.sh

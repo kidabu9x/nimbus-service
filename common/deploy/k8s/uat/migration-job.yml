@@ -7,7 +7,7 @@ spec:
     spec:
       containers:
         - name: $JOB_NAME-migration
-          image: gcr.io/nimbus-non-prod/nimbus-service-migration:${IMAGE_TAG}
+          image: gcr.io/$PROJECT_ID/$JOB_NAME:$IMAGE_TAG
           envFrom:
             - configMapRef:
                 name: nimbus-service-common
