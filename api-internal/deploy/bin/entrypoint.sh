@@ -1,6 +1,6 @@
 #!/bin/sh
-#sed -e 's/}}/}/g' -e 's/{{/\${/g' config/$ENVIRONMENT-config.json > config/$ENVIRONMENT-config-tmp.json && mv config/$ENVIRONMENT-config-tmp.json config/$ENVIRONMENT-config.json
-#envsubst < config/$ENVIRONMENT-config.json > config/$ENVIRONMENT-config-tmp.json && mv config/$ENVIRONMENT-config-tmp.json config/$ENVIRONMENT-config.json
+sed -e 's/}}/}/g' -e 's/{{/\${/g' config/$ENVIRONMENT-config.json > config/$ENVIRONMENT-config-tmp.json && mv config/$ENVIRONMENT-config-tmp.json config/$ENVIRONMENT-config.json
+envsubst < config/$ENVIRONMENT-config.json > config/$ENVIRONMENT-config-tmp.json && mv config/$ENVIRONMENT-config-tmp.json config/$ENVIRONMENT-config.json
 
 java -Xms32m \
     -Xmx$JVM_XMX \
