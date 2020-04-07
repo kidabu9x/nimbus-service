@@ -1,8 +1,8 @@
 steps:
-#  - id: maven-build
-#    name: maven:3.6.0-jdk-8-alpine
-#    entrypoint: 'mvn'
-#    args: ['package', '-DskipTests']
+  - id: maven-build
+    name: maven:3.6.0-jdk-8-alpine
+    entrypoint: 'mvn'
+    args: ['package', '-DskipTests']
 
   - id: docker-build-migration
     name: 'gcr.io/cloud-builders/docker'
