@@ -13,7 +13,6 @@ on:
 env:
   GKE_CLUSTER: main
   GKE_ZONE: asia-southeast1-b
-  IMAGE_TAG: $GITHUB_SHA
   MAVEN_OPTS: "-Dmaven.repo.local=.m2"
 
 jobs:
@@ -52,7 +51,7 @@ jobs:
         run: |-
           gcloud builds submit \
           --config=cloudbuild.yml \
-          --substitutions=_JOB_NAME=$GITHUB_REPOSITORY,_IMAGE_TAG=$IMAGE_TAG,_JOB_ID=${{ secrets.NONPROD_GKE_PROJECT }} \
+          --substitutions=_JOB_NAME=$GITHUB_REPOSITORY,_IMAGE_TAG=$GITHUB_SHA,_JOB_ID=${{ secrets.NONPROD_GKE_PROJECT }} \
 
   deploy_nimbus_internal_to_uat:
     runs-on: ubuntu-latest
