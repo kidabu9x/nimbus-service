@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: nimbus-public
+  name: nimbus-internal
 data:
   VERSION: $IMAGE_TAG
   JDBC_MASTER_URL:

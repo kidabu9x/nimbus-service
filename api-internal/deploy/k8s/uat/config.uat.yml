@@ -3,7 +3,6 @@ kind: ConfigMap
 metadata:
   name: nimbus-internal
 data:
-  VERSION: $IMAGE_TAG
   JDBC_MASTER_URL: jdbc:mysql://35.189.33.66/billservice_uat
   JDBC_MASTER_USERNAME: nimbus_uat
   JDBC_MASTER_PASSWORD: kCnS9WM4

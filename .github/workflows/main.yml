@@ -45,8 +45,13 @@ jobs:
 
       # Configure Docker to use the gcloud command-line tool as a credential
       # helper for authentication
-      - run: |-
+      - name: authorize gcloud
+        run: |-
           gcloud --quiet auth configure-docker
+
+      - name: authorize gke
+          run: |-
+            gcloud container clusters get-credentials "$GKE_CLUSTER" --zone "$GKE_ZONE"
 
       - name: run cloudbuild
         run: |-
@@ -78,6 +83,7 @@ jobs:
     needs: docker_build
     name: run migration in uat
     env:
+      ENVIRONMENT: uat
       GCP_PROJECT_ID: ${{ secrets.NONPROD_GKE_PROJECT }}
       GKE_CLUSTER_NAME: $GKE_CLUSTER
       GKE_DEPLOYER_KEY: ${{ secrets.NONPROD_GKE_SA_KEY }}
