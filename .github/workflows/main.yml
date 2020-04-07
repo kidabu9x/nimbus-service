@@ -69,6 +69,7 @@ jobs:
       ZONE: $GKE_ZONE
     steps:
       - name: run gke deploy
+        uses: actions/checkout@v2
         run: |-
           cd api-internal/deploy/k8s/uat && bash deploy-uat.sh
 
@@ -84,4 +85,5 @@ jobs:
       ZONE: $GKE_ZONE
     steps:
       - name: run gke deploy
+        uses: actions/checkout@v2
         run: cd ./common/deploy/k8s/uat && bash deploy-uat.sh
