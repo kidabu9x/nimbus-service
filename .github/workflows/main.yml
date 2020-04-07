@@ -68,8 +68,8 @@ jobs:
       JOB_NAME: $JOB_ORIGINAL_NAME-api-internal
       ZONE: $GKE_ZONE
     steps:
+      - uses: actions/checkout@v2
       - name: run gke deploy
-        uses: actions/checkout@v2
         run: |-
           cd api-internal/deploy/k8s/uat && bash deploy-uat.sh
 
@@ -84,6 +84,6 @@ jobs:
       JOB_NAME: $JOB_ORIGINAL_NAME-migration
       ZONE: $GKE_ZONE
     steps:
+      - uses: actions/checkout@v2
       - name: run gke deploy
-        uses: actions/checkout@v2
         run: cd ./common/deploy/k8s/uat && bash deploy-uat.sh
