@@ -29,12 +29,9 @@ jobs:
         run: |-
           mvn $MAVEN_OPTS clean package
 
-  docker_build:
+  authorize_gcloud:
     runs-on: ubuntu-latest
-    needs: maven_build
     steps:
-      - uses: actions/checkout@v2
-
       # Setup gcloud CLI
       - uses: GoogleCloudPlatform/github-actions/setup-gcloud@master
         with:
@@ -51,8 +48,15 @@ jobs:
 
       - name: authorize gke
         run: |-
-          gcloud container clusters get-credentials "$GKE_CLUSTER" --zone "$GKE_ZONE"
+          gcloud container clusters get-credentials "$GKE_CLUSTER" --region "$GKE_ZONE" --project "${{ secrets.NONPROD_GKE_PROJECT }}"
+          echo "K8S CLUSTER: `kubectl config current-context`"
 
+  docker_build:
+    runs-on: ubuntu-latest
+    needs: [maven_build, authorize_gcloud]
+    steps:
+      - uses: actions/checkout@v2
+        -
       - name: run cloudbuild
         run: |-
           gcloud builds submit \
@@ -92,4 +96,5 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - name: run gke deploy
-        run: cd ./common/deploy/k8s/uat && bash deploy-uat.sh
+        run: |-
+          cd common/deploy/k8s/uat && bash deploy-uat.sh
