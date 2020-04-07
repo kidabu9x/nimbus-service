@@ -14,7 +14,8 @@ env:
   GKE_CLUSTER: main
   GKE_ZONE: asia-southeast1-b
   MAVEN_OPTS: "-Dmaven.repo.local=.m2"
-
+  JOB_ORIGINAL_NAME: nimbus-service
+  
 jobs:
   maven_build:
     runs-on: ubuntu-latest
@@ -51,7 +52,7 @@ jobs:
         run: |-
           gcloud builds submit \
           --config=cloudbuild.yml \
-          --substitutions=_JOB_NAME=$GITHUB_REPOSITORY,_IMAGE_TAG=$GITHUB_SHA,_JOB_ID=${{ secrets.NONPROD_GKE_PROJECT }} \
+          --substitutions=_JOB_NAME=$JOB_ORIGINAL_NAME,_IMAGE_TAG=$GITHUB_SHA,_JOB_ID=${{ secrets.NONPROD_GKE_PROJECT }} \
 
   deploy_nimbus_internal_to_uat:
     runs-on: ubuntu-latest
@@ -64,11 +65,12 @@ jobs:
       GCP_PROJECT_ID: ${{ secrets.NONPROD_GKE_PROJECT }}
       GKE_CLUSTER_NAME: $GKE_CLUSTER
       GKE_DEPLOYER_KEY: ${{ secrets.NONPROD_GKE_SA_KEY }}
-      JOB_NAME: $GITHUB_REPOSITORY-api-internal
+      JOB_NAME: $JOB_ORIGINAL_NAME-api-internal
       ZONE: $GKE_ZONE
     steps:
       - name: run gke deploy
-        run: cd api-internal/deploy/k8s/uat && bash deploy-uat.sh
+        run: |-
+          cd api-internal/deploy/k8s/uat && bash deploy-uat.sh
 
   run_migration_in_uat:
     runs-on: ubuntu-latest
@@ -78,8 +80,8 @@ jobs:
       GCP_PROJECT_ID: ${{ secrets.NONPROD_GKE_PROJECT }}
       GKE_CLUSTER_NAME: $GKE_CLUSTER
       GKE_DEPLOYER_KEY: ${{ secrets.NONPROD_GKE_SA_KEY }}
-      JOB_NAME: $GITHUB_REPOSITORY-migration
+      JOB_NAME: $JOB_ORIGINAL_NAME-migration
       ZONE: $GKE_ZONE
     steps:
       - name: run gke deploy
-        run: cd common/deploy/k8s/uat && bash deploy-uat.sh
+        run: cd ./common/deploy/k8s/uat && bash deploy-uat.sh
