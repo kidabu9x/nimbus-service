@@ -71,7 +71,7 @@ jobs:
       GCP_PROJECT_ID: ${{ secrets.NONPROD_GKE_PROJECT }}
       GKE_CLUSTER_NAME: $GKE_CLUSTER
       GKE_DEPLOYER_KEY: ${{ secrets.NONPROD_GKE_SA_KEY }}
-      JOB_NAME: $JOB_ORIGINAL_NAME-api-internal
+      JOB_NAME: nimbus-service-api-internal
       ZONE: $GKE_ZONE
     steps:
       - uses: actions/checkout@v2
@@ -108,7 +108,7 @@ jobs:
       GCP_PROJECT_ID: ${{ secrets.NONPROD_GKE_PROJECT }}
       GKE_CLUSTER_NAME: $GKE_CLUSTER
       GKE_DEPLOYER_KEY: ${{ secrets.NONPROD_GKE_SA_KEY }}
-      JOB_NAME: $JOB_ORIGINAL_NAME-migration
+      JOB_NAME: nimbus-service-migration
       ZONE: $GKE_ZONE
     steps:
       - uses: actions/checkout@v2

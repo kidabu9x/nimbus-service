@@ -33,7 +33,7 @@ spec:
               protocol: TCP
           envFrom:
             - configMapRef:
-              name: nimbus-internal
+                name: nimbus-internal
       imagePullSecrets:
         - name: docker-image-pull-secret
 ---
