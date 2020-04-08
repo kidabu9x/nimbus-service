@@ -24,7 +24,7 @@ spec:
         - env:
             - name: ENVIRONMENT
               value: $ENVIRONMENT
-          image: asia.gcr.io/$GCP_PROJECT_ID/$REPO_NAME:$COMMIT_SHA
+          image: gcr.io/$GCP_PROJECT_ID/$REPO_NAME:$COMMIT_SHA
           imagePullPolicy: Always
           name: $REPO_NAME
           ports:
