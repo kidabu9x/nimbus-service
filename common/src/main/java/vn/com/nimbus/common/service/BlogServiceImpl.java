@@ -62,6 +62,15 @@ public class BlogServiceImpl implements BlogService {
         return Flux.fromStream(blogRepository.findAll().stream().map(this::buildBlogResponse));
     }
 
+    @Override
+    @Transactional(readOnly = true)
+    public Mono<BlogResponse> getBlog(Integer blogId) {
+        Optional<Blogs> blogOpt = blogRepository.findById(blogId);
+        if (!blogOpt.isPresent())
+            throw new AppException(AppExceptionCode.BLOG_NOT_FOUND);
+        return Mono.just(this.buildBlogResponse(blogOpt.get()));
+    }
+
     private BlogResponse buildBlogResponse(Blogs blog) {
         log.info("Build blog detail, blog id : {}", blog.getId());
         BlogResponse response = new BlogResponse();
@@ -109,6 +118,7 @@ public class BlogServiceImpl implements BlogService {
     }
 
     @Override
+    @Transactional
     public void deleteBlog(Integer blogId) {
         Optional<Blogs> blogOpt = blogRepository.findById(blogId);
         if (!blogOpt.isPresent())

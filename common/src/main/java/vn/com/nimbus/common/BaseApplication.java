@@ -9,6 +9,7 @@ public class BaseApplication {
     protected static void loadCommonConfig() {
         SetupConfig setupConfig = new SetupConfig();
         env = setupConfig.getEnv();
+        System.out.println(env);
         setupConfig.setupCommonConfig(env);
     }
 }

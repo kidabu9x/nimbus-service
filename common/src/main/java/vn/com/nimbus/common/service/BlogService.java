@@ -8,6 +8,8 @@ import vn.com.nimbus.common.model.response.BlogResponse;
 public interface BlogService {
     Flux<BlogResponse> getBlogs();
 
+    Mono<BlogResponse> getBlog(Integer blogId);
+
     Mono<BlogResponse> createBlog(Integer userId, CreateBlogRequest request);
 
     void deleteBlog(Integer blogId);

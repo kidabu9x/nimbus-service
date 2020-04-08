@@ -5,17 +5,25 @@ steps:
     args: ['package', '-DskipTests']
 
   - id: docker-build-migration
-    name: 'gcr.io/cloud-builders/docker'
-    args: ['build', '--tag=gcr.io/${_JOB_ID}/${_JOB_NAME}-migration:${_IMAGE_TAG}', 'common']
+    name: 'asia.gcr.io/cloud-builders/docker'
+    args: ['build', '--tag=asia.gcr.io/${_JOB_ID}/${_JOB_NAME}-migration:${_IMAGE_TAG}', 'common']
 
-  - id: docker-build-api-internal
-    name: 'gcr.io/cloud-builders/docker'
-    args: ['build', '--tag=gcr.io/${_JOB_ID}/${_JOB_NAME}-api-internal:${_IMAGE_TAG}', 'api-internal']
+  - id: docker-build-blog-internal
+    name: 'asia.gcr.io/cloud-builders/docker'
+    args: ['build', '--tag=asia.gcr.io/${_JOB_ID}/${_JOB_NAME}-blog-internal:${_IMAGE_TAG}', 'blog-internal']
+
+  - id: docker-build-auth
+    name: 'asia.gcr.io/cloud-builders/docker'
+    args: ['build', '--tag=asia.gcr.io/${_JOB_ID}/${_JOB_NAME}-auth:${_IMAGE_TAG}', 'auth']
 
   - id: docker-push-migration
-    name: 'gcr.io/cloud-builders/docker'
-    args: ["push", "gcr.io/${_JOB_ID}/${_JOB_NAME}-migration:${_IMAGE_TAG}"]
+    name: 'asia.gcr.io/cloud-builders/docker'
+    args: ["push", "asia.gcr.io/${_JOB_ID}/${_JOB_NAME}-migration:${_IMAGE_TAG}"]
 
-  - id: docker-push-api-internal
-    name: 'gcr.io/cloud-builders/docker'
-    args: ["push", "gcr.io/${_JOB_ID}/${_JOB_NAME}-api-internal:${_IMAGE_TAG}"]
+  - id: docker-push-blog-internal
+    name: 'asia.gcr.io/cloud-builders/docker'
+    args: ["push", "asia.gcr.io/${_JOB_ID}/${_JOB_NAME}-blog-internal:${_IMAGE_TAG}"]
+
+  - id: docker-push-auth
+    name: 'asia.gcr.io/cloud-builders/docker'
+    args: ["push", "asia.gcr.io/${_JOB_ID}/${_JOB_NAME}-auth:${_IMAGE_TAG}"]
