@@ -67,4 +67,4 @@ spec:
       targetPort: 8080
   selector:
     name: $JOB_NAME
-  type: NodePort
+  type: LoadBalancer
