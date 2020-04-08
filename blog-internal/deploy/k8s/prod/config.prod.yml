@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: nimbus-internal
+  name: blog-internal
 data:
   VERSION: $IMAGE_TAG
   JDBC_MASTER_URL:

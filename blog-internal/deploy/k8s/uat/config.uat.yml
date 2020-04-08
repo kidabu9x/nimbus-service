@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: nimbus-internal
+  name: blog-internal
 data:
   JDBC_MASTER_URL: jdbc:mysql://35.189.33.66/nimbus_service
   JDBC_MASTER_USERNAME: nimbus_uat
