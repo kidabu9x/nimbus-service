@@ -65,7 +65,7 @@ jobs:
           HOST: api-internal-uat.nimbus.com.vn
           SERVICE_PATH: /blog-internal
           GCP_PROJECT_ID: ${{ secrets.NONPROD_GKE_PROJECT }}
-          JOB_NAME: JOB_ORIGINAL_NAME-blog-internal
+          JOB_NAME: $JOB_ORIGINAL_NAME-blog-internal
           IMAGE_TAG: ${{ github.sha }}
         run: |-
           cd blog-internal/deploy/k8s/uat && bash deploy-uat.sh
@@ -76,7 +76,7 @@ jobs:
           HOST: auth.nimbus.com.vn
           SERVICE_PATH: /auth
           GCP_PROJECT_ID: ${{ secrets.NONPROD_GKE_PROJECT }}
-          JOB_NAME: JOB_ORIGINAL_NAME-auth
+          JOB_NAME: $JOB_ORIGINAL_NAME-auth
           IMAGE_TAG: ${{ github.sha }}
         run: |-
           cd auth/deploy/k8s/uat && bash deploy-uat.sh
@@ -85,7 +85,7 @@ jobs:
         env:
           ENVIRONMENT: uat
           GCP_PROJECT_ID: ${{ secrets.NONPROD_GKE_PROJECT }}
-          JOB_NAME: JOB_ORIGINAL_NAME-migration
+          JOB_NAME: $JOB_ORIGINAL_NAME-migration
           IMAGE_TAG: ${{ github.sha }}
         run: |-
           cd common/deploy/k8s/uat && bash deploy-uat.sh
