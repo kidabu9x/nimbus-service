@@ -77,4 +77,4 @@ spec:
       targetPort: 8080
   selector:
     name: $JOB_NAME
-  type: ClusterIP
+  type: NodePort
