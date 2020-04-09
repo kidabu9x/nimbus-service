@@ -3,6 +3,7 @@ kind: Ingress
 metadata:
   name: nimbus-ingress
   annotations:
+    kubernetes.io/ingress.class: nginx
     ingress.kubernetes.io/enable-cors: "true"
 spec:
   rules:
