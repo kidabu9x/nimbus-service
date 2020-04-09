@@ -87,7 +87,7 @@ spec:
       targetPort: 8080
   selector:
     name: $JOB_NAME
-  type: NodePort
+  type: ClusterIP
 ---
 apiVersion: extensions/v1beta1
 kind: Ingress
