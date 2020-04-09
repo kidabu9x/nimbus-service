@@ -18,7 +18,8 @@ kind: VirtualService
 metadata:
   name: $JOB_NAME
 spec:
-  gateways: $GATEWAY
+  gateways:
+    - $GATEWAY
   hosts:
     - "*"
   http:
