@@ -1,6 +1,8 @@
 package vn.com.nimbus.auth.controller;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -20,6 +22,11 @@ import javax.validation.Valid;
 public class AuthController extends AbstractController {
     @Resource
     private AuthService authService;
+
+    @GetMapping("/health-check")
+    public ResponseEntity healthCheck() {
+        return ResponseEntity.ok("healthy");
+    }
 
     @PostMapping("/register")
     public Mono<BaseResponse> register(@Valid @RequestBody RegisterRequest request) {

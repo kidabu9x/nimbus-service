@@ -30,5 +30,5 @@ spec:
         - destination:
             host: $JOB_NAME
             port:
-              number: 80
+              number: 8080
             weight: 100
