@@ -9,4 +9,4 @@ spec:
           - path: /*
             backend:
               serviceName: nimbus-auth
-              servicePort: 8080
+              servicePort: 80
