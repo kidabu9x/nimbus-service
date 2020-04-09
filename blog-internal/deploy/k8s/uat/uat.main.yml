@@ -34,6 +34,16 @@ spec:
           envFrom:
             - configMapRef:
                 name: blog-internal
+          livenessProbe:
+            initialDelaySeconds: 30
+            failureThreshold: 3
+            httpGet:
+              path: /v1/health-check
+              port: 8080
+              scheme: HTTP
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 10
       imagePullSecrets:
         - name: docker-image-pull-secret
 ---
@@ -67,4 +77,4 @@ spec:
       targetPort: 8080
   selector:
     name: $JOB_NAME
-  type: ClusterIP
+  type: NodePort
