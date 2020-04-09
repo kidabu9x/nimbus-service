@@ -76,7 +76,7 @@ jobs:
           JOB_NAME: nimbus-auth
           GATEWAY: nimbus-gateway
         run: |-
-          cd auth/deploy/k8s && kubectl apply -f virtualservice.yml -n uat
+          cd auth/deploy/k8s && bash deploy-virtual.sh
 
       - name: deploy blog internal to uat
         env:
