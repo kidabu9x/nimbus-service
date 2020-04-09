@@ -71,12 +71,9 @@ jobs:
         run: |-
           cd auth/deploy/k8s/uat && bash deploy-uat.sh
 
-      - name: deploy istio auth
-        env:
-          JOB_NAME: nimbus-auth
-          GATEWAY: nimbus-gateway
+      - name: expose
         run: |-
-          cd auth/deploy/k8s && bash deploy-virtual.sh
+          kubectl apply -f ingress.yml -n uat
 
       - name: deploy blog internal to uat
         env:
