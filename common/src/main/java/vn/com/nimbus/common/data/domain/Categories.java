@@ -45,8 +45,8 @@ public class Categories {
     @LastModifiedDate
     private LocalDateTime updatedAt;
 
-    @ManyToMany(fetch = FetchType.LAZY)
-    @JoinTable(name = "blog_category", joinColumns = @JoinColumn(name = "category_id"),
-            inverseJoinColumns = @JoinColumn(name = "blog_id"))
-    private Set<Blogs> blogs;
+//    @ManyToMany(fetch = FetchType.LAZY)
+//    @JoinTable(name = "blog_category", joinColumns = @JoinColumn(name = "category_id"),
+//            inverseJoinColumns = @JoinColumn(name = "blog_id"))
+//    private Set<Blogs> blogs;
 }

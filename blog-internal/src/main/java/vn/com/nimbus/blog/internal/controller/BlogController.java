@@ -22,7 +22,7 @@ import javax.validation.Valid;
 
 @RestController
 @RequestMapping("/v1/blogs")
-public class ApiController extends AbstractController {
+public class BlogController extends AbstractController {
     @Resource
     private BlogService blogService;
 

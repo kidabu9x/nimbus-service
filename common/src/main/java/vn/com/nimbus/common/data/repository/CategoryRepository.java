@@ -9,4 +9,8 @@ import java.util.List;
 @Repository
 public interface CategoryRepository extends JpaRepository<Categories, Integer> {
     List<Categories> findAllByIdIn(List<Integer> ids);
+
+    Categories findByTitle(String title);
+
+    Long countBySlugContains(String candidate);
 }

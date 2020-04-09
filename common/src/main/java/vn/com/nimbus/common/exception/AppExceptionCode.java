@@ -73,8 +73,10 @@ public class AppExceptionCode {
     public static final vn.com.nimbus.common.exception.AppExceptionCode BLOG_NOT_FOUND = newErrorCode(4041100, "Blog not found");
     public static final vn.com.nimbus.common.exception.AppExceptionCode USER_NOT_FOUND = newErrorCode(4041101, "User not found");
     public static final vn.com.nimbus.common.exception.AppExceptionCode BLOG_CONTENT_NOT_FOUND = newErrorCode(4041102, "Blog content not found");
+    public static final vn.com.nimbus.common.exception.AppExceptionCode CATEGORY_NOT_FOUND = newErrorCode(4041103, "Category not found");
 
     public static final vn.com.nimbus.common.exception.AppExceptionCode EMAIL_HAS_EXISTS = newErrorCode(4091100, "email already exists");
+    public static final vn.com.nimbus.common.exception.AppExceptionCode CATEGORY_HAS_EXISTS = newErrorCode(4091100, "category already exists");
 
 
     public static final vn.com.nimbus.common.exception.AppExceptionCode INTERNAL_SERVER_ERROR = newErrorCode(5001100, "Internal server error");
