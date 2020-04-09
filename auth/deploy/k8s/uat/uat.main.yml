@@ -38,7 +38,7 @@ spec:
             initialDelaySeconds: 30
             failureThreshold: 3
             httpGet:
-              path: /v1/health-check
+              path: /
               port: 8080
               scheme: HTTP
             periodSeconds: 10
