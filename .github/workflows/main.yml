@@ -91,6 +91,6 @@ jobs:
         run: |-
           cd common/deploy/k8s/uat && bash deploy-uat.sh
 
-      - name: expose
-        run: |-
-          kubectl apply -f ingress.yml -n uat
+#      - name: expose
+#        run: |-
+#          kubectl apply -f ingress.yml -n uat
