@@ -85,13 +85,3 @@ spec:
               serviceName: $JOB_NAME
               servicePort: 80
             path: $SERVICE_PATH
----
-apiVersion: networking.istio.io/v1alpha3
-kind: DestinationRule
-metadata:
-  name: $JOB_NAME
-spec:
-  host: $JOB_NAME
-  trafficPolicy:
-    tls:
-      mode: ISTIO_MUTUAL

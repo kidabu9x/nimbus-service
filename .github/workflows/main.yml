@@ -15,6 +15,7 @@ env:
   GKE_ZONE: asia-southeast1-b
   MAVEN_OPTS: "-Dmaven.repo.local=.m2"
   JOB_ORIGINAL_NAME: nimbus
+  GATEWAY: nimbus-gateway
 
 jobs:
   maven_build:
@@ -59,17 +60,6 @@ jobs:
           --config=cloudbuild.yml \
           --substitutions=_JOB_NAME=$JOB_ORIGINAL_NAME,_IMAGE_TAG=$GITHUB_SHA,_JOB_ID=${{ secrets.NONPROD_GKE_PROJECT }} \
 
-      - name: deploy blog internal to uat
-        env:
-          ENVIRONMENT: uat
-          HOST: api-internal-uat.nimbus.com.vn
-          SERVICE_PATH: /blog-internal
-          GCP_PROJECT_ID: ${{ secrets.NONPROD_GKE_PROJECT }}
-          JOB_NAME: nimbus-blog-internal
-          IMAGE_TAG: ${{ github.sha }}
-        run: |-
-          cd blog-internal/deploy/k8s/uat && bash deploy-uat.sh
-
       - name: deploy auth to uat
         env:
           ENVIRONMENT: uat
@@ -80,6 +70,24 @@ jobs:
           IMAGE_TAG: ${{ github.sha }}
         run: |-
           cd auth/deploy/k8s/uat && bash deploy-uat.sh
+
+      - name: deploy istio auth
+        env:
+          JOB_NAME: nimbus-auth
+          GATEWAY: $GATEWAY
+        run: |-
+          cd auth/deploy/k8s && kubectl apply -f virtualservice.yml -n uat
+
+      - name: deploy blog internal to uat
+        env:
+          ENVIRONMENT: uat
+          HOST: api-internal-uat.nimbus.com.vn
+          SERVICE_PATH: /blog-internal
+          GCP_PROJECT_ID: ${{ secrets.NONPROD_GKE_PROJECT }}
+          JOB_NAME: nimbus-blog-internal
+          IMAGE_TAG: ${{ github.sha }}
+        run: |-
+          cd blog-internal/deploy/k8s/uat && bash deploy-uat.sh
 
       - name: deploy migration to uat
         env:
