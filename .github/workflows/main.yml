@@ -63,7 +63,7 @@ jobs:
       - name: deploy auth to uat
         env:
           ENVIRONMENT: uat
-          HOST: auth.nimbus.com.vn
+          HOST: auth-uat.nimbus.com.vn
           SERVICE_PATH: /
           GCP_PROJECT_ID: ${{ secrets.NONPROD_GKE_PROJECT }}
           JOB_NAME: nimbus-auth
