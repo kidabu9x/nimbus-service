@@ -2,6 +2,8 @@ apiVersion: networking.k8s.io/v1beta1
 kind: Ingress
 metadata:
   name: nimbus-ingress
+  annotations:
+    kubernetes.io/ingress.class: nginx
 spec:
   rules:
     - host: auth-uat.nimbus.com.vn
