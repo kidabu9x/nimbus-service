@@ -75,7 +75,7 @@ jobs:
         env:
           ENVIRONMENT: uat
           HOST: api-internal-uat.nimbus.com.vn
-          SERVICE_PATH: /blog-internal
+          SERVICE_PATH: /
           GCP_PROJECT_ID: ${{ secrets.NONPROD_GKE_PROJECT }}
           JOB_NAME: nimbus-blog-internal
           IMAGE_TAG: ${{ github.sha }}
