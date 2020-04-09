@@ -4,12 +4,16 @@ metadata:
   name: nimbus-ingress
 spec:
   rules:
-    - http:
+    - host: auth-uat.nimbus.com.vn
+      http:
         paths:
           - path: /*
             backend:
               serviceName: nimbus-auth
               servicePort: 80
+    - host: api-internal-uat.nimbus.com.vn
+      http:
+        paths:
           - path: /blog-internal
             backend:
               serviceName: nimbus-blog-internal

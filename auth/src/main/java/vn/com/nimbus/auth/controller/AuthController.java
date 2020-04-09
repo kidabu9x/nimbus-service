@@ -23,11 +23,6 @@ public class AuthController extends AbstractController {
     @Resource
     private AuthService authService;
 
-    @GetMapping("/health-check")
-    public ResponseEntity healthCheck() {
-        return ResponseEntity.ok("healthy");
-    }
-
     @PostMapping("/register")
     public Mono<BaseResponse> register(@Valid @RequestBody RegisterRequest request) {
         return processBaseResponse(authService.register(request));
