@@ -16,7 +16,7 @@ spec:
     - host: api-internal-uat.nimbus.com.vn
       http:
         paths:
-          - path: /blog-internal
+          - path: /blog-internal/*
             backend:
               serviceName: nimbus-blog-internal
               servicePort: 80
