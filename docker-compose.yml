@@ -13,6 +13,19 @@ services:
     environment:
       ENVIRONMENT: docker
 
+  auth:
+    hostname: auth.local
+    container_name: nimbus-auth
+    ports:
+      - 48081:8080
+    build: auth
+    depends_on:
+      - mysql
+    env_file:
+      - .env
+    environment:
+      ENVIRONMENT: docker
+
   liquibase:
     build: common
     depends_on:
