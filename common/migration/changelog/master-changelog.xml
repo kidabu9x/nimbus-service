@@ -10,4 +10,9 @@
                  path="/sql/init.sql"/>
     </changeSet>
 
+    <changeSet id="2020_04_10_add_position_for_blog_content" author="duongnk" context="auto">
+        <sqlFile encoding="utf8" endDelimiter=";"
+                 path="/sql/2020_04_10_add_position_for_blog_content.sql"/>
+    </changeSet>
+
 </databaseChangeLog>
