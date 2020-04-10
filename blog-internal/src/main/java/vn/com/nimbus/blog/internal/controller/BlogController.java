@@ -14,6 +14,7 @@ import reactor.core.publisher.Mono;
 import vn.com.nimbus.common.controller.AbstractController;
 import vn.com.nimbus.common.model.constant.KeyConstant;
 import vn.com.nimbus.common.model.request.CreateBlogRequest;
+import vn.com.nimbus.common.model.request.UpdateBlogRequest;
 import vn.com.nimbus.common.model.response.BaseResponse;
 import vn.com.nimbus.common.service.BlogService;
 
@@ -41,16 +42,18 @@ public class BlogController extends AbstractController {
         HttpHeaders headers = currentResponse.getHeaders();
         String userId = headers.getFirst(KeyConstant.X_USER_ID);
         assert userId != null;
-        return processBaseResponse(blogService.createBlog(Integer.valueOf(userId), request));
+        request.setUserId(Integer.valueOf(userId));
+        return processBaseResponse(blogService.createBlog(request));
     }
 
     @PutMapping("/{blogId}")
-    public Mono<BaseResponse> updateBlog(ServerHttpResponse currentResponse, @Valid @RequestBody CreateBlogRequest request, @PathVariable("blogId") Integer blogId) {
+    public Mono<BaseResponse> updateBlog(ServerHttpResponse currentResponse, @Valid @RequestBody UpdateBlogRequest request, @PathVariable("blogId") Integer blogId) {
         HttpHeaders headers = currentResponse.getHeaders();
         String userId = headers.getFirst(KeyConstant.X_USER_ID);
         request.setId(blogId);
         assert userId != null;
-        blogService.createBlog(Integer.valueOf(userId), request);
+        request.setUserId(Integer.valueOf(userId));
+        blogService.updateBlog(request);
         return processBaseResponse();
     }
 

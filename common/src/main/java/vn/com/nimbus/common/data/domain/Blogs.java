@@ -60,13 +60,11 @@ public class Blogs {
     @LastModifiedDate
     private LocalDateTime updatedAt;
 
-    @OneToMany(mappedBy = "blog", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "blog", fetch = FetchType.EAGER)
     private Set<BlogContents> contents;
 
-    @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
-    @JoinTable(name = "blog_tag", joinColumns = @JoinColumn(name = "blog_id"),
-            inverseJoinColumns = @JoinColumn(name = "tag_id"))
-    private Set<Tags> tags;
+    @OneToMany(mappedBy = "blog", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    private Set<BlogTag> tags;
 
     @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     @JoinTable(name = "blog_category", joinColumns = @JoinColumn(name = "blog_id"),

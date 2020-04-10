@@ -45,6 +45,8 @@ public class Tags {
     @LastModifiedDate
     private LocalDateTime updatedAt;
 
+
+
 //    @ManyToMany(fetch = FetchType.LAZY)
 //    @JoinTable(name = "blog_tag", joinColumns = @JoinColumn(name = "tag_id"),
 //        inverseJoinColumns = @JoinColumn(name = "blog_id"))

@@ -13,4 +13,6 @@ public interface CategoryRepository extends JpaRepository<Categories, Integer> {
     Categories findByTitle(String title);
 
     Long countBySlugContains(String candidate);
+
+    List<Categories> findAllByOrderByCreatedAt();
 }

@@ -1,13 +1,18 @@
 package vn.com.nimbus.common.service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.PropertyNamingStrategy;
 import com.github.slugify.Slugify;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import vn.com.nimbus.common.data.domain.BlogContents;
+import vn.com.nimbus.common.data.domain.BlogTag;
 import vn.com.nimbus.common.data.domain.Blogs;
 import vn.com.nimbus.common.data.domain.Categories;
 import vn.com.nimbus.common.data.domain.Tags;
@@ -21,13 +26,17 @@ import vn.com.nimbus.common.data.repository.TagRepository;
 import vn.com.nimbus.common.data.repository.UserRepository;
 import vn.com.nimbus.common.exception.AppException;
 import vn.com.nimbus.common.exception.AppExceptionCode;
+import vn.com.nimbus.common.model.extra.BlogExtraData;
 import vn.com.nimbus.common.model.request.CreateBlogRequest;
+import vn.com.nimbus.common.model.request.UpdateBlogRequest;
 import vn.com.nimbus.common.model.response.BlogResponse;
 
 import javax.annotation.Resource;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -43,16 +52,16 @@ public class BlogServiceImpl implements BlogService {
     private BlogRepository blogRepository;
 
     @Resource
-    private BlogContentRepository blogContentRepository;
-
-    @Resource
-    private TagRepository tagRepository;
-
-    @Resource
     private UserRepository userRepository;
 
     @Resource
     private CategoryRepository categoryRepository;
+
+    @Resource
+    private TagService tagService;
+
+    @Resource
+    private BlogContentService blogContentService;
 
     private final Slugify slugify = new Slugify();
 
@@ -79,33 +88,35 @@ public class BlogServiceImpl implements BlogService {
         response.setSlug(blog.getSlug());
         response.setUpdatedAt(this.formatLocalDateTime(blog.getUpdatedAt()));
 
-        List<BlogResponse.Author> authors = blog.getAuthors().stream()
-                .map(a -> {
-                    BlogResponse.Author author = new BlogResponse.Author();
-                    author.setId(a.getId());
-                    author.setFirstName(a.getFirstName());
-                    author.setLastName(a.getLastName());
-                    author.setEmail(a.getEmail());
-                    author.setAvatar(a.getAvatar());
-                    return author;
-                })
-                .collect(Collectors.toList());
-        response.setAuthors(authors);
-
         List<BlogResponse.Content> contents = blog.getContents()
                 .stream()
+                .sorted(Comparator.comparing(BlogContents::getPosition))
                 .map(b -> {
                     BlogResponse.Content content = new BlogResponse.Content();
                     content.setId(b.getId());
                     content.setContent(b.getContent());
                     content.setType(b.getType());
+                    content.setPosition(b.getPosition());
                     return content;
                 })
                 .collect(Collectors.toList());
         response.setContents(contents);
 
-        List<String> tags = blog.getTags() != null ? blog.getTags().stream().map(Tags::getTitle).collect(Collectors.toList()) : new ArrayList<>();
+        List<String> tags = blog.getTags() != null ? blog.getTags().stream().map(t -> t.getTag().getTitle()).collect(Collectors.toList()) : new ArrayList<>();
         response.setTags(tags);
+
+        BlogExtraData extraData;
+        if (blog.getExtraData() != null) {
+            JsonParseService<BlogExtraData> jsonParseService = new JsonParseService<>();
+            extraData = jsonParseService.toEntityData(blog.getExtraData(), BlogExtraData.class);
+            if (StringUtils.isEmpty(extraData.getFacebookPixelId())) {
+                extraData.setFacebookPixelId("");
+            }
+        } else {
+            extraData = new BlogExtraData();
+            extraData.setFacebookPixelId("");
+        }
+        response.setExtraData(extraData);
 
         return response;
     }
@@ -129,18 +140,24 @@ public class BlogServiceImpl implements BlogService {
 
     @Override
     @Transactional
-    public Mono<BlogResponse> createBlog(Integer userId, CreateBlogRequest request) {
+    public Mono<BlogResponse> createBlog(CreateBlogRequest request) {
         Blogs blog = new Blogs();
-        boolean isExist = false;
-        if (request.getId() != null) {
-            Optional<Blogs> blogOpt = blogRepository.findById(request.getId());
-            if (!blogOpt.isPresent())
-                throw new AppException(AppExceptionCode.BLOG_NOT_FOUND);
-            blog = blogOpt.get();
-            isExist = true;
-        }
+        this.saveBlog(blog, request);
+        return this.getBlog(blog.getId());
+    }
 
-        Optional<Users> userOpt = userRepository.findById(userId);
+    @Override
+    @Transactional
+    public void updateBlog(UpdateBlogRequest request) {
+        Optional<Blogs> blogOpt = blogRepository.findById(request.getId());
+        if (!blogOpt.isPresent())
+            throw new AppException(AppExceptionCode.BLOG_NOT_FOUND);
+        Blogs blog = blogOpt.get();
+        this.saveBlog(blog, request);
+    }
+
+    private void saveBlog(Blogs blog, CreateBlogRequest request) {
+        Optional<Users> userOpt = userRepository.findById(request.getUserId());
         if (!userOpt.isPresent())
             throw new AppException(AppExceptionCode.USER_NOT_FOUND);
 
@@ -155,13 +172,25 @@ public class BlogServiceImpl implements BlogService {
         if (StringUtils.isEmpty(blog.getSlug())) {
             blog.setSlug(this.generateSlug(blog.getTitle()));
         }
+        if (request.getExtraData() != null) {
+            try {
+                BlogExtraData extraData = new BlogExtraData();
+                extraData.setFacebookPixelId(request.getExtraData().getFacebookPixelId());
+                ObjectMapper mapper = new ObjectMapper();
+                mapper.setPropertyNamingStrategy(PropertyNamingStrategy.SNAKE_CASE);
+                String extraDataStr = mapper.writeValueAsString(extraData);
+                blog.setExtraData(extraDataStr);
+            } catch (JsonProcessingException e) {
+                log.error("Fail to parse blog extra data: {}", request.getExtraData());
+                throw new AppException(AppExceptionCode.INTERNAL_SERVER_ERROR);
+            }
+
+        }
         blog = blogRepository.save(blog);
-        this.saveContent(blog, request.getContents());
-        this.saveAuthors(userOpt.get(), blog, isExist);
-        this.saveTags(blog, request.getTags());
+        blogContentService.saveContents(blog, request.getContents());
+        tagService.saveTags(blog, request.getTags());
+        this.saveAuthors(userOpt.get(), blog);
         this.saveCategories(request, blog);
-        blog = blogRepository.save(blog);
-        return Mono.just(this.buildBlogResponse(blog));
     }
 
     private void saveCategories(CreateBlogRequest request, Blogs blog) {
@@ -172,8 +201,8 @@ public class BlogServiceImpl implements BlogService {
         blog.setCategories(categories);
     }
 
-    private void saveAuthors(Users user, Blogs blog, boolean isExist) {
-        Set<Users> users = isExist ? blog.getAuthors() : new HashSet<>();
+    private void saveAuthors(Users user, Blogs blog) {
+        Set<Users> users = !CollectionUtils.isEmpty(blog.getAuthors()) ? blog.getAuthors() : new HashSet<>();
         boolean isAuthor = users.stream().anyMatch(u -> u.getId().equals(user.getId()));
         if (!isAuthor)
             users.add(user);
@@ -189,64 +218,4 @@ public class BlogServiceImpl implements BlogService {
         return slug;
     }
 
-    private void saveContent(Blogs blog, List<CreateBlogRequest.Content> reqContents) {
-        List<BlogContents> contents = new ArrayList<>();
-        for (CreateBlogRequest.Content reqContent: reqContents) {
-            BlogContents content;
-            boolean isExist = false;
-            if (reqContent.getId() != null) {
-                content = blogContentRepository.findByIdAndBlogId(reqContent.getId(), blog.getId());
-                if (content == null) {
-                    throw new AppException(AppExceptionCode.BLOG_CONTENT_NOT_FOUND);
-                }
-                isExist = true;
-            } else {
-                content = new BlogContents();
-            }
-            content.setBlogId(blog.getId());
-            content.setContent(reqContent.getContent());
-            try {
-                if (!isExist)
-                    content.setType(BlogContentType.valueOf(reqContent.getType()));
-            } catch (IllegalArgumentException e) {
-                log.warn("Client passing illegal content type");
-                throw new AppException(AppExceptionCode.UNSUPPORTED_CONTENT_TYPE);
-            }
-            contents.add(content);
-        }
-        blog.setContents(new HashSet<>(blogContentRepository.saveAll(contents)));
-    }
-
-    private void saveTags(Blogs blog, List<String> tagStrs) {
-        Set<Tags> tags = new HashSet<>();
-        if (tagStrs == null)
-            return;
-
-        Map<String, Integer> tagCount = new HashMap<>();
-
-        for (String tagStr: tagStrs) {
-            tagStr = tagStr.trim();
-            String slug = slugify.slugify(tagStr);
-            if (tagCount.containsKey(slug))
-                tagCount.put(slug, tagCount.get(slug) + 1);
-            else
-                tagCount.put(slug, 0);
-
-            String tempSlug = tagCount.get(slug) > 0 ? slug.concat("-").concat(Integer.toString(tagCount.get(slug))) : slug;
-            Tags tag = tagRepository.findByTitleAndSlug(tagStr, tempSlug);
-            if (tag != null) {
-                tag.setUpdatedAt(LocalDateTime.now());
-            } else {
-                tag = new Tags();
-                Integer count = tagRepository.countBySlugContains(slug);
-                Integer requestCount = tagCount.get(slug);
-                if ((count + requestCount) > 0)
-                    slug = slug.concat("-").concat(Integer.toString(count + requestCount));
-                tag.setTitle(tagStr);
-                tag.setSlug(slug);
-            }
-            tags.add(tag);
-        }
-        blog.setTags(new HashSet<>(tagRepository.saveAll(tags)));
-    }
 }

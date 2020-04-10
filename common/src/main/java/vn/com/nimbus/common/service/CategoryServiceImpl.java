@@ -1,6 +1,7 @@
 package vn.com.nimbus.common.service;
 
 import com.github.slugify.Slugify;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import reactor.core.publisher.Flux;
@@ -17,6 +18,7 @@ import javax.annotation.Resource;
 import java.util.Optional;
 
 @Service
+@Slf4j
 public class CategoryServiceImpl implements CategoryService {
     @Resource
     private CategoryRepository categoryRepository;
@@ -26,15 +28,17 @@ public class CategoryServiceImpl implements CategoryService {
     @Override
     @Transactional(readOnly = true)
     public Flux<CategoryResponse> getCategories() {
-        return Flux.fromStream(categoryRepository.findAll().stream().map(this::buildResponse));
+        return Flux.fromStream(categoryRepository.findAllByOrderByCreatedAt().stream().map(this::buildResponse));
     }
 
     @Override
     @Transactional(readOnly = true)
     public Mono<CategoryResponse> getCategory(Integer categoryId) {
         Optional<Categories> opt = categoryRepository.findById(categoryId);
-        if (!opt.isPresent())
+        if (!opt.isPresent()) {
+            log.warn("Category not found, id : {}", categoryId);
             throw new AppException(AppExceptionCode.CATEGORY_NOT_FOUND);
+        }
 
         return Mono.just(this.buildResponse(opt.get()));
     }
@@ -68,8 +72,10 @@ public class CategoryServiceImpl implements CategoryService {
         String title = request.getTitle().trim();
 
         Optional<Categories> opt = categoryRepository.findById(id);
-        if (!opt.isPresent())
+        if (!opt.isPresent()) {
+            log.warn("Category not found, id : {}", id);
             throw new AppException(AppExceptionCode.CATEGORY_NOT_FOUND);
+        }
 
         Categories category = opt.get();
         category.setTitle(title);
@@ -81,8 +87,10 @@ public class CategoryServiceImpl implements CategoryService {
     @Transactional
     public void deleteCategory(Integer id) {
         Optional<Categories> opt = categoryRepository.findById(id);
-        if (!opt.isPresent())
+        if (!opt.isPresent()) {
+            log.warn("Category not found, id : {}", id);
             throw new AppException(AppExceptionCode.CATEGORY_NOT_FOUND);
+        }
 
         categoryRepository.delete(opt.get());
     }

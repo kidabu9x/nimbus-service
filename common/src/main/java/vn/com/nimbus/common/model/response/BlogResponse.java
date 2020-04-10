@@ -4,6 +4,7 @@ import lombok.Getter;
 import lombok.Setter;
 import vn.com.nimbus.common.data.domain.constant.BlogContentType;
 import vn.com.nimbus.common.data.domain.constant.BlogStatus;
+import vn.com.nimbus.common.model.extra.BlogExtraData;
 
 import java.util.List;
 
@@ -19,12 +20,15 @@ public class BlogResponse {
     private List<Author> authors;
     private String updatedAt;
 
+    private BlogExtraData extraData;
+
     @Setter
     @Getter
     public static class Content {
         private Integer id;
         private String content;
         private BlogContentType type;
+        private Integer position;
     }
 
     @Setter

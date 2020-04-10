@@ -40,4 +40,7 @@ public class BlogContents {
 
     @Column(name = "content")
     private String content;
+
+    @Column(name = "position")
+    private Integer position;
 }
