@@ -42,6 +42,9 @@ public class Blogs {
     @Column(name = "slug", unique = true)
     private String slug;
 
+    @Column(name = "description")
+    private String description;
+
     @Column(name = "status")
     @Enumerated(EnumType.STRING)
     private BlogStatus status;
@@ -66,10 +69,8 @@ public class Blogs {
     @OneToMany(mappedBy = "blog", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     private Set<BlogTag> tags;
 
-    @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
-    @JoinTable(name = "blog_category", joinColumns = @JoinColumn(name = "blog_id"),
-            inverseJoinColumns = @JoinColumn(name = "category_id"))
-    private Set<Categories> categories;
+    @OneToMany(mappedBy = "blog", fetch = FetchType.EAGER)
+    private Set<BlogCategory> categories;
 
     @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     @JoinTable(name = "blog_user", joinColumns = @JoinColumn(name = "blog_id"),

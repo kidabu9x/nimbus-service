@@ -2,9 +2,14 @@ package vn.com.nimbus.common.service;
 
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import vn.com.nimbus.common.data.domain.Blogs;
+import vn.com.nimbus.common.data.domain.Categories;
+import vn.com.nimbus.common.model.request.CreateBlogRequest;
 import vn.com.nimbus.common.model.request.CreateCategoryRequest;
 import vn.com.nimbus.common.model.request.UpdateCategoryRequest;
 import vn.com.nimbus.common.model.response.CategoryResponse;
+
+import java.util.List;
 
 public interface CategoryService {
     Flux<CategoryResponse> getCategories();
@@ -16,5 +21,7 @@ public interface CategoryService {
     void updateCategory(UpdateCategoryRequest request);
 
     void deleteCategory(Integer id);
+
+    List<Categories> updateBlogCategories(Blogs blog, List<CreateBlogRequest.Category> categories);
 
 }

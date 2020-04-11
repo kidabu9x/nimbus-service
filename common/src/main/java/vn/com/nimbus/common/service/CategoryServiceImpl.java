@@ -6,22 +6,37 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import vn.com.nimbus.common.data.domain.BlogCategory;
+import vn.com.nimbus.common.data.domain.BlogCategoryID;
+import vn.com.nimbus.common.data.domain.BlogTag;
+import vn.com.nimbus.common.data.domain.BlogTagID;
+import vn.com.nimbus.common.data.domain.Blogs;
 import vn.com.nimbus.common.data.domain.Categories;
+import vn.com.nimbus.common.data.domain.Tags;
+import vn.com.nimbus.common.data.repository.BlogCategoryRepository;
 import vn.com.nimbus.common.data.repository.CategoryRepository;
 import vn.com.nimbus.common.exception.AppException;
 import vn.com.nimbus.common.exception.AppExceptionCode;
+import vn.com.nimbus.common.model.request.CreateBlogRequest;
 import vn.com.nimbus.common.model.request.CreateCategoryRequest;
 import vn.com.nimbus.common.model.request.UpdateCategoryRequest;
 import vn.com.nimbus.common.model.response.CategoryResponse;
 
 import javax.annotation.Resource;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Service
 @Slf4j
 public class CategoryServiceImpl implements CategoryService {
     @Resource
     private CategoryRepository categoryRepository;
+
+    @Resource
+    private BlogCategoryRepository blogCategoryRepository;
 
     private final Slugify slugify = new Slugify();
 
@@ -102,5 +117,41 @@ public class CategoryServiceImpl implements CategoryService {
         response.setTitle(category.getTitle());
         response.setTotalBlogs(0L);
         return response;
+    }
+
+    @Override
+    @Transactional
+    public List<Categories> updateBlogCategories(Blogs blog, List<CreateBlogRequest.Category> categories) {
+        Integer blogId = blog.getId();
+        List<BlogCategory> linked = blogCategoryRepository.findByBlogId(blogId);
+        List<Integer> linkedIds = linked.stream().map(l -> l.getId().getCategoryId()).collect(Collectors.toList());
+        List<Integer> requestIds = categories.stream().map(CreateBlogRequest.Category::getId).collect(Collectors.toList());
+
+        List<BlogCategory> newLinked = requestIds.stream().filter(t -> !linkedIds.contains(t))
+                .map(t -> {
+                    BlogCategoryID id = new BlogCategoryID();
+                    id.setBlogId(blogId);
+                    id.setCategoryId(t);
+                    BlogCategory link = new BlogCategory();
+                    link.setId(id);
+                    return link;
+                })
+                .collect(Collectors.toList());
+        blogCategoryRepository.saveAll(newLinked);
+
+        List<BlogCategory> oldLinked = linkedIds.stream().filter(t -> !requestIds.contains(t))
+                .map(t -> {
+                    BlogCategoryID id = new BlogCategoryID();
+                    id.setBlogId(blogId);
+                    id.setCategoryId(t);
+                    BlogCategory link = new BlogCategory();
+                    link.setId(id);
+                    return link;
+                })
+                .collect(Collectors.toList());
+        blogCategoryRepository.deleteAll(oldLinked);
+
+
+        return new ArrayList<>();
     }
 }

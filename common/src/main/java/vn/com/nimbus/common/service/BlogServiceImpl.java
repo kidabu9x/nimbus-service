@@ -63,6 +63,9 @@ public class BlogServiceImpl implements BlogService {
     @Resource
     private BlogContentService blogContentService;
 
+    @Resource
+    private CategoryService categoryService;
+
     private final Slugify slugify = new Slugify();
 
     @Override
@@ -86,7 +89,9 @@ public class BlogServiceImpl implements BlogService {
         response.setId(blog.getId());
         response.setTitle(blog.getTitle());
         response.setSlug(blog.getSlug());
+        response.setDescription(blog.getDescription());
         response.setUpdatedAt(this.formatLocalDateTime(blog.getUpdatedAt()));
+        response.setStatus(blog.getStatus());
 
         List<BlogResponse.Content> contents = blog.getContents()
                 .stream()
@@ -101,6 +106,17 @@ public class BlogServiceImpl implements BlogService {
                 })
                 .collect(Collectors.toList());
         response.setContents(contents);
+
+        List<BlogResponse.Category> categories = blog.getCategories()
+                .stream()
+                .map(c -> {
+                    BlogResponse.Category category = new BlogResponse.Category();
+                    category.setId(category.getId());
+                    category.setTitle(category.getTitle());
+                    return category;
+                })
+                .collect(Collectors.toList());
+        response.setCategories(categories);
 
         List<String> tags = blog.getTags() != null ? blog.getTags().stream().map(t -> t.getTag().getTitle()).collect(Collectors.toList()) : new ArrayList<>();
         response.setTags(tags);
@@ -169,6 +185,8 @@ public class BlogServiceImpl implements BlogService {
         }
         blog.setTitle(request.getTitle());
         blog.setThumbnail(request.getThumbnail());
+        blog.setDescription(request.getDescription());
+
         if (StringUtils.isEmpty(blog.getSlug())) {
             blog.setSlug(this.generateSlug(blog.getTitle()));
         }
@@ -189,17 +207,17 @@ public class BlogServiceImpl implements BlogService {
         blog = blogRepository.save(blog);
         blogContentService.saveContents(blog, request.getContents());
         tagService.saveTags(blog, request.getTags());
+        categoryService.updateBlogCategories(blog, request.getCategories());
         this.saveAuthors(userOpt.get(), blog);
-        this.saveCategories(request, blog);
     }
-
-    private void saveCategories(CreateBlogRequest request, Blogs blog) {
-        if (request.getCategoryIds() == null)
-            return;
-
-        Set<Categories> categories = new HashSet<>(categoryRepository.findAllByIdIn(request.getCategoryIds()));
-        blog.setCategories(categories);
-    }
+//
+//    private void saveCategories(CreateBlogRequest request, Blogs blog) {
+//        if (request.getCategoryIds() == null)
+//            return;
+//
+//        Set<Categories> categories = new HashSet<>(categoryRepository.findAllByIdIn(request.getCategoryIds()));
+////        blog.setCategories(categories);
+//    }
 
     private void saveAuthors(Users user, Blogs blog) {
         Set<Users> users = !CollectionUtils.isEmpty(blog.getAuthors()) ? blog.getAuthors() : new HashSet<>();

@@ -13,6 +13,8 @@ import java.util.List;
 public class CreateBlogRequest {
     private Integer userId;
 
+    private String description;
+
     @NotEmpty
     @Size(min = 1, max=255)
     private String title;
@@ -22,6 +24,9 @@ public class CreateBlogRequest {
     private List<String> tags;
 
     private String status;
+
+    @Valid
+    private List<Category> categories;
 
     @Valid
     @NotEmpty
@@ -44,5 +49,12 @@ public class CreateBlogRequest {
     @Getter
     public static class ExtraData {
         private String facebookPixelId;
+    }
+
+    @Setter
+    @Getter
+    public static class Category {
+        private Integer id;
+        private String title;
     }
 }

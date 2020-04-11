@@ -18,7 +18,9 @@ public class BlogResponse {
     private List<Content> contents;
     private List<String> tags;
     private List<Author> authors;
+    private List<Category> categories;
     private String updatedAt;
+    private String description;
 
     private BlogExtraData extraData;
 
@@ -39,5 +41,12 @@ public class BlogResponse {
         private String firstName;
         private String lastName;
         private String avatar;
+    }
+
+    @Setter
+    @Getter
+    public static class Category {
+        private Integer id;
+        private String title;
     }
 }

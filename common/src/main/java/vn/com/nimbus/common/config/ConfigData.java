@@ -3,11 +3,14 @@ package vn.com.nimbus.common.config;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.List;
+
 @Getter
 @Setter
 public class ConfigData {
     private DBConnection dbConnection;
     private SignatureInfo signatureInfo;
+    private CloudinaryConfig cloudinaryConfig;
 
     @Getter
     @Setter
@@ -33,5 +36,15 @@ public class ConfigData {
     public static class SignatureInfo {
         private String privateKey;
         private String publicKey;
+    }
+
+    @Setter
+    @Getter
+    public static class CloudinaryConfig {
+        private String cloudName;
+        private String apiKey;
+        private String apiSecret;
+        private String folder;
+        private List<String> supportedFileFormats;
     }
 }

@@ -59,6 +59,8 @@ public class AppExceptionCode {
     public static final vn.com.nimbus.common.exception.AppExceptionCode BLOG_TITLE_TOO_LONG = newErrorCode(4001103, "Blog title is too long. Must be shorter than 255 characters");
     public static final vn.com.nimbus.common.exception.AppExceptionCode UNSUPPORTED_CONTENT_TYPE = newErrorCode(4001103, "Content type is unsupported");
     public static final vn.com.nimbus.common.exception.AppExceptionCode UNSUPPORTED_BLOG_STATUS = newErrorCode(4001103, "Content type is unsupported");
+    public static final vn.com.nimbus.common.exception.AppExceptionCode FILE_UPLOADING_IS_EMPTY = newErrorCode(4001100, "File cannot be empty");
+    public static final vn.com.nimbus.common.exception.AppExceptionCode UNSUPPORTED_IMAGE_FORMAT = newErrorCode(4001100, "Unsupported image format. Try again with following: '.png', '.jpg'");
 
 
     public static final vn.com.nimbus.common.exception.AppExceptionCode UN_AUTHORIZED = newErrorCode(4011100, "Unauthorized");
@@ -80,6 +82,8 @@ public class AppExceptionCode {
 
 
     public static final vn.com.nimbus.common.exception.AppExceptionCode INTERNAL_SERVER_ERROR = newErrorCode(5001100, "Internal server error");
+    public static final vn.com.nimbus.common.exception.AppExceptionCode FAIL_TO_CONVERT_FILE = newErrorCode(5001101, "Internal server error. Failed to convert file");
+    public static final vn.com.nimbus.common.exception.AppExceptionCode FAIL_TO_UPLOAD_IMAGE = newErrorCode(5001102, "Fail to upload image");
 
     public int getHttpStatusCode() {
         if (this.parentErrorCode >= 1000000)

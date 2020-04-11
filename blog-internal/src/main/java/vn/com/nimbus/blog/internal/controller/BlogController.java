@@ -2,6 +2,7 @@ package vn.com.nimbus.blog.internal.controller;
 
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.server.reactive.ServerHttpResponse;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -23,6 +24,7 @@ import javax.validation.Valid;
 
 @RestController
 @RequestMapping("/v1/blogs")
+@CrossOrigin
 public class BlogController extends AbstractController {
     @Resource
     private BlogService blogService;
