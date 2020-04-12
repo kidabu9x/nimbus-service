@@ -13,11 +13,24 @@ services:
     environment:
       ENVIRONMENT: docker
 
+  blog-public:
+    hostname: blog-public.local
+    container_name: blog-public
+    ports:
+      - 48081:8080
+    build: blog-public
+    depends_on:
+      - mysql
+    env_file:
+      - .env
+    environment:
+      ENVIRONMENT: docker
+
   auth:
     hostname: auth.local
     container_name: nimbus-auth
     ports:
-      - 48081:8080
+      - 48082:8080
     build: auth
     depends_on:
       - mysql
