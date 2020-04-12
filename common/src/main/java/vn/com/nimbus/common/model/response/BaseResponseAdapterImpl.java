@@ -13,7 +13,7 @@ import java.util.Collections;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
-public class BaseResponseAdapterImpl implements BaseResponseAdapter{
+public class BaseResponseAdapterImpl implements BaseResponseAdapter {
     private Object singleObject;
     private Collection items;
     private Pageable pageable;
@@ -42,6 +42,12 @@ public class BaseResponseAdapterImpl implements BaseResponseAdapter{
         this.items = items;
         this.limitOffsetPageable = pageable;
         this.singleResponse = false;
+    }
+
+    public BaseResponseAdapterImpl(Object item, LimitOffsetPageable pageable) {
+        this.singleObject = item;
+        this.singleResponse = true;
+        this.limitOffsetPageable = pageable;
     }
 
     public BaseResponseAdapterImpl(AppException throwable) {
@@ -98,9 +104,16 @@ public class BaseResponseAdapterImpl implements BaseResponseAdapter{
             // if the response is single response
             if (singleResponse) {
                 response.setData(singleObject);
-                BaseResponse.Meta meta = new BaseResponse.Meta.MetaBuilder()
-                        .code(200)
-                        .build();
+                BaseResponse.Meta.MetaBuilder metaBuilder = new BaseResponse.Meta.MetaBuilder()
+                        .code(200);
+                // if it use limit-offset pageable
+                if (Objects.nonNull(limitOffsetPageable)) {
+                    metaBuilder.limit(limitOffsetPageable.getLimit())
+                            .offset(limitOffsetPageable.getOffset())
+                            .total(limitOffsetPageable.getTotal());
+                }
+
+                BaseResponse.Meta meta = metaBuilder.build();
                 response.setMeta(meta);
             } else {// if the response is array response
                 response.setData(items);

@@ -9,6 +9,7 @@ import java.util.List;
 @Data
 public class Paging<T> implements Serializable {
 
+    private T item;
     private List<T> items;
     private Pageable pageable;
     private LimitOffsetPageable limitOffsetPageable;
@@ -31,5 +32,10 @@ public class Paging<T> implements Serializable {
     public Paging(List<T> items, LimitOffsetPageable pageable) {
         this(pageable);
         this.items = items;
+    }
+
+    public Paging(T item, LimitOffsetPageable pageable) {
+        this(pageable);
+        this.item = item;
     }
 }

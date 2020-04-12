@@ -16,9 +16,17 @@ public abstract class AbstractController {
                 return Mono.just(responseAdapter.getBaseResponse());
             } else if (data instanceof Paging) {
                 Paging paging = (Paging) data;
-                BaseResponseAdapter responseAdapter = Objects.nonNull(paging.getPageable()) ?
-                        new BaseResponseAdapterImpl(paging.getItems(), paging.getPageable()) :
-                        new BaseResponseAdapterImpl(paging.getItems(), paging.getLimitOffsetPageable());
+                BaseResponseAdapter responseAdapter;
+                if (Objects.nonNull(paging.getPageable())) {
+                    responseAdapter = new BaseResponseAdapterImpl(paging.getItems(), paging.getPageable());
+                } else {
+                    if (paging.getItem() != null) {
+                        responseAdapter = new BaseResponseAdapterImpl(paging.getItem(), paging.getLimitOffsetPageable());
+                    } else {
+                        responseAdapter = new BaseResponseAdapterImpl(paging.getItems(), paging.getLimitOffsetPageable());
+                    }
+                }
+
                 return Mono.just(responseAdapter.getBaseResponse());
             } else {
                 BaseResponseAdapter responseAdapter = new BaseResponseAdapterImpl(data);
@@ -30,5 +38,10 @@ public abstract class AbstractController {
     protected <T> Mono<BaseResponse> processBaseResponse() {
         BaseResponseAdapter responseAdapter = new BaseResponseAdapterImpl();
         return Mono.just(responseAdapter.getBaseResponse());
+    }
+
+    protected static boolean isArray(Object obj)
+    {
+        return obj!=null && obj.getClass().isArray();
     }
 }

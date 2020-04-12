@@ -7,19 +7,16 @@ import com.github.slugify.Slugify;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
-import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import vn.com.nimbus.common.data.domain.BlogContents;
 import vn.com.nimbus.common.data.domain.Blogs;
 import vn.com.nimbus.common.data.domain.Users;
 import vn.com.nimbus.common.data.domain.constant.BlogStatus;
 import vn.com.nimbus.common.data.repository.BlogRepository;
-import vn.com.nimbus.common.data.repository.CategoryRepository;
 import vn.com.nimbus.common.data.repository.UserRepository;
 import vn.com.nimbus.common.exception.AppException;
 import vn.com.nimbus.common.exception.AppExceptionCode;
@@ -58,6 +55,9 @@ public class BlogServiceImpl implements BlogService {
 
     @Resource
     private CategoryService categoryService;
+
+    @Resource
+    private BlogViewService blogViewService;
 
     private final Slugify slugify = new Slugify();
 
@@ -160,6 +160,7 @@ public class BlogServiceImpl implements BlogService {
         blogContentService.deleteContents(new ArrayList<>(blogOpt.get().getContents()));
         tagService.deleteRelation(new ArrayList<>(blog.getTags()));
         categoryService.deleteRelation(new ArrayList<>(blog.getCategories()));
+        blogViewService.deleteByBlogId(blogId);
         blogRepository.delete(blogOpt.get());
     }
 

@@ -16,27 +16,23 @@ public class BlogPublicDetailResponse extends BasePublicResponse{
 
     private String updatedAt;
 
-    private String content;
+    private List<Content> contents;
 
-    private Integer viewsCount;
+    private long viewsCount;
 
-    private List<BlogPublicResponse.Author> authors;
+    private List<Author> authors;
 
     private List<String> tags;
 
     private BlogExtraData extraData;
 
-    @Setter
+    private String readingTime;
+
     @Getter
-    public static class Author {
+    @Setter
+    public static class Content {
         private Integer id;
 
-        private String firstName;
-
-        private String lastName;
-
-        private String email;
-
-        private String avatar;
+        private String content;
     }
 }

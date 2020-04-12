@@ -72,6 +72,9 @@ public class Blogs {
     @OneToMany(mappedBy = "blog", fetch = FetchType.EAGER)
     private Set<BlogCategory> categories;
 
+    @OneToMany(mappedBy = "blog", fetch = FetchType.EAGER)
+    private Set<BlogView> views;
+
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "blog_user", joinColumns = @JoinColumn(name = "blog_id"),
             inverseJoinColumns = @JoinColumn(name = "user_id"))

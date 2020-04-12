@@ -31,7 +31,6 @@ public class CreateBlogRequest {
     @Valid
     @NotEmpty
     private List<Content> contents;
-    private List<Integer> categoryIds;
 
     private ExtraData extraData;
 

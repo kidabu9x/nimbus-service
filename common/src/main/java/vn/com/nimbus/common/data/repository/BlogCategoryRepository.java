@@ -1,10 +1,13 @@
 package vn.com.nimbus.common.data.repository;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 import vn.com.nimbus.common.data.domain.BlogCategory;
 import vn.com.nimbus.common.data.domain.BlogCategoryID;
+import vn.com.nimbus.common.data.domain.Blogs;
 import vn.com.nimbus.common.data.domain.Categories;
 
 import java.util.List;
@@ -17,4 +20,6 @@ public interface BlogCategoryRepository extends JpaRepository<BlogCategory, Blog
     List<Categories> findLinkedCategories(Integer blogId);
 
     List<BlogCategory> findByBlogId(Integer blogId);
+
+    Page<BlogCategory> findByCategory(Categories category, Pageable pageable);
 }
