@@ -1,9 +1,9 @@
 package vn.com.nimbus.common.service;
 
 import reactor.core.publisher.Mono;
-import vn.com.nimbus.common.model.request.RegisterRequest;
+import vn.com.nimbus.common.model.request.AuthRequest;
 
 public interface AuthService {
 
-    Mono<Object> register(RegisterRequest request);
+    Mono<Object> oauth(AuthRequest request);
 }

@@ -106,7 +106,7 @@ public class AppConfig {
     }
 
     @Bean
-    public LocalContainerEntityManagerFactoryBean appEntityManagerFactory() throws IllegalStateException, IOException {
+    public LocalContainerEntityManagerFactoryBean appEntityManagerFactory() throws IllegalStateException {
         LocalContainerEntityManagerFactoryBean entityManagerFactoryBean = new LocalContainerEntityManagerFactoryBean();
         Boolean useHA = ConfigLoader.getInstance().configData.getDbConnection().getIsUseHa();
         if (useHA)

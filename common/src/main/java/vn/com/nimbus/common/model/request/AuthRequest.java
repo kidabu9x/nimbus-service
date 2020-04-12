@@ -8,14 +8,9 @@ import javax.validation.constraints.NotEmpty;
 
 @Setter
 @Getter
-public class RegisterRequest {
-    @NotEmpty
-    @Email
-    private String email;
+public class AuthRequest {
+    private String type;
 
-    private String firstName;
+    private String token;
 
-    private String lastName;
-
-    private String avatar;
 }

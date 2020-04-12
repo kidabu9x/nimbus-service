@@ -55,12 +55,13 @@ public class AppExceptionCode {
     public static final vn.com.nimbus.common.exception.AppExceptionCode BAD_REQUEST = newErrorCode(4001100, "Bad request");
     public static final vn.com.nimbus.common.exception.AppExceptionCode INVALID_BILLS = newErrorCode(4001102, "Invalid Bill List");
     public static final vn.com.nimbus.common.exception.AppExceptionCode CUSTOMER_CODE_TOO_SHORT = newErrorCode(4001103, "Customer code too short. Min length 2");
-    public static final vn.com.nimbus.common.exception.AppExceptionCode FIRST_OR_LAST_NAME_CANT_BE_EMPTY = newErrorCode(4001103, "first name or last name must be valid");
-    public static final vn.com.nimbus.common.exception.AppExceptionCode BLOG_TITLE_TOO_LONG = newErrorCode(4001103, "Blog title is too long. Must be shorter than 255 characters");
-    public static final vn.com.nimbus.common.exception.AppExceptionCode UNSUPPORTED_CONTENT_TYPE = newErrorCode(4001103, "Content type is unsupported");
-    public static final vn.com.nimbus.common.exception.AppExceptionCode UNSUPPORTED_BLOG_STATUS = newErrorCode(4001103, "Content type is unsupported");
-    public static final vn.com.nimbus.common.exception.AppExceptionCode FILE_UPLOADING_IS_EMPTY = newErrorCode(4001100, "File cannot be empty");
-    public static final vn.com.nimbus.common.exception.AppExceptionCode UNSUPPORTED_IMAGE_FORMAT = newErrorCode(4001100, "Unsupported image format. Try again with following: '.png', '.jpg'");
+    public static final vn.com.nimbus.common.exception.AppExceptionCode FIRST_OR_LAST_NAME_CANT_BE_EMPTY = newErrorCode(4001104, "first name or last name must be valid");
+    public static final vn.com.nimbus.common.exception.AppExceptionCode BLOG_TITLE_TOO_LONG = newErrorCode(4001105, "Blog title is too long. Must be shorter than 255 characters");
+    public static final vn.com.nimbus.common.exception.AppExceptionCode UNSUPPORTED_CONTENT_TYPE = newErrorCode(4001106, "Content type is unsupported");
+    public static final vn.com.nimbus.common.exception.AppExceptionCode UNSUPPORTED_BLOG_STATUS = newErrorCode(4001107, "Content type is unsupported");
+    public static final vn.com.nimbus.common.exception.AppExceptionCode FILE_UPLOADING_IS_EMPTY = newErrorCode(4001108, "File cannot be empty");
+    public static final vn.com.nimbus.common.exception.AppExceptionCode UNSUPPORTED_IMAGE_FORMAT = newErrorCode(4001109, "Unsupported image format. Try again with following: '.png', '.jpg'");
+    public static final vn.com.nimbus.common.exception.AppExceptionCode UNSUPPORTED_AUTH_TYPE = newErrorCode(4001110, "Unsupported auth type.");
 
 
     public static final vn.com.nimbus.common.exception.AppExceptionCode UN_AUTHORIZED = newErrorCode(4011100, "Unauthorized");
