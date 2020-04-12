@@ -122,6 +122,9 @@ public class CategoryServiceImpl implements CategoryService {
     @Override
     @Transactional
     public List<Categories> updateBlogCategories(Blogs blog, List<CreateBlogRequest.Category> categories) {
+        if (categories == null)
+            return null;
+
         Integer blogId = blog.getId();
         List<BlogCategory> linked = blogCategoryRepository.findByBlogId(blogId);
         List<Integer> linkedIds = linked.stream().map(l -> l.getId().getCategoryId()).collect(Collectors.toList());

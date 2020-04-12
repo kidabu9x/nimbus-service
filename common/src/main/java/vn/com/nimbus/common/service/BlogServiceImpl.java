@@ -107,16 +107,20 @@ public class BlogServiceImpl implements BlogService {
                 .collect(Collectors.toList());
         response.setContents(contents);
 
-        List<BlogResponse.Category> categories = blog.getCategories()
-                .stream()
-                .map(c -> {
-                    BlogResponse.Category category = new BlogResponse.Category();
-                    category.setId(category.getId());
-                    category.setTitle(category.getTitle());
-                    return category;
-                })
-                .collect(Collectors.toList());
-        response.setCategories(categories);
+        if (!CollectionUtils.isEmpty(blog.getCategories())) {
+            List<BlogResponse.Category> categories = blog.getCategories()
+                    .stream()
+                    .map(c -> {
+                        BlogResponse.Category category = new BlogResponse.Category();
+                        category.setId(category.getId());
+                        category.setTitle(category.getTitle());
+                        return category;
+                    })
+                    .collect(Collectors.toList());
+            response.setCategories(categories);
+        } else {
+            response.setCategories(new ArrayList<>());
+        }
 
         List<String> tags = blog.getTags() != null ? blog.getTags().stream().map(t -> t.getTag().getTitle()).collect(Collectors.toList()) : new ArrayList<>();
         response.setTags(tags);

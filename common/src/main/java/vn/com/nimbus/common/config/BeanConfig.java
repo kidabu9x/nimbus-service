@@ -52,11 +52,8 @@ public class BeanConfig {
         CorsConfiguration corsConfig = new CorsConfiguration();
         corsConfig.setAllowedOrigins(Collections.singletonList(CorsConfiguration.ALL));
         corsConfig.setMaxAge(8000L);
-        corsConfig.addAllowedMethod("GET");
-        corsConfig.addAllowedMethod("POST");
-        corsConfig.addAllowedMethod("PUT");
-        corsConfig.addAllowedMethod("DELETE");
-        corsConfig.addAllowedMethod("OPTIONS");
+        corsConfig.addAllowedHeader("*");
+        corsConfig.addAllowedMethod("*");
 
         UrlBasedCorsConfigurationSource source =
                 new UrlBasedCorsConfigurationSource();
