@@ -63,4 +63,9 @@ public class BlogContentServiceImpl implements BlogContentService {
 
         return updateContent;
     }
+
+    @Override
+    public void deleteContents(List<BlogContents> contents) {
+        blogContentRepository.deleteAll(contents);
+    }
 }

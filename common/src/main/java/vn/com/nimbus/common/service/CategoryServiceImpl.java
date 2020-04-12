@@ -157,4 +157,9 @@ public class CategoryServiceImpl implements CategoryService {
 
         return new ArrayList<>();
     }
+
+    @Override
+    public void deleteRelation(List<BlogCategory> blogCategories) {
+        blogCategoryRepository.deleteAll(blogCategories);
+    }
 }

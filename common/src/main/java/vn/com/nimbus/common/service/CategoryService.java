@@ -2,6 +2,7 @@ package vn.com.nimbus.common.service;
 
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import vn.com.nimbus.common.data.domain.BlogCategory;
 import vn.com.nimbus.common.data.domain.Blogs;
 import vn.com.nimbus.common.data.domain.Categories;
 import vn.com.nimbus.common.model.request.CreateBlogRequest;
@@ -24,4 +25,5 @@ public interface CategoryService {
 
     List<Categories> updateBlogCategories(Blogs blog, List<CreateBlogRequest.Category> categories);
 
+    void deleteRelation(List<BlogCategory> blogCategories);
 }

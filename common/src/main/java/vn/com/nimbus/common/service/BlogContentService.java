@@ -8,4 +8,6 @@ import java.util.List;
 
 public interface BlogContentService {
     List<BlogContents> saveContents(Blogs blog, List<CreateBlogRequest.Content> contents);
+
+    void deleteContents(List<BlogContents> contents);
 }

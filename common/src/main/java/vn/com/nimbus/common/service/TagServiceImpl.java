@@ -104,4 +104,8 @@ public class TagServiceImpl implements TagService {
         return tagRepository.saveAll(tags);
     }
 
+    @Override
+    public void deleteRelation(List<BlogTag> blogTags) {
+        blogTagRepository.deleteAll(blogTags);
+    }
 }

@@ -31,7 +31,7 @@ public class BlogContents {
     @Column(name = "blog_id")
     private Integer blogId;
 
-    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "blog_id", insertable = false, updatable = false)
     private Blogs blog;
 

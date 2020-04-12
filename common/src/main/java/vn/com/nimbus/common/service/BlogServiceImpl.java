@@ -156,6 +156,10 @@ public class BlogServiceImpl implements BlogService {
         if (!blogOpt.isPresent())
             throw new AppException(AppExceptionCode.BLOG_NOT_FOUND);
 
+        Blogs blog = blogOpt.get();
+        blogContentService.deleteContents(new ArrayList<>(blogOpt.get().getContents()));
+        tagService.deleteRelation(new ArrayList<>(blog.getTags()));
+        categoryService.deleteRelation(new ArrayList<>(blog.getCategories()));
         blogRepository.delete(blogOpt.get());
     }
 
