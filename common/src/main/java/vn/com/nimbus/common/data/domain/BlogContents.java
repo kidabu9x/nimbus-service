@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.Setter;
 import vn.com.nimbus.common.data.domain.constant.BlogContentType;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
@@ -30,7 +31,7 @@ public class BlogContents {
     @Column(name = "blog_id")
     private Integer blogId;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "blog_id", insertable = false, updatable = false)
     private Blogs blog;
 

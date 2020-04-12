@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Mono;
 import vn.com.nimbus.common.controller.AbstractController;
@@ -30,8 +31,12 @@ public class BlogController extends AbstractController {
     private BlogService blogService;
 
     @GetMapping()
-    public Mono<BaseResponse> getBlogs() {
-        return processBaseResponse(blogService.getBlogs().collectList());
+    public Mono<BaseResponse> getBlogs(
+            @RequestParam(name = "title", required = false, defaultValue = "") String title,
+            @RequestParam(name = "limit", required = false, defaultValue = "10") Integer limit,
+            @RequestParam(name = "offset", required = false, defaultValue = "0") Integer offset
+    ) {
+        return processBaseResponse(blogService.getBlogs(title, limit, offset));
     }
 
     @GetMapping("/{blogId}")

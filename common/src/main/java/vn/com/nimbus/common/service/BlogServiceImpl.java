@@ -5,6 +5,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.PropertyNamingStrategy;
 import com.github.slugify.Slugify;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
@@ -12,21 +15,17 @@ import org.springframework.util.StringUtils;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import vn.com.nimbus.common.data.domain.BlogContents;
-import vn.com.nimbus.common.data.domain.BlogTag;
 import vn.com.nimbus.common.data.domain.Blogs;
-import vn.com.nimbus.common.data.domain.Categories;
-import vn.com.nimbus.common.data.domain.Tags;
 import vn.com.nimbus.common.data.domain.Users;
-import vn.com.nimbus.common.data.domain.constant.BlogContentType;
 import vn.com.nimbus.common.data.domain.constant.BlogStatus;
-import vn.com.nimbus.common.data.repository.BlogContentRepository;
 import vn.com.nimbus.common.data.repository.BlogRepository;
 import vn.com.nimbus.common.data.repository.CategoryRepository;
-import vn.com.nimbus.common.data.repository.TagRepository;
 import vn.com.nimbus.common.data.repository.UserRepository;
 import vn.com.nimbus.common.exception.AppException;
 import vn.com.nimbus.common.exception.AppExceptionCode;
 import vn.com.nimbus.common.model.extra.BlogExtraData;
+import vn.com.nimbus.common.model.paging.LimitOffsetPageable;
+import vn.com.nimbus.common.model.paging.Paging;
 import vn.com.nimbus.common.model.request.CreateBlogRequest;
 import vn.com.nimbus.common.model.request.UpdateBlogRequest;
 import vn.com.nimbus.common.model.response.BlogResponse;
@@ -35,12 +34,9 @@ import javax.annotation.Resource;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -55,9 +51,6 @@ public class BlogServiceImpl implements BlogService {
     private UserRepository userRepository;
 
     @Resource
-    private CategoryRepository categoryRepository;
-
-    @Resource
     private TagService tagService;
 
     @Resource
@@ -70,8 +63,16 @@ public class BlogServiceImpl implements BlogService {
 
     @Override
     @Transactional(readOnly = true)
-    public Flux<BlogResponse> getBlogs() {
-        return Flux.fromStream(blogRepository.findAll().stream().map(this::buildBlogResponse));
+    public Mono<Paging<BlogResponse>> getBlogs(String title, Integer limit, Integer offset) {
+        LimitOffsetPageable limitOffsetPageable = new LimitOffsetPageable();
+        limitOffsetPageable.setLimit(limit);
+        limitOffsetPageable.setOffset(offset);
+
+        Page<Blogs> blogsPage = blogRepository.findByTitleContains(title, PageRequest.of(offset, limit));
+        List<BlogResponse> resBlogs = blogsPage.get().map(this::buildBlogResponse).collect(Collectors.toList());
+        limitOffsetPageable.setTotal(blogsPage.getTotalElements());
+        Paging<BlogResponse> paging = new Paging<>(resBlogs, limitOffsetPageable);
+        return Mono.just(paging);
     }
 
     @Override
@@ -214,14 +215,6 @@ public class BlogServiceImpl implements BlogService {
         categoryService.updateBlogCategories(blog, request.getCategories());
         this.saveAuthors(userOpt.get(), blog);
     }
-//
-//    private void saveCategories(CreateBlogRequest request, Blogs blog) {
-//        if (request.getCategoryIds() == null)
-//            return;
-//
-//        Set<Categories> categories = new HashSet<>(categoryRepository.findAllByIdIn(request.getCategoryIds()));
-////        blog.setCategories(categories);
-//    }
 
     private void saveAuthors(Users user, Blogs blog) {
         Set<Users> users = !CollectionUtils.isEmpty(blog.getAuthors()) ? blog.getAuthors() : new HashSet<>();

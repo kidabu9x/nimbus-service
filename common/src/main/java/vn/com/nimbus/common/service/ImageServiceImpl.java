@@ -4,6 +4,9 @@ import com.cloudinary.Cloudinary;
 import com.cloudinary.Uploader;
 import com.cloudinary.utils.ObjectUtils;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.core.io.buffer.DataBuffer;
+import org.springframework.core.io.buffer.DataBufferUtils;
+import org.springframework.http.codec.multipart.FilePart;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 import vn.com.nimbus.common.config.ConfigData;
@@ -17,11 +20,22 @@ import vn.com.nimbus.common.utils.StreamUtils;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URL;
+import java.nio.ByteBuffer;
+import java.nio.channels.AsynchronousFileChannel;
+import java.nio.channels.Channels;
+import java.nio.channels.CompletionHandler;
+import java.nio.channels.FileChannel;
+import java.nio.channels.ReadableByteChannel;
+import java.nio.file.Path;
+import java.nio.file.StandardOpenOption;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 
 @Service
 @Slf4j
@@ -41,12 +55,18 @@ public class ImageServiceImpl implements ImageService {
     }
 
     @Override
-    public Mono<UploadImageResponse> uploadImage(String filename, InputStream stream) {
-        String url = this.upload(filename, stream);
+    public Mono<UploadImageResponse> uploadImage(FilePart file) {
+        DataBufferUtils.join(file.content()).flatMap(it -> {
+            String url = this.upload(file.filename(), it.asInputStream());
+            UploadImageResponse response = new UploadImageResponse();
+            response.setUrl(url);
+            return Mono.just(response);
+        });
+
         UploadImageResponse response = new UploadImageResponse();
-        response.setUrl(url);
         return Mono.just(response);
     }
+
 
     private String upload(String filename, InputStream stream) {
         ConfigData.CloudinaryConfig config = ConfigLoader.getInstance().configData.getCloudinaryConfig();
@@ -75,4 +95,5 @@ public class ImageServiceImpl implements ImageService {
         }
 
     }
+
 }
