@@ -19,6 +19,11 @@ public class BlogController extends AbstractController {
     @Resource
     private BlogPublicService blogService;
 
+    @GetMapping("/feature")
+    public Mono<BaseResponse> getFeature() {
+        return processBaseResponse(blogService.getFeature());
+    }
+
     @GetMapping("/{slug}")
     public Mono<BaseResponse> getBySlug(
             @PathVariable String slug,

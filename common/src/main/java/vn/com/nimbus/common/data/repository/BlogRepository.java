@@ -8,6 +8,8 @@ import org.springframework.stereotype.Repository;
 import vn.com.nimbus.common.data.domain.Blogs;
 import vn.com.nimbus.common.data.domain.constant.BlogStatus;
 
+import java.util.List;
+
 @Repository
 public interface BlogRepository extends JpaRepository<Blogs, Integer> {
     Integer countBySlugContains(String candidate);
@@ -15,5 +17,7 @@ public interface BlogRepository extends JpaRepository<Blogs, Integer> {
     Blogs findBySlugAndStatus(String candidate, BlogStatus status);
 
     Page<Blogs> findByTitleContains(String title, Pageable pageable);
+
+    List<Blogs> findByIdIn(List<Integer> ids);
 
 }
