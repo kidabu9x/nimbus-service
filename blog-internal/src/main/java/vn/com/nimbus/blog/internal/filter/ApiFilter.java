@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Marker;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.web.server.ServerWebExchange;
@@ -42,7 +43,7 @@ public class ApiFilter extends BaseFilter implements WebFilter {
         LoggingHandler.preLog(markers, serverWebExchange.getRequest());
 
         String path = serverWebExchange.getRequest().getPath().toString();
-        if (AppUtils.isBelongUrlWhiteList(path, KeyConstant.AUTH_WHITE_LIST_URL)) {
+        if (AppUtils.isBelongUrlWhiteList(path, KeyConstant.AUTH_WHITE_LIST_URL) || Objects.equals(serverWebExchange.getRequest().getMethod(), HttpMethod.OPTIONS)) {
             return webFilterChain.filter(serverWebExchange).doOnSuccess(aVoid -> LoggingHandler.postLog(markers, serverWebExchange, startTime));
         }
 
@@ -61,9 +62,6 @@ public class ApiFilter extends BaseFilter implements WebFilter {
         Integer userId = claims.get(KeyConstant.USER_ID, Integer.class);
         serverWebExchange.getResponse().getHeaders().add(KeyConstant.X_USER_ID, userId.toString());
 
-        serverWebExchange.getResponse()
-                .getHeaders().setContentType(MediaType.APPLICATION_JSON);
-        LoggingHandler.preLog(markers, serverWebExchange.getRequest());
         return webFilterChain.filter(serverWebExchange)
                 .doOnSuccess(aVoid ->
                         LoggingHandler.postLog(markers, serverWebExchange, startTime)
