@@ -43,27 +43,21 @@ public class BaseFilter {
             deviceOS = "ORIGINAL_OS";
         }
 
-        String userId = AppUtils.headerOption(headers, KeyConstant.X_USER_ID);
-        if (StringUtils.isEmpty(userId)) {
-            userId = "1";
-        }
-
         Map<String, String> headerMark = new HashMap<>();
         headerMark.put(KeyConstant.X_REQUEST_ID, requestId);
 
         Marker marker = Markers.appendEntries(headerMark);
 
-        buildHeaderResponse(serverWebExchange, requestId, deviceId, deviceSessionId, appVersion, deviceOS, userId);
+        buildHeaderResponse(serverWebExchange, requestId, deviceId, deviceSessionId, appVersion, deviceOS);
         return marker;
     }
 
 
-    private void buildHeaderResponse(ServerWebExchange serverWebExchange, String requestId, String deviceId, String deviceSessionId, String appVersion, String deviceOS, String userId) {
+    private void buildHeaderResponse(ServerWebExchange serverWebExchange, String requestId, String deviceId, String deviceSessionId, String appVersion, String deviceOS) {
         serverWebExchange.getResponse().getHeaders().add(KeyConstant.X_REQUEST_ID, requestId);
         serverWebExchange.getResponse().getHeaders().add(KeyConstant.X_DEVICE_ID, deviceId);
         serverWebExchange.getResponse().getHeaders().add(KeyConstant.X_DEVICE_SESSION_ID, deviceSessionId);
         serverWebExchange.getResponse().getHeaders().add(KeyConstant.X_DEVICE_VERSION, appVersion);
         serverWebExchange.getResponse().getHeaders().add(KeyConstant.X_DEVICE_OS, deviceOS);
-        serverWebExchange.getResponse().getHeaders().add(KeyConstant.X_USER_ID, userId);
     }
 }

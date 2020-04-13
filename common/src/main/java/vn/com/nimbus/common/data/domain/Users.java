@@ -38,6 +38,9 @@ public class Users {
     @Column(name = "last_name")
     private String lastName;
 
+    @Column(name = "id_ref")
+    private String idRef;
+
     @Column(name = "avatar")
     private String avatar;
 

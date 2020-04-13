@@ -20,4 +20,9 @@
                  path="/sql/2020_04_11_add_blog_views_and_blog_description.sql"/>
     </changeSet>
 
+    <changeSet id="2020_04_13_add_id_ref_for_users_table" author="duongnk" context="auto">
+        <sqlFile encoding="utf8" endDelimiter=";"
+                 path="/sql/2020_04_13_add_id_ref_for_users_table.sql"/>
+    </changeSet>
+
 </databaseChangeLog>

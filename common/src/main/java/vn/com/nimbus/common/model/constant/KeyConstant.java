@@ -13,9 +13,12 @@ public interface KeyConstant {
     String X_API_SECRET = "X-Api-Secret";
     List<String> INTERNAL_WHITE_LIST_URL = Arrays.asList("/payment-notify-order","/health-check", "/migrate_prepaid", "/login");
     List<String> MOBILE_WHITE_LIST_URL = Arrays.asList("/health-check");
-    List<String> OPS_WHITE_LIST_URL = Arrays.asList("/health-check");
+    List<String> AUTH_WHITE_LIST_URL = Arrays.asList("/oauth2");
     String X_DEVICE_OS = "X-Device-OS";
     String X_DEVICE_VERSION = "X-BillPay-Version";
     String SERVICE_CODE = "BILL_MANAGEMENT";
+
+    String BEARER = "Bearer";
+    String USER_ID = "user_id";
 
 }

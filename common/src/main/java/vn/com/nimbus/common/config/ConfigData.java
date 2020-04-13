@@ -9,8 +9,9 @@ import java.util.List;
 @Setter
 public class ConfigData {
     private DBConnection dbConnection;
-    private SignatureInfo signatureInfo;
+    private OauthKey oauthKey;
     private CloudinaryConfig cloudinaryConfig;
+    private GoogleOauthConfig googleOauthConfig;
 
     @Getter
     @Setter
@@ -33,9 +34,10 @@ public class ConfigData {
 
     @Getter
     @Setter
-    public static class SignatureInfo {
+    public static class OauthKey {
         private String privateKey;
         private String publicKey;
+        private Long ttl;
     }
 
     @Setter
@@ -46,5 +48,13 @@ public class ConfigData {
         private String apiSecret;
         private String folder;
         private List<String> supportedFileFormats;
+    }
+
+    @Setter
+    @Getter
+    public static class GoogleOauthConfig {
+        private String clientId;
+        private String clientSecret;
+        private String projectId;
     }
 }

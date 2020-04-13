@@ -62,6 +62,7 @@ public class AppExceptionCode {
     public static final vn.com.nimbus.common.exception.AppExceptionCode FILE_UPLOADING_IS_EMPTY = newErrorCode(4001108, "File cannot be empty");
     public static final vn.com.nimbus.common.exception.AppExceptionCode UNSUPPORTED_IMAGE_FORMAT = newErrorCode(4001109, "Unsupported image format. Try again with following: '.png', '.jpg'");
     public static final vn.com.nimbus.common.exception.AppExceptionCode UNSUPPORTED_AUTH_TYPE = newErrorCode(4001110, "Unsupported auth type.");
+    public static final vn.com.nimbus.common.exception.AppExceptionCode INVALID_TOKEN_ID = newErrorCode(4001111, "Invalid token id.");
 
 
     public static final vn.com.nimbus.common.exception.AppExceptionCode UN_AUTHORIZED = newErrorCode(4011100, "Unauthorized");
