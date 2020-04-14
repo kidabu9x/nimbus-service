@@ -48,6 +48,7 @@ public class CreateBlogRequest {
     @Getter
     public static class ExtraData {
         private String facebookPixelId;
+        private String googleAnalyticsId;
     }
 
     @Setter

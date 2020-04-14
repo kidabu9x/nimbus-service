@@ -7,4 +7,6 @@ import lombok.Setter;
 @Getter
 public class BlogExtraData {
     private String facebookPixelId;
+
+    private String googleAnalyticsId;
 }

@@ -12,6 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 import reactor.core.publisher.Mono;
+import vn.com.nimbus.common.data.domain.BlogCategory;
 import vn.com.nimbus.common.data.domain.BlogContents;
 import vn.com.nimbus.common.data.domain.Blogs;
 import vn.com.nimbus.common.data.domain.Users;
@@ -111,10 +112,11 @@ public class BlogServiceImpl implements BlogService {
         if (!CollectionUtils.isEmpty(blog.getCategories())) {
             List<BlogResponse.Category> categories = blog.getCategories()
                     .stream()
+                    .map(BlogCategory::getCategory)
                     .map(c -> {
                         BlogResponse.Category category = new BlogResponse.Category();
-                        category.setId(category.getId());
-                        category.setTitle(category.getTitle());
+                        category.setId(c.getId());
+                        category.setTitle(c.getTitle());
                         return category;
                     })
                     .collect(Collectors.toList());
@@ -133,9 +135,13 @@ public class BlogServiceImpl implements BlogService {
             if (StringUtils.isEmpty(extraData.getFacebookPixelId())) {
                 extraData.setFacebookPixelId("");
             }
+            if (StringUtils.isEmpty(extraData.getGoogleAnalyticsId())) {
+                extraData.setGoogleAnalyticsId("");
+            }
         } else {
             extraData = new BlogExtraData();
             extraData.setFacebookPixelId("");
+            extraData.setGoogleAnalyticsId("");
         }
         response.setExtraData(extraData);
 
@@ -204,6 +210,7 @@ public class BlogServiceImpl implements BlogService {
             try {
                 BlogExtraData extraData = new BlogExtraData();
                 extraData.setFacebookPixelId(request.getExtraData().getFacebookPixelId());
+                extraData.setGoogleAnalyticsId(request.getExtraData().getGoogleAnalyticsId());
                 ObjectMapper mapper = new ObjectMapper();
                 mapper.setPropertyNamingStrategy(PropertyNamingStrategy.SNAKE_CASE);
                 String extraDataStr = mapper.writeValueAsString(extraData);
