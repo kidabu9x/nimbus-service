@@ -1,4 +1,5 @@
 package vn.com.nimbus.common.service;
 
-public class BlogCategoryService {
+public interface BlogCategoryService {
+    void deleteByBlogId(Integer blogId);
 }

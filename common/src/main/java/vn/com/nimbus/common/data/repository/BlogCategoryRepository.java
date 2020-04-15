@@ -27,4 +27,7 @@ public interface BlogCategoryRepository extends JpaRepository<BlogCategory, Blog
             countQuery = "SELECT count(bc.id) FROM BlogCategory bc INNER JOIN Blogs b ON b.id = bc.id.blogId WHERE bc.id.categoryId = ?1 AND b.status = ?2"
     )
     Page<BlogCategory> findByCategoryId(Integer categoryId, BlogStatus blogStatus, Pageable pageable);
+
+    void deleteByBlogId(Integer blogId);
+
 }

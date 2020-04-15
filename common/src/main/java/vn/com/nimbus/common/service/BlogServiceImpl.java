@@ -60,6 +60,9 @@ public class BlogServiceImpl implements BlogService {
     @Resource
     private BlogViewService blogViewService;
 
+    @Resource
+    private BlogCategoryService blogCategoryService;
+
     private final Slugify slugify = new Slugify();
 
     @Override
@@ -167,6 +170,7 @@ public class BlogServiceImpl implements BlogService {
         tagService.deleteRelation(new ArrayList<>(blog.getTags()));
         categoryService.deleteRelation(new ArrayList<>(blog.getCategories()));
         blogViewService.deleteByBlogId(blogId);
+        blogCategoryService.deleteByBlogId(blogId);
         blogRepository.delete(blogOpt.get());
     }
 
@@ -219,7 +223,6 @@ public class BlogServiceImpl implements BlogService {
                 log.error("Fail to parse blog extra data: {}", request.getExtraData());
                 throw new AppException(AppExceptionCode.INTERNAL_SERVER_ERROR);
             }
-
         }
         blog = blogRepository.save(blog);
         blogContentService.saveContents(blog, request.getContents());
