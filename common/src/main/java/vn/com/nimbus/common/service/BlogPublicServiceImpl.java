@@ -201,7 +201,10 @@ public class BlogPublicServiceImpl implements BlogPublicService {
 
         Page<BlogCategory> page = blogCategoryRepository.findByCategory(category, PageRequest.of(limitOffsetPageable.getOffset(), limitOffsetPageable.getLimit()));
         List<BlogCategory> blogCategories = page.getContent();
-        List<BasePublicResponse.Blog> blogs = this.extractBlogs(blogCategories.stream().map(BlogCategory::getBlog).collect(Collectors.toList()));
+        List<BasePublicResponse.Blog> blogs = this.extractBlogs(blogCategories.stream()
+                .map(BlogCategory::getBlog)
+                .filter(b -> b.getStatus().equals(BlogStatus.PUBLISHED))
+                .collect(Collectors.toList()));
         response.setBlogs(blogs);
 
         limitOffsetPageable.setTotal(page.getTotalElements());
@@ -219,7 +222,10 @@ public class BlogPublicServiceImpl implements BlogPublicService {
 
         Page<BlogTag> page = blogTagRepository.findByTag(tag, PageRequest.of(limitOffsetPageable.getOffset(), limitOffsetPageable.getLimit()));
         List<BlogTag> blogTags = page.getContent();
-        List<BasePublicResponse.Blog> blogs = this.extractBlogs(blogTags.stream().map(BlogTag::getBlog).collect(Collectors.toList()));
+        List<BasePublicResponse.Blog> blogs = this.extractBlogs(blogTags.stream()
+                .map(BlogTag::getBlog)
+                .filter(b -> b.getStatus().equals(BlogStatus.PUBLISHED))
+                .collect(Collectors.toList()));
         response.setBlogs(blogs);
 
         limitOffsetPageable.setTotal(page.getTotalElements());
