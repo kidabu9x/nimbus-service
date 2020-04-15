@@ -1,10 +1,10 @@
 version: '3.2'
 services:
   blog-internal:
-    hostname: blog-internal.local
+    hostname: blog-internal.$ENVIRONMENT
     container_name: blog-internal
     ports:
-      - 48080:8080
+      - ${PORT}0:8080
     build: blog-internal
     depends_on:
       - mysql
@@ -14,30 +14,30 @@ services:
       ENVIRONMENT: docker
 
   blog-public:
-    hostname: blog-public.local
+    hostname: blog-public.$ENVIRONMENT
     container_name: blog-public
     ports:
-      - 48081:8080
+      - ${PORT}1:8080
     build: blog-public
     depends_on:
       - mysql
     env_file:
       - .env
     environment:
-      ENVIRONMENT: docker
+      ENVIRONMENT: $ENVIRONMENT
 
   auth:
     hostname: auth.local
     container_name: nimbus-auth
     ports:
-      - 48082:8080
+      - ${PORT}2:8080
     build: auth
     depends_on:
       - mysql
     env_file:
       - .env
     environment:
-      ENVIRONMENT: docker
+      ENVIRONMENT: $ENVIRONMENT
 
   liquibase:
     build: common
@@ -46,19 +46,19 @@ services:
     links:
       - mysql
     environment:
-      ENVIRONMENT: local
+      ENVIRONMENT: $ENVIRONMENT
       JDBC_MASTER_URL: jdbc:mysql://mysql/nimbus_service?useUnicode=true&characterEncoding=utf-8
       JDBC_MASTER_USERNAME: root
       JDBC_MASTER_PASSWORD:
 
   mysql:
-    hostname: mysql.local
+    hostname: mysql.$ENVIRONMENT
     container_name: nimbus-mysql
     build: docker/images/mysql
     volumes:
-      - database_uat:/var/lib/mysql
+      - ${DB_VOLUME}:/var/lib/mysql
     ports:
-      - 43320:3306
+      - ${PORT}20:3306
 
 volumes:
-  database_uat:
+  ${DB_VOLUME}:
