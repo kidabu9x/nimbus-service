@@ -121,7 +121,6 @@ public class BlogPublicServiceImpl implements BlogPublicService {
             return Mono.just(res);
         }
 
-
         Categories category = categoryRepository.findBySlug(slug);
         if (category != null) {
 
@@ -199,11 +198,10 @@ public class BlogPublicServiceImpl implements BlogPublicService {
         response.setTitle(category.getTitle());
         response.setType(PublicResponseType.CATEGORY);
 
-        Page<BlogCategory> page = blogCategoryRepository.findByCategory(category, PageRequest.of(limitOffsetPageable.getOffset(), limitOffsetPageable.getLimit()));
+        Page<BlogCategory> page = blogCategoryRepository.findByCategoryId(category.getId(), BlogStatus.PUBLISHED, PageRequest.of(limitOffsetPageable.getOffset(), limitOffsetPageable.getLimit()));
         List<BlogCategory> blogCategories = page.getContent();
         List<BasePublicResponse.Blog> blogs = this.extractBlogs(blogCategories.stream()
                 .map(BlogCategory::getBlog)
-                .filter(b -> b.getStatus().equals(BlogStatus.PUBLISHED))
                 .collect(Collectors.toList()));
         response.setBlogs(blogs);
 
@@ -220,7 +218,7 @@ public class BlogPublicServiceImpl implements BlogPublicService {
         response.setTitle(tag.getTitle());
         response.setType(PublicResponseType.TAG);
 
-        Page<BlogTag> page = blogTagRepository.findByTag(tag, PageRequest.of(limitOffsetPageable.getOffset(), limitOffsetPageable.getLimit()));
+        Page<BlogTag> page = blogTagRepository.findByTag(tag.getId(), BlogStatus.PUBLISHED, PageRequest.of(limitOffsetPageable.getOffset(), limitOffsetPageable.getLimit()));
         List<BlogTag> blogTags = page.getContent();
         List<BasePublicResponse.Blog> blogs = this.extractBlogs(blogTags.stream()
                 .map(BlogTag::getBlog)
