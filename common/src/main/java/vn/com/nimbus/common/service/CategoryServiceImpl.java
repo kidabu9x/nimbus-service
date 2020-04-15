@@ -38,6 +38,7 @@ public class CategoryServiceImpl implements CategoryService {
     @Resource
     private BlogCategoryRepository blogCategoryRepository;
 
+
     private final Slugify slugify = new Slugify();
 
     @Override
@@ -106,7 +107,7 @@ public class CategoryServiceImpl implements CategoryService {
             log.warn("Category not found, id : {}", id);
             throw new AppException(AppExceptionCode.CATEGORY_NOT_FOUND);
         }
-
+        blogCategoryRepository.deleteByCategoryId(opt.get().getId());
         categoryRepository.delete(opt.get());
     }
 

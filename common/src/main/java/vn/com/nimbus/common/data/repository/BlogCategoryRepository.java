@@ -30,4 +30,6 @@ public interface BlogCategoryRepository extends JpaRepository<BlogCategory, Blog
 
     void deleteByBlogId(Integer blogId);
 
+    void deleteByCategoryId(Integer categoryId);
+
 }
