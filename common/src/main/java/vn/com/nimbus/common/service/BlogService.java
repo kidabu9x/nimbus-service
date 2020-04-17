@@ -8,7 +8,7 @@ import vn.com.nimbus.common.model.request.UpdateBlogRequest;
 import vn.com.nimbus.common.model.response.BlogResponse;
 
 public interface BlogService {
-    Mono<Paging<BlogResponse>> getBlogs(String title, Integer limit, Integer offset);
+    Mono<Paging<BlogResponse>> getBlogs(String title, Integer categoryId, Integer limit, Integer offset);
 
     Mono<BlogResponse> getBlog(Integer blogId);
 

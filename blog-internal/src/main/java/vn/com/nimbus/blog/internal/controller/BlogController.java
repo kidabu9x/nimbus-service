@@ -34,9 +34,10 @@ public class BlogController extends AbstractController {
     public Mono<BaseResponse> getBlogs(
             @RequestParam(name = "title", required = false, defaultValue = "") String title,
             @RequestParam(name = "limit", required = false, defaultValue = "10") Integer limit,
-            @RequestParam(name = "offset", required = false, defaultValue = "0") Integer offset
+            @RequestParam(name = "offset", required = false, defaultValue = "0") Integer offset,
+            @RequestParam(name = "category_id", required = false, defaultValue = "") Integer categoryId
     ) {
-        return processBaseResponse(blogService.getBlogs(title, limit, offset));
+        return processBaseResponse(blogService.getBlogs(title, categoryId, limit, offset));
     }
 
     @GetMapping("/{blogId}")

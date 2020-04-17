@@ -67,12 +67,17 @@ public class BlogServiceImpl implements BlogService {
 
     @Override
     @Transactional(readOnly = true)
-    public Mono<Paging<BlogResponse>> getBlogs(String title, Integer limit, Integer offset) {
+    public Mono<Paging<BlogResponse>> getBlogs(String title, Integer categoryId, Integer limit, Integer offset) {
         LimitOffsetPageable limitOffsetPageable = new LimitOffsetPageable();
         limitOffsetPageable.setLimit(limit);
         limitOffsetPageable.setOffset(offset);
 
-        Page<Blogs> blogsPage = blogRepository.findByTitleContains(title, PageRequest.of(offset, limit));
+        Page<Blogs> blogsPage;
+        if (categoryId != null) {
+            blogsPage = blogRepository.findByCategoryIdAndTitleContains(title, categoryId, PageRequest.of(offset, limit));
+        } else {
+            blogsPage = blogRepository.findByTitleContains(title, PageRequest.of(offset, limit));
+        }
         List<BlogResponse> resBlogs = blogsPage.get().map(this::buildBlogResponse).collect(Collectors.toList());
         limitOffsetPageable.setTotal(blogsPage.getTotalElements());
         Paging<BlogResponse> paging = new Paging<>(resBlogs, limitOffsetPageable);

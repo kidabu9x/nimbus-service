@@ -56,9 +56,9 @@ services:
     container_name: nimbus-mysql
     build: docker/images/mysql
     volumes:
-      - database_uat:/var/lib/mysql
+      - database:/var/lib/mysql
     ports:
       - 43320:3306
 
 volumes:
-  database_uat:
+  database:

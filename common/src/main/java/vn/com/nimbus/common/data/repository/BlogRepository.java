@@ -18,6 +18,9 @@ public interface BlogRepository extends JpaRepository<Blogs, Integer> {
 
     Page<Blogs> findByTitleContains(String title, Pageable pageable);
 
+    @Query("SELECT b FROM Blogs b INNER JOIN BlogCategory bc ON bc.id.categoryId = ?2 WHERE b.title LIKE %?1%" )
+    Page<Blogs> findByCategoryIdAndTitleContains(String title, Integer categoryId, Pageable pageable);
+
     List<Blogs> findByIdIn(List<Integer> ids);
 
 }
