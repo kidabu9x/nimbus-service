@@ -100,6 +100,7 @@ public class BlogServiceImpl implements BlogService {
         response.setTitle(blog.getTitle());
         response.setSlug(blog.getSlug());
         response.setDescription(blog.getDescription());
+        response.setThumbnail(blog.getThumbnail());
         response.setUpdatedAt(this.formatLocalDateTime(blog.getUpdatedAt()));
         response.setStatus(blog.getStatus());
 

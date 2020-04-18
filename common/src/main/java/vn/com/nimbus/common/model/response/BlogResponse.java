@@ -15,6 +15,7 @@ public class BlogResponse {
     private String title;
     private String slug;
     private BlogStatus status;
+    private String thumbnail;
     private List<Content> contents;
     private List<String> tags;
     private List<Author> authors;
