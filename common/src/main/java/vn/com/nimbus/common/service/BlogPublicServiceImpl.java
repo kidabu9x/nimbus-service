@@ -4,6 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 import reactor.core.publisher.Mono;
 import vn.com.nimbus.common.data.domain.BlogCategory;
@@ -33,6 +34,8 @@ import vn.com.nimbus.common.utils.FormatUtils;
 
 import javax.annotation.Resource;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
@@ -65,24 +68,21 @@ public class BlogPublicServiceImpl implements BlogPublicService {
     private BlogViewService viewService;
 
     @Override
-    public Mono<Object> getFeature() {
+    public Mono<FeatureResponse> getFeature() {
         final int LIMIT = 5;
         FeatureResponse response = new FeatureResponse();
         Page<Categories> page = categoryRepository.findAll(PageRequest.of(0, 10));
         List<Categories> categories = page.getContent();
-        List<BasePublicResponse.Category> categoryRes = this.extractCategories(categories);
-        response.setCategories(categoryRes);
 
-        List<Integer> mostViewBlogIds = blogViewRepository.getMostViews(LIMIT);
-        List<Blogs> mostViewBlogs = blogRepository.findByIdIn(mostViewBlogIds);
+        List<Blogs> mostViewBlogs = this.getMostViewedBlogs(LIMIT, Collections.emptyList());
         List<BasePublicResponse.Blog> highLights = this.extractBlogs(mostViewBlogs);
         response.setHighlights(highLights);
 
         List<Blogs> allBlogs = new ArrayList<>(mostViewBlogs);
-        List<Integer> allBlogIds = new ArrayList<>(mostViewBlogIds);
+        List<Integer> allBlogIds = mostViewBlogs.stream().map(Blogs::getId).collect(Collectors.toList());
         List<FeatureResponse.Feature> features = new ArrayList<>();
         categories.forEach(category -> {
-            List<Integer> ids = blogViewRepository.getMostViewsByCategoryId(category.getId(), LIMIT);
+            List<Integer> ids = blogViewRepository.getMostViewsByCategoryId(category.getId(), BlogStatus.PUBLISHED, LIMIT);
             List<Integer> fetchIds = new ArrayList<>();
             List<Integer> existIds = new ArrayList<>();
 
@@ -146,6 +146,8 @@ public class BlogPublicServiceImpl implements BlogPublicService {
         response.setTitle(blog.getTitle());
         response.setSlug(blog.getSlug());
         response.setType(PublicResponseType.BLOG);
+        List<Blogs> mostViewedBlogs = this.getMostViewedBlogs(5, Collections.singletonList(blog.getId()));
+        response.setHighlight(this.extractBlogs(mostViewedBlogs));
 
         response.setDescription(blog.getDescription());
         response.setThumbnail(blog.getThumbnail());
@@ -197,6 +199,8 @@ public class BlogPublicServiceImpl implements BlogPublicService {
         response.setSlug(category.getSlug());
         response.setTitle(category.getTitle());
         response.setType(PublicResponseType.CATEGORY);
+        List<Blogs> mostViewedBlogs = this.getMostViewedBlogs(5, Collections.emptyList());
+        response.setHighlight(this.extractBlogs(mostViewedBlogs));
 
         Page<BlogCategory> page = blogCategoryRepository.findByCategoryId(category.getId(), BlogStatus.PUBLISHED, PageRequest.of(limitOffsetPageable.getOffset(), limitOffsetPageable.getLimit()));
         List<BlogCategory> blogCategories = page.getContent();
@@ -217,6 +221,8 @@ public class BlogPublicServiceImpl implements BlogPublicService {
         response.setSlug(tag.getSlug());
         response.setTitle(tag.getTitle());
         response.setType(PublicResponseType.TAG);
+        List<Blogs> mostViewedBlogs = this.getMostViewedBlogs(5, Collections.emptyList());
+        response.setHighlight(this.extractBlogs(mostViewedBlogs));
 
         Page<BlogTag> page = blogTagRepository.findByTag(tag.getId(), BlogStatus.PUBLISHED, PageRequest.of(limitOffsetPageable.getOffset(), limitOffsetPageable.getLimit()));
         List<BlogTag> blogTags = page.getContent();
@@ -299,6 +305,11 @@ public class BlogPublicServiceImpl implements BlogPublicService {
                     return author;
                 })
                 .collect(Collectors.toList());
+    }
+
+    private List<Blogs> getMostViewedBlogs(Integer limit, List<Integer> idNotIn) {
+        List<Integer> mostViewBlogIds = blogViewRepository.getMostViews(limit, CollectionUtils.isEmpty(idNotIn) ? null : idNotIn.get(0));
+        return blogRepository.findByIdIn(mostViewBlogIds);
     }
 
 }

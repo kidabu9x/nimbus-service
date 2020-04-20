@@ -9,8 +9,6 @@ import java.util.List;
 @Getter
 public class FeatureResponse extends BasePublicResponse {
 
-    List<BasePublicResponse.Category> categories;
-
     List<BasePublicResponse.Blog> highlights;
 
     List<Feature> features;
@@ -19,7 +17,7 @@ public class FeatureResponse extends BasePublicResponse {
     @Setter
     public static class Feature {
         BasePublicResponse.Category category;
-        List<BasePublicResponse.Blog> Blogs;
+        List<BasePublicResponse.Blog> blogs;
     }
 
 }

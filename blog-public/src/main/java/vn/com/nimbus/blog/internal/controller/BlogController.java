@@ -10,6 +10,7 @@ import vn.com.nimbus.common.controller.AbstractController;
 import vn.com.nimbus.common.model.paging.LimitOffsetPageable;
 import vn.com.nimbus.common.model.response.BaseResponse;
 import vn.com.nimbus.common.service.BlogPublicService;
+import vn.com.nimbus.common.service.CategoryService;
 
 import javax.annotation.Resource;
 
@@ -19,9 +20,17 @@ public class BlogController extends AbstractController {
     @Resource
     private BlogPublicService blogService;
 
+    @Resource
+    private CategoryService categoryService;
+
     @GetMapping("/feature")
     public Mono<BaseResponse> getFeature() {
         return processBaseResponse(blogService.getFeature());
+    }
+
+    @GetMapping("/categories")
+    public Mono<BaseResponse> getCategories() {
+        return processBaseResponse(categoryService.getCategories().collectList());
     }
 
     @GetMapping("/{slug}")

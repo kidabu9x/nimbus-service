@@ -38,7 +38,6 @@ public class CategoryServiceImpl implements CategoryService {
     @Resource
     private BlogCategoryRepository blogCategoryRepository;
 
-
     private final Slugify slugify = new Slugify();
 
     @Override

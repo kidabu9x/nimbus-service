@@ -21,6 +21,8 @@ public class BasePublicResponse {
 
     List<Blog> blogs;
 
+    List<Blog> highlight;
+
     @Setter
     @Getter
     public static class Blog {
