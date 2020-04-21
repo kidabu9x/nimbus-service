@@ -9,8 +9,6 @@ import java.util.List;
 @Getter
 public class FeatureResponse extends BasePublicResponse {
 
-    List<BasePublicResponse.Blog> highlights;
-
     List<Feature> features;
 
     @Getter

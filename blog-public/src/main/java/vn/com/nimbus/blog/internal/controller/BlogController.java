@@ -23,9 +23,21 @@ public class BlogController extends AbstractController {
     @Resource
     private CategoryService categoryService;
 
-    @GetMapping("/feature")
+    @GetMapping("/features")
     public Mono<BaseResponse> getFeature() {
         return processBaseResponse(blogService.getFeature());
+    }
+
+    @GetMapping("/search")
+    public Mono<BaseResponse> searchBlog(
+            @RequestParam(name = "query", required = false, defaultValue = "") String search,
+            @RequestParam(name = "limit", required = false, defaultValue = "10") Integer limit,
+            @RequestParam(name = "offset", required = false, defaultValue = "0") Integer offset
+    ) {
+        LimitOffsetPageable limitOffsetPageable = new LimitOffsetPageable();
+        limitOffsetPageable.setLimit(limit);
+        limitOffsetPageable.setOffset(offset);
+        return processBaseResponse(blogService.searchBlog(search, limitOffsetPageable));
     }
 
     @GetMapping("/categories")

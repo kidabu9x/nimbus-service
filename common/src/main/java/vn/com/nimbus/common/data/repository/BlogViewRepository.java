@@ -30,13 +30,25 @@ public interface BlogViewRepository extends JpaRepository<BlogView, Integer> {
     @Query(
             nativeQuery = true,
             value = "SELECT bv.blog_id " +
-                    "FROM blog_category bc " +
-                    "LEFT JOIN blogs b on bc.blog_id = b.id " +
-                    "LEFT JOIN blog_views bv ON b.id = bv.blog_id " +
-                    "WHERE bc.category_id = ?1 AND b.status = ?2 " +
+                    "FROM blog_views bv " +
+                    "INNER JOIN blogs b on bv.blog_id = b.id " +
+                    "WHERE b.status = 'PUBLISHED' " +
                     "GROUP BY bv.blog_id " +
                     "ORDER BY COUNT(bv.blog_id) DESC " +
-                    "LIMIT ?3"
+                    "LIMIT ?1"
     )
-    List<Integer> getMostViewsByCategoryId(Integer id, BlogStatus blogStatus, Integer limit);
+    List<Integer> getMostViews(Integer limit);
+
+    @Query(
+            nativeQuery = true,
+            value = "SELECT bv.blog_id " +
+                    "FROM blog_category bc " +
+                    "INNER JOIN blogs b on bc.blog_id = b.id " +
+                    "INNER JOIN blog_views bv ON b.id = bv.blog_id " +
+                    "WHERE bc.category_id = ?1 AND b.status = 'PUBLISHED' " +
+                    "GROUP BY bv.blog_id " +
+                    "ORDER BY COUNT(bv.blog_id) DESC " +
+                    "LIMIT ?2"
+    )
+    List<Integer> getMostViewsByCategoryId(Integer id, Integer limit);
 }
