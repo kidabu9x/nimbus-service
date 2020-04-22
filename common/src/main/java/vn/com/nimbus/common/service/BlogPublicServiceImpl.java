@@ -3,8 +3,9 @@ package vn.com.nimbus.common.service;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-import org.springframework.util.StringUtils;
+import org.springframework.util.CollectionUtils;
 import reactor.core.publisher.Mono;
 import vn.com.nimbus.common.data.domain.BlogCategory;
 import vn.com.nimbus.common.data.domain.BlogContents;
@@ -23,7 +24,6 @@ import vn.com.nimbus.common.data.repository.CategoryRepository;
 import vn.com.nimbus.common.data.repository.TagRepository;
 import vn.com.nimbus.common.exception.AppException;
 import vn.com.nimbus.common.exception.AppExceptionCode;
-import vn.com.nimbus.common.model.extra.BlogExtraData;
 import vn.com.nimbus.common.model.paging.LimitOffsetPageable;
 import vn.com.nimbus.common.model.paging.Paging;
 import vn.com.nimbus.common.model.response.BasePublicResponse;
@@ -34,6 +34,8 @@ import vn.com.nimbus.common.utils.ParseExtraDataUtils;
 
 import javax.annotation.Resource;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
@@ -67,21 +69,20 @@ public class BlogPublicServiceImpl implements BlogPublicService {
 
     @Override
     public Mono<FeatureResponse> getFeature() {
-        final int LIMIT = 5;
+        final Pageable pageable = PageRequest.of(0, 5);
         FeatureResponse response = new FeatureResponse();
         Page<Categories> page = categoryRepository.findAll(PageRequest.of(0, 10));
         List<Categories> categories = page.getContent();
 
-        List<Integer> mostViewBlogIds = blogViewRepository.getMostViews(LIMIT);
-        List<Blogs> mostViewBlogs = blogRepository.findByIdIn(mostViewBlogIds);
+        List<Blogs> mostViewBlogs = this.getMostViewedBlogs(Collections.emptyList());
         List<BasePublicResponse.Blog> highLights = this.extractBlogs(mostViewBlogs);
         response.setHighlights(highLights);
 
         List<Blogs> allBlogs = new ArrayList<>(mostViewBlogs);
-        List<Integer> allBlogIds = mostViewBlogIds;
+        List<Integer> allBlogIds = mostViewBlogs.stream().map(Blogs::getId).collect(Collectors.toList());
         List<FeatureResponse.Feature> features = new ArrayList<>();
         categories.forEach(category -> {
-            List<Integer> ids = blogViewRepository.getMostViewsByCategoryId(category.getId(), LIMIT);
+            List<Integer> ids = blogViewRepository.getMostViewsByCategoryId(category.getId(), pageable);
             List<Integer> fetchIds = new ArrayList<>();
             List<Integer> existIds = new ArrayList<>();
 
@@ -118,124 +119,133 @@ public class BlogPublicServiceImpl implements BlogPublicService {
         BasePublicResponse response = new BasePublicResponse();
         response.setType(PublicResponseType.SEARCH);
         response.setBlogs(resBlogs);
-        response.setHighlights(this.extractBlogs(this.getMostViewedBlogs(5)));
+        response.setHighlights(this.extractBlogs(
+                this.getMostViewedBlogs(
+                        blogsPage.get()
+                                .map(Blogs::getId)
+                                .collect(Collectors.toList())
+                )
+            )
+        );
         return Mono.just(new Paging<>(response, limitOffsetPageable));
     }
 
     @Override
     public Mono<Object> getBlog(String slug, LimitOffsetPageable limitOffsetPageable) {
         log.info("Build data from slug: {}", slug);
+
         Blogs blog = blogRepository.findBySlugAndStatus(slug, BlogStatus.PUBLISHED);
+        Paging<BasePublicResponse> res;
         if (blog != null) {
-            BlogPublicDetailResponse res = this.buildBlogRes(blog);
+            res = this.buildBaseRes(PublicResponseType.BLOG, blog, limitOffsetPageable);
             viewService.addView(blog);
             return Mono.just(res);
         }
 
         Categories category = categoryRepository.findBySlug(slug);
         if (category != null) {
-
-            Paging<BasePublicResponse> res = this.buildCategoryRes(category, limitOffsetPageable);
+            res = this.buildBaseRes(PublicResponseType.CATEGORY, category, limitOffsetPageable);
             return Mono.just(res);
         }
 
         Optional<Tags> tagOpt = tagRepository.findBySlug(slug);
         if (tagOpt.isPresent()) {
             Tags tag = tagOpt.get();
-            Paging<BasePublicResponse> res = this.buildTag(tag, limitOffsetPageable);
+            res = this.buildBaseRes(PublicResponseType.TAG, tag, limitOffsetPageable);
             return Mono.just(res);
         }
 
         throw new AppException(AppExceptionCode.SLUG_NOT_FOUND);
     }
 
-    private BlogPublicDetailResponse buildBlogRes(Blogs blog) {
-        log.info("Build blog public detail, id {}, slug {}", blog.getId(), blog.getSlug());
-
-        BlogPublicDetailResponse response = new BlogPublicDetailResponse();
-        response.setType(PublicResponseType.BLOG);
-        List<Blogs> mostViewedBlogs = this.getMostViewedBlogs(5);
-        response.setHighlights(this.extractBlogs(mostViewedBlogs));
-
-        BasePublicResponse.BlogDetail blogDetail = new BasePublicResponse.BlogDetail();
-        blogDetail.setId(blog.getId());
-        blogDetail.setTitle(blog.getTitle());
-        blogDetail.setSlug(blog.getSlug());
-        blogDetail.setDescription(blog.getDescription());
-        blogDetail.setThumbnail(blog.getThumbnail());
-        blogDetail.setUpdatedAt(FormatUtils.formatLocalDateTime(blog.getUpdatedAt()));
-        blogDetail.setReadingTime("5 phút đọc");
-        blogDetail.setViewsCount(blog.getViews().size() + 1);
-        blogDetail.setCommentCount(0);
-
-        List<BlogPublicDetailResponse.Content> contents = blog.getContents().stream()
-                .sorted(Comparator.comparing(BlogContents::getPosition))
-                .map(c -> {
-                    BlogPublicDetailResponse.Content content = new BlogPublicDetailResponse.Content();
-                    content.setId(c.getId());
-                    content.setContent(c.getContent());
-                    return content;
-                }).collect(Collectors.toList());
-        blogDetail.setContents(contents);
-
-        List<BasePublicResponse.Author> authors = this.extractAuthors(blog.getAuthors());
-        blogDetail.setAuthors(authors);
-
-        List<BasePublicResponse.Tag> tags = this.extractTags(blog.getTags());
-        blogDetail.setTags(tags);
-
-        blogDetail.setExtraData(ParseExtraDataUtils.parseBlogExtraData(blog));
-
-        response.setBlog(blogDetail);
-        return response;
-    }
-
-    private Paging<BasePublicResponse> buildCategoryRes(Categories category, LimitOffsetPageable limitOffsetPageable) {
-        log.info("Build category detail, category id: {}", category.getId());
+    private Paging<BasePublicResponse> buildBaseRes(PublicResponseType type, Object data, LimitOffsetPageable limitOffsetPageable) {
+        log.info("Build base response from {} with data: {}", type, data);
         BasePublicResponse response = new BasePublicResponse();
-        response.setType(PublicResponseType.CATEGORY);
-        List<Blogs> mostViewedBlogs = this.getMostViewedBlogs(5);
+        response.setType(type);
+
+        List<Blogs> blogs;
+
+        switch (type) {
+            case BLOG:
+                Blogs blog = (Blogs) data;
+                BasePublicResponse.BlogDetail blogDetail = new BasePublicResponse.BlogDetail();
+                blogDetail.setId(blog.getId());
+                blogDetail.setTitle(blog.getTitle());
+                blogDetail.setSlug(blog.getSlug());
+                blogDetail.setDescription(blog.getDescription());
+                blogDetail.setThumbnail(blog.getThumbnail());
+                blogDetail.setUpdatedAt(FormatUtils.formatLocalDateTime(blog.getUpdatedAt()));
+                blogDetail.setReadingTime("5 phút đọc");
+                blogDetail.setViewsCount(blog.getViews().size() + 1);
+                blogDetail.setCommentCount(0);
+
+                List<BlogPublicDetailResponse.Content> contents = blog.getContents().stream()
+                        .sorted(Comparator.comparing(BlogContents::getPosition))
+                        .map(c -> {
+                            BlogPublicDetailResponse.Content content = new BlogPublicDetailResponse.Content();
+                            content.setId(c.getId());
+                            content.setContent(c.getContent());
+                            return content;
+                        }).collect(Collectors.toList());
+                blogDetail.setContents(contents);
+                List<BasePublicResponse.Author> authors = this.extractAuthors(blog.getAuthors());
+                blogDetail.setAuthors(authors);
+                List<BasePublicResponse.Category> categories = this.extractCategories(blog.getCategories().stream().map(BlogCategory::getCategory).collect(Collectors.toList()));
+                blogDetail.setCategories(categories);
+                List<BasePublicResponse.Tag> tags = this.extractTags(blog.getTags());
+                blogDetail.setTags(tags);
+                blogDetail.setExtraData(ParseExtraDataUtils.parseBlogExtraData(blog));
+                response.setBlog(blogDetail);
+
+                blogs = Collections.singletonList(blog);
+                break;
+            case CATEGORY:
+                Categories category = (Categories) data;
+                BasePublicResponse.Category categoryDetail = new BasePublicResponse.Category();
+                categoryDetail.setId(category.getId());
+                categoryDetail.setSlug(category.getSlug());
+                categoryDetail.setTitle(category.getTitle());
+                response.setCategory(categoryDetail);
+
+                Page<BlogCategory> pageCat = blogCategoryRepository.findByCategoryId(
+                        category.getId(),
+                        BlogStatus.PUBLISHED,
+                        PageRequest.of(limitOffsetPageable.getOffset(), limitOffsetPageable.getLimit())
+                );
+                limitOffsetPageable.setTotal(pageCat.getTotalElements());
+                blogs = pageCat.getContent().stream()
+                        .map(BlogCategory::getBlog)
+                        .collect(Collectors.toList());
+                break;
+            case TAG:
+                Tags tag = (Tags) data;
+                BasePublicResponse.Tag tagDetail = new BasePublicResponse.Tag();
+                tagDetail.setId(tag.getId());
+                tagDetail.setSlug(tag.getSlug());
+                tagDetail.setTitle(tag.getTitle());
+                response.setTag(tagDetail);
+                Page<BlogTag> pageTag = blogTagRepository.findByTag(
+                        tag.getId(),
+                        BlogStatus.PUBLISHED,
+                        PageRequest.of(limitOffsetPageable.getOffset(), limitOffsetPageable.getLimit())
+                );
+                limitOffsetPageable.setTotal(pageTag.getTotalElements());
+                blogs = pageTag.getContent().stream()
+                        .map(BlogTag::getBlog)
+                        .collect(Collectors.toList());
+                break;
+            default:
+                throw new AppException(AppExceptionCode.INTERNAL_SERVER_ERROR);
+        }
+
+        if (!type.equals(PublicResponseType.BLOG)) {
+            List<BasePublicResponse.Blog> blogRes = this.extractBlogs(blogs);
+            response.setBlogs(blogRes);
+        }
+
+        List<Integer> excludeIds = blogs.stream().map(Blogs::getId).collect(Collectors.toList());
+        List<Blogs> mostViewedBlogs = this.getMostViewedBlogs(excludeIds);
         response.setHighlights(this.extractBlogs(mostViewedBlogs));
-        BasePublicResponse.Category categoryDetail = new BasePublicResponse.Category();
-        categoryDetail.setId(category.getId());
-        categoryDetail.setSlug(category.getSlug());
-        categoryDetail.setTitle(category.getTitle());
-        response.setCategory(categoryDetail);
-
-        Page<BlogCategory> page = blogCategoryRepository.findByCategoryId(category.getId(), BlogStatus.PUBLISHED, PageRequest.of(limitOffsetPageable.getOffset(), limitOffsetPageable.getLimit()));
-        List<BlogCategory> blogCategories = page.getContent();
-        List<BasePublicResponse.Blog> blogs = this.extractBlogs(blogCategories.stream()
-                .map(BlogCategory::getBlog)
-                .collect(Collectors.toList()));
-        response.setBlogs(blogs);
-
-        limitOffsetPageable.setTotal(page.getTotalElements());
-
-        return new Paging<>(response, limitOffsetPageable);
-    }
-
-    private Paging<BasePublicResponse> buildTag(Tags tag, LimitOffsetPageable limitOffsetPageable) {
-        log.info("Build tag detail, category id: {}", tag.getId());
-        BasePublicResponse response = new BasePublicResponse();
-        response.setType(PublicResponseType.TAG);
-        BasePublicResponse.Tag tagDetail = new BasePublicResponse.Tag();
-        tagDetail.setId(tag.getId());
-        tagDetail.setSlug(tag.getSlug());
-        tagDetail.setTitle(tag.getTitle());
-        response.setTag(tagDetail);
-
-        List<Blogs> mostViewedBlogs = this.getMostViewedBlogs(5);
-        response.setHighlights(this.extractBlogs(mostViewedBlogs));
-
-        Page<BlogTag> page = blogTagRepository.findByTag(tag.getId(), BlogStatus.PUBLISHED, PageRequest.of(limitOffsetPageable.getOffset(), limitOffsetPageable.getLimit()));
-        List<BlogTag> blogTags = page.getContent();
-        List<BasePublicResponse.Blog> blogs = this.extractBlogs(blogTags.stream()
-                .map(BlogTag::getBlog)
-                .filter(b -> b.getStatus().equals(BlogStatus.PUBLISHED))
-                .collect(Collectors.toList()));
-        response.setBlogs(blogs);
-
-        limitOffsetPageable.setTotal(page.getTotalElements());
 
         return new Paging<>(response, limitOffsetPageable);
     }
@@ -314,9 +324,12 @@ public class BlogPublicServiceImpl implements BlogPublicService {
                 .collect(Collectors.toList());
     }
 
-    private List<Blogs> getMostViewedBlogs(Integer limit) {
-        List<Integer> mostViewBlogIds = blogViewRepository.getMostViews(limit);
-        return blogRepository.findByIdIn(mostViewBlogIds);
+    private List<Blogs> getMostViewedBlogs(List<Integer> excludeIds) {
+        if (CollectionUtils.isEmpty(excludeIds))
+            excludeIds = Collections.singletonList(-1);
+
+        List<Integer> page = blogViewRepository.getMostViews(excludeIds, PageRequest.of(0, 5));
+        return blogRepository.findByIdIn(page);
     }
 
 }
