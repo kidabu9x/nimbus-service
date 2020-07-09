@@ -59,6 +59,8 @@ services:
       - database:/var/lib/mysql
     ports:
       - 43320:3306
+    security_opt:
+      - seccomp:unconfined
 
 #  phpmyadmin:
 #    image: phpmyadmin/phpmyadmin
