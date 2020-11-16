@@ -1,44 +1,5 @@
 version: '3.2'
 services:
-  blog-internal:
-    hostname: blog-internal.local
-    container_name: blog-internal
-    ports:
-      - 48080:8080
-    build: blog-internal
-    depends_on:
-      - mysql
-    env_file:
-      - .env
-    environment:
-      ENVIRONMENT: docker
-
-  blog-public:
-    hostname: blog-public.local
-    container_name: blog-public
-    ports:
-      - 48081:8080
-    build: blog-public
-    depends_on:
-      - mysql
-    env_file:
-      - .env
-    environment:
-      ENVIRONMENT: docker
-
-  auth:
-    hostname: auth.local
-    container_name: nimbus-auth
-    ports:
-      - 48082:8080
-    build: auth
-    depends_on:
-      - mysql
-    env_file:
-      - .env
-    environment:
-      ENVIRONMENT: docker
-
   liquibase:
     build: common
     depends_on:
@@ -47,18 +8,20 @@ services:
       - mysql
     environment:
       ENVIRONMENT: local
-      JDBC_MASTER_URL: jdbc:mysql://mysql/nimbus_service?useUnicode=true&characterEncoding=utf-8
+      JDBC_MASTER_URL: jdbc:mysql://mysql/blog_service?useUnicode=true&characterEncoding=utf-8
       JDBC_MASTER_USERNAME: root
       JDBC_MASTER_PASSWORD:
 
   mysql:
-    hostname: mysql.local
-    container_name: nimbus-mysql
-    build: docker/images/mysql
-    volumes:
-      - database:/var/lib/mysql
-    ports:
-      - 43320:3306
+    command: --init-file="/tmp/init.sql"
+      volumes:
+        - database:/var/lib/mysql
+        - ./data/init.sql:/tmp/init.sql
+      environment:
+        MYSQL_ROOT_PASSWORD: ""
+        MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
+      ports:
+        - 53320:3306
 
 volumes:
   database:

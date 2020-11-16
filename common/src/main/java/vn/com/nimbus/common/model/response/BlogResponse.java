@@ -2,8 +2,8 @@ package vn.com.nimbus.common.model.response;
 
 import lombok.Getter;
 import lombok.Setter;
-import vn.com.nimbus.common.data.domain.constant.BlogContentType;
-import vn.com.nimbus.common.data.domain.constant.BlogStatus;
+import vn.com.nimbus.data.domain.constant.BlogContentType;
+import vn.com.nimbus.data.domain.constant.BlogStatus;
 import vn.com.nimbus.common.model.extra.BlogExtraData;
 
 import java.util.List;

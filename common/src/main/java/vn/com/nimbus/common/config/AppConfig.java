@@ -19,7 +19,6 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 import javax.sql.DataSource;
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
@@ -27,7 +26,7 @@ import java.util.Properties;
 @Configuration
 @EnableJpaAuditing
 @EnableTransactionManagement(proxyTargetClass = true)
-@EnableJpaRepositories(basePackages = {"vn.com.nimbus.common.data.repository"},
+@EnableJpaRepositories(basePackages = {"vn.com.nimbus.data.repository"},
         entityManagerFactoryRef = "appEntityManagerFactory",
         transactionManagerRef = "appTransactionManager"
 )
@@ -127,7 +126,7 @@ public class AppConfig {
 
     @Bean("appTransactionManager")
     @Primary
-    public JpaTransactionManager appTransactionManager() throws IllegalStateException, IOException {
+    public JpaTransactionManager appTransactionManager() throws IllegalStateException {
         JpaTransactionManager transactionManager = new JpaTransactionManager();
         transactionManager.setEntityManagerFactory(appEntityManagerFactory().getObject());
         transactionManager.setJpaDialect(getHibernateJpaDialect());

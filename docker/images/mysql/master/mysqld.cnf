@@ -1,9 +1,0 @@
-[mysqld]
-server-id=1
-log-bin=mysql-bin
-character-set-server=utf8mb4
-collation-server=utf8mb4_unicode_ci
-innodb_flush_log_at_trx_commit=1
-sync_binlog=1
-log-slave-updates=1
-datadir=/var/lib/mysql

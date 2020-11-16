@@ -3,9 +3,9 @@ package vn.com.nimbus.common.service;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import vn.com.nimbus.common.data.domain.BlogView;
-import vn.com.nimbus.common.data.domain.Blogs;
-import vn.com.nimbus.common.data.repository.BlogViewRepository;
+import vn.com.nimbus.data.domain.BlogView;
+import vn.com.nimbus.data.domain.Blogs;
+import vn.com.nimbus.data.repository.BlogViewRepository;
 
 import javax.annotation.Resource;
 

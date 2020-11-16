@@ -3,7 +3,7 @@ package vn.com.nimbus.common.model.response;
 
 import lombok.Getter;
 import lombok.Setter;
-import vn.com.nimbus.common.data.domain.constant.PublicResponseType;
+import vn.com.nimbus.data.domain.constant.PublicResponseType;
 import vn.com.nimbus.common.model.extra.BlogExtraData;
 
 import java.util.List;

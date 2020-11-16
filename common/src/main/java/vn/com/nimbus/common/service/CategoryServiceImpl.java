@@ -6,15 +6,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-import vn.com.nimbus.common.data.domain.BlogCategory;
-import vn.com.nimbus.common.data.domain.BlogCategoryID;
-import vn.com.nimbus.common.data.domain.BlogTag;
-import vn.com.nimbus.common.data.domain.BlogTagID;
-import vn.com.nimbus.common.data.domain.Blogs;
-import vn.com.nimbus.common.data.domain.Categories;
-import vn.com.nimbus.common.data.domain.Tags;
-import vn.com.nimbus.common.data.repository.BlogCategoryRepository;
-import vn.com.nimbus.common.data.repository.CategoryRepository;
+import vn.com.nimbus.data.domain.BlogCategory;
+import vn.com.nimbus.data.domain.BlogCategoryID;
+import vn.com.nimbus.data.domain.Blogs;
+import vn.com.nimbus.data.domain.Categories;
+import vn.com.nimbus.data.repository.BlogCategoryRepository;
+import vn.com.nimbus.data.repository.CategoryRepository;
 import vn.com.nimbus.common.exception.AppException;
 import vn.com.nimbus.common.exception.AppExceptionCode;
 import vn.com.nimbus.common.model.request.CreateBlogRequest;
@@ -27,7 +24,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 @Service
 @Slf4j

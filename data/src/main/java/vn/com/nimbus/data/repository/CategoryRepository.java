@@ -1,0 +1,21 @@
+package vn.com.nimbus.data.repository;
+
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
+import vn.com.nimbus.data.domain.Categories;
+
+import java.util.List;
+
+@Repository
+public interface CategoryRepository extends JpaRepository<Categories, Integer> {
+    List<Categories> findAllByIdIn(List<Integer> ids);
+
+    Categories findByTitle(String title);
+
+    Categories findBySlug(String slug);
+
+    Long countBySlugContains(String candidate);
+
+    List<Categories> findAllByOrderByCreatedAt();
+
+}

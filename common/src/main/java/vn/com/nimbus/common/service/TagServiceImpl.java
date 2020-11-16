@@ -2,20 +2,18 @@ package vn.com.nimbus.common.service;
 
 import com.github.slugify.Slugify;
 import lombok.extern.slf4j.Slf4j;
-import net.logstash.logback.encoder.org.apache.commons.lang.ArrayUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import vn.com.nimbus.common.data.domain.BlogTag;
-import vn.com.nimbus.common.data.domain.BlogTagID;
-import vn.com.nimbus.common.data.domain.Blogs;
-import vn.com.nimbus.common.data.domain.Tags;
-import vn.com.nimbus.common.data.repository.BlogTagRepository;
-import vn.com.nimbus.common.data.repository.TagRepository;
+import vn.com.nimbus.data.domain.BlogTag;
+import vn.com.nimbus.data.domain.BlogTagID;
+import vn.com.nimbus.data.domain.Blogs;
+import vn.com.nimbus.data.domain.Tags;
+import vn.com.nimbus.data.repository.BlogTagRepository;
+import vn.com.nimbus.data.repository.TagRepository;
 
 import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;

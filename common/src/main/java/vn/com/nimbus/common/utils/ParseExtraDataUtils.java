@@ -1,7 +1,7 @@
 package vn.com.nimbus.common.utils;
 
 import org.springframework.util.StringUtils;
-import vn.com.nimbus.common.data.domain.Blogs;
+import vn.com.nimbus.data.domain.Blogs;
 import vn.com.nimbus.common.model.extra.BlogExtraData;
 import vn.com.nimbus.common.service.JsonParseService;
 

@@ -2,9 +2,9 @@ package vn.com.nimbus.common.service;
 
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-import vn.com.nimbus.common.data.domain.BlogCategory;
-import vn.com.nimbus.common.data.domain.Blogs;
-import vn.com.nimbus.common.data.domain.Categories;
+import vn.com.nimbus.data.domain.BlogCategory;
+import vn.com.nimbus.data.domain.Blogs;
+import vn.com.nimbus.data.domain.Categories;
 import vn.com.nimbus.common.model.request.CreateBlogRequest;
 import vn.com.nimbus.common.model.request.CreateCategoryRequest;
 import vn.com.nimbus.common.model.request.UpdateCategoryRequest;
