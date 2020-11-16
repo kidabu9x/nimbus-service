@@ -1,4 +1,4 @@
-package vn.com.nimbus.common.model.request;
+package vn.com.nimbus.blog.internal.model.request;
 
 import lombok.Getter;
 import lombok.Setter;

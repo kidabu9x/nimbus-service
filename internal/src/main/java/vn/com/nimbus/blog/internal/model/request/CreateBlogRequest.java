@@ -1,4 +1,4 @@
-package vn.com.nimbus.common.model.request;
+package vn.com.nimbus.blog.internal.model.request;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -6,11 +6,14 @@ import lombok.Setter;
 import javax.validation.Valid;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Size;
+import java.io.Serializable;
 import java.util.List;
 
 @Setter
 @Getter
-public class CreateBlogRequest {
+public class CreateBlogRequest implements Serializable {
+    private static final long serialVersionUID = -2979433259008078591L;
+
     private Integer userId;
 
     private String description;
@@ -28,9 +31,8 @@ public class CreateBlogRequest {
     @Valid
     private List<Category> categories;
 
-    @Valid
     @NotEmpty
-    private List<Content> contents;
+    private List<@Valid Content> contents;
 
     private ExtraData extraData;
 

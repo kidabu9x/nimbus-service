@@ -1,7 +1,7 @@
 version: '3.2'
 services:
   liquibase:
-    build: common
+    build: data
     depends_on:
       - mysql
     links:
@@ -13,15 +13,16 @@ services:
       JDBC_MASTER_PASSWORD:
 
   mysql:
+    image: mysql:8.0.18
     command: --init-file="/tmp/init.sql"
-      volumes:
-        - database:/var/lib/mysql
-        - ./data/init.sql:/tmp/init.sql
-      environment:
-        MYSQL_ROOT_PASSWORD: ""
-        MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
-      ports:
-        - 53320:3306
+    volumes:
+      - database:/var/lib/mysql
+      - ./data/init.sql:/tmp/init.sql
+    environment:
+      MYSQL_ROOT_PASSWORD: ""
+      MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
+    ports:
+      - 53326:3306
 
 volumes:
   database:

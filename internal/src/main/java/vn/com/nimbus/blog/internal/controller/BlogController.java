@@ -13,15 +13,17 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Mono;
+import vn.com.nimbus.blog.internal.model.response.BlogResponse;
+import vn.com.nimbus.blog.internal.service.BlogService;
 import vn.com.nimbus.common.controller.AbstractController;
 import vn.com.nimbus.common.model.constant.KeyConstant;
-import vn.com.nimbus.common.model.request.CreateBlogRequest;
-import vn.com.nimbus.common.model.request.UpdateBlogRequest;
+import vn.com.nimbus.blog.internal.model.request.CreateBlogRequest;
+import vn.com.nimbus.blog.internal.model.request.UpdateBlogRequest;
 import vn.com.nimbus.common.model.response.BaseResponse;
-import vn.com.nimbus.common.service.BlogService;
 
 import javax.annotation.Resource;
 import javax.validation.Valid;
+import java.util.List;
 
 @RestController
 @RequestMapping("/v1/blogs")
@@ -31,48 +33,56 @@ public class BlogController extends AbstractController {
     private BlogService blogService;
 
     @GetMapping()
-    public Mono<BaseResponse> getBlogs(
+    public Mono<BaseResponse<List<BlogResponse>>> getBlogs(
             @RequestParam(name = "title", required = false, defaultValue = "") String title,
             @RequestParam(name = "limit", required = false, defaultValue = "10") Integer limit,
             @RequestParam(name = "offset", required = false, defaultValue = "0") Integer offset,
             @RequestParam(name = "category_id", required = false, defaultValue = "") Integer categoryId
     ) {
-        return processBaseResponse(blogService.getBlogs(title, categoryId, limit, offset));
+        return Mono
+                .just(blogService.getBlogs(title, categoryId, limit, offset))
+                .map(BaseResponse::ofSucceeded);
     }
 
     @GetMapping("/{blogId}")
-    public Mono<BaseResponse> getBlog(@PathVariable Integer blogId) {
-        return processBaseResponse(blogService.getBlog(blogId));
+    public Mono<BaseResponse<BlogResponse>> getBlog(@PathVariable Integer blogId) {
+        return Mono
+                .just(blogService.getBlog(blogId))
+                .map(BaseResponse::ofSucceeded);
     }
 
     @PostMapping()
-    public Mono<BaseResponse> createBlog(ServerHttpResponse currentResponse, @Valid @RequestBody CreateBlogRequest request) {
+    public Mono<BaseResponse<BlogResponse>> createBlog(ServerHttpResponse currentResponse, @Valid @RequestBody CreateBlogRequest request) {
         HttpHeaders headers = currentResponse.getHeaders();
         String userId = headers.getFirst(KeyConstant.X_USER_ID);
         assert userId != null;
         request.setUserId(Integer.valueOf(userId));
-        return processBaseResponse(blogService.createBlog(request));
+        return Mono
+                .just(blogService.createBlog(request))
+                .map(BaseResponse::ofSucceeded);
     }
 
     @PutMapping("/{blogId}")
-    public Mono<BaseResponse> updateBlog(ServerHttpResponse currentResponse, @Valid @RequestBody UpdateBlogRequest request, @PathVariable("blogId") Integer blogId) {
+    public Mono<BaseResponse<BlogResponse>> updateBlog(ServerHttpResponse currentResponse, @Valid @RequestBody UpdateBlogRequest request, @PathVariable("blogId") Integer blogId) {
         HttpHeaders headers = currentResponse.getHeaders();
         String userId = headers.getFirst(KeyConstant.X_USER_ID);
         request.setId(blogId);
         assert userId != null;
         request.setUserId(Integer.valueOf(userId));
-        blogService.updateBlog(request);
-        return processBaseResponse();
+        return Mono
+                .just(blogService.updateBlog(request))
+                .map(BaseResponse::ofSucceeded);
     }
 
     @DeleteMapping("/{blogId}")
-    public Mono<BaseResponse> deleteBlog(
+    public Mono<BaseResponse<Boolean>> deleteBlog(
             ServerHttpResponse currentResponse, @PathVariable("blogId") Integer blogId
     ) {
         HttpHeaders headers = currentResponse.getHeaders();
         String userId = headers.getFirst(KeyConstant.X_USER_ID);
         assert userId != null;
-        this.blogService.deleteBlog(blogId);
-        return processBaseResponse();
+        return Mono
+                .just(blogService.deleteBlog(blogId))
+                .map(BaseResponse::ofSucceeded);
     }
 }

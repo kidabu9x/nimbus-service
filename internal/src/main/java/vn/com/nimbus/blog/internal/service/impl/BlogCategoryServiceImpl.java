@@ -1,7 +1,8 @@
-package vn.com.nimbus.common.service;
+package vn.com.nimbus.blog.internal.service.impl;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import vn.com.nimbus.blog.internal.service.BlogCategoryService;
 import vn.com.nimbus.data.repository.BlogCategoryRepository;
 
 import javax.annotation.Resource;

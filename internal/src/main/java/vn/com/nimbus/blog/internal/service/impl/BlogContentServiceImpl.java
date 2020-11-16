@@ -1,16 +1,17 @@
-package vn.com.nimbus.common.service;
+package vn.com.nimbus.blog.internal.service.impl;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
+import vn.com.nimbus.blog.internal.model.request.CreateBlogRequest;
+import vn.com.nimbus.blog.internal.service.BlogContentService;
 import vn.com.nimbus.data.domain.BlogContents;
 import vn.com.nimbus.data.domain.Blogs;
 import vn.com.nimbus.data.domain.constant.BlogContentType;
 import vn.com.nimbus.data.repository.BlogContentRepository;
 import vn.com.nimbus.common.exception.AppException;
 import vn.com.nimbus.common.exception.AppExceptionCode;
-import vn.com.nimbus.common.model.request.CreateBlogRequest;
 
 import javax.annotation.Resource;
 import java.util.ArrayList;

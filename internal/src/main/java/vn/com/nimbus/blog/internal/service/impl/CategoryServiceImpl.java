@@ -1,4 +1,4 @@
-package vn.com.nimbus.common.service;
+package vn.com.nimbus.blog.internal.service.impl;
 
 import com.github.slugify.Slugify;
 import lombok.extern.slf4j.Slf4j;
@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import vn.com.nimbus.blog.internal.service.CategoryService;
 import vn.com.nimbus.data.domain.BlogCategory;
 import vn.com.nimbus.data.domain.BlogCategoryID;
 import vn.com.nimbus.data.domain.Blogs;
@@ -38,7 +39,7 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     @Transactional(readOnly = true)
-    public Flux<CategoryResponse> getCategories() {
+    public CategoryResponse getCategories() {
         return Flux.fromStream(categoryRepository.findAllByOrderByCreatedAt().stream().map(this::buildResponse));
     }
 

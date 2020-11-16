@@ -1,8 +1,8 @@
-package vn.com.nimbus.common.service;
+package vn.com.nimbus.blog.internal.service;
 
+import vn.com.nimbus.blog.internal.model.request.CreateBlogRequest;
 import vn.com.nimbus.data.domain.BlogContents;
 import vn.com.nimbus.data.domain.Blogs;
-import vn.com.nimbus.common.model.request.CreateBlogRequest;
 
 import java.util.List;
 

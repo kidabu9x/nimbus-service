@@ -10,10 +10,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Mono;
 import vn.com.nimbus.common.controller.AbstractController;
-import vn.com.nimbus.common.model.request.CreateCategoryRequest;
-import vn.com.nimbus.common.model.request.UpdateCategoryRequest;
+import vn.com.nimbus.blog.internal.model.request.CreateCategoryRequest;
+import vn.com.nimbus.blog.internal.model.request.UpdateCategoryRequest;
 import vn.com.nimbus.common.model.response.BaseResponse;
-import vn.com.nimbus.common.service.CategoryService;
+import vn.com.nimbus.blog.internal.service.CategoryService;
 
 import javax.annotation.Resource;
 import javax.validation.Valid;

@@ -1,5 +1,6 @@
 package vn.com.nimbus.common.model.response;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -7,51 +8,78 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
+import lombok.experimental.Accessors;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import vn.com.nimbus.common.model.error.BusinessErrorCode;
+import vn.com.nimbus.common.model.error.FieldViolation;
+import vn.com.nimbus.common.model.exception.BaseException;
 
 import java.io.Serializable;
 import java.util.List;
 
 @Data
-@NoArgsConstructor
-@AllArgsConstructor
-@ToString
-public class BaseResponse implements Serializable {
+@Accessors(chain = true)
+@JsonInclude(JsonInclude.Include.NON_NULL)
+@Slf4j
+public class BaseResponse<T> {
+    public static final String OK_CODE = "200";
+    private T data;
+    private Metadata meta = new Metadata();
 
-    private Object data;
-    private Meta meta;
-
-    @Getter
-    @Setter
-    @ToString
-    @Builder
-    public static class Meta implements Serializable {
-        private List<ErrorMessageCode> errors;
-        private int code;
-        private String message;
-        private Integer page;
-        private Integer pageSize;
-        private Integer limit;
-        private Integer offset;
-        private Long total;
+    public static <T> BaseResponse<T> ofSucceeded(T data) {
+        BaseResponse<T> response = new BaseResponse<>();
+        response.data = data;
+        response.meta.code = OK_CODE;
+        return response;
     }
 
-    @Getter
-    @AllArgsConstructor
-    @ToString
-    public static class ErrorMessageCode implements Serializable {
-
-        private Integer code;
-        private String target;
-        private String message;
-
-        public ErrorMessageCode(int code, String message) {
-            this.code = code;
-            this.message = message;
-        }
-
-        public ErrorMessageCode(String target, String message) {
-            this.target = target;
-            this.message = message;
-        }
+    public static BaseResponse<Void> ofSucceeded() {
+        BaseResponse<Void> response = new BaseResponse<>();
+        response.meta.code = OK_CODE;
+        return response;
     }
+
+    public static <T> BaseResponse<List<T>> ofSucceeded(Page<T> data) {
+        BaseResponse<List<T>> response = new BaseResponse<>();
+        response.data = data.getContent();
+        response.meta.code = OK_CODE;
+        response.meta.page = data.getPageable().getPageNumber();
+        response.meta.size = data.getPageable().getPageSize();
+        response.meta.total = data.getTotalElements();
+        return response;
+    }
+
+    public static BaseResponse<Void> ofFailed(BusinessErrorCode errorCode) {
+        return ofFailed(errorCode, null);
+    }
+
+    public static BaseResponse<Void> ofFailed(BusinessErrorCode errorCode, String message) {
+        return ofFailed(errorCode, message, errorCode.getErrors());
+    }
+
+    public static BaseResponse<Void> ofFailed(BusinessErrorCode errorCode, String message, List<FieldViolation> errors) {
+        BaseResponse<Void> response = new BaseResponse<>();
+        response.meta.code = String.valueOf(errorCode.getCode());
+        response.meta.message = message != null ? message : errorCode.getMessage();
+        response.meta.errors = errors;
+        return response;
+    }
+
+    public static BaseResponse<Void> ofFailed(BaseException exception) {
+        return ofFailed(exception.getErrorCode(), exception.getMessage());
+    }
+
+    @Data
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    public static class Metadata {
+        String code;
+        Integer page;
+        Integer size;
+        Long total;
+        List<FieldViolation> errors;
+        String message;
+        Boolean hasData;
+    }
+
 }
