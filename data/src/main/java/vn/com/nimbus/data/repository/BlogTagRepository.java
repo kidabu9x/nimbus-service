@@ -19,8 +19,8 @@ public interface BlogTagRepository extends JpaRepository<BlogTag, BlogTagID> {
     List<BlogTag> findByBlogId(Integer id);
 
     @Query(
-            value = "SELECT bt FROM BlogTag bt INNER JOIN Blogs b ON b.id = bt.id.blogId WHERE bt.id.tagId = ?1 AND b.status = ?2",
-            countQuery = "SELECT count(bt.id) FROM BlogTag bt INNER JOIN Blogs b ON b.id = bt.id.blogId WHERE bt.id.tagId = ?1 AND b.status = ?2"
+            value = "SELECT bt FROM BlogTag bt INNER JOIN Blog b ON b.id = bt.id.blogId WHERE bt.id.tagId = ?1 AND b.status = ?2",
+            countQuery = "SELECT count(bt.id) FROM BlogTag bt INNER JOIN Blog b ON b.id = bt.id.blogId WHERE bt.id.tagId = ?1 AND b.status = ?2"
     )
     Page<BlogTag> findByTag(Integer tagId, BlogStatus blogStatus, Pageable pageable);
 }

@@ -3,23 +3,23 @@ package vn.com.nimbus.data.repository;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
-import vn.com.nimbus.data.domain.Tags;
+import vn.com.nimbus.data.domain.Tag;
 
 import java.util.List;
 import java.util.Optional;
 
 @Repository
-public interface TagRepository extends JpaRepository<Tags, Integer> {
+public interface TagRepository extends JpaRepository<Tag, Integer> {
     Integer countBySlugContains(String candidate);
 
-    Optional<Tags> findBySlug(String slug);
+    Optional<Tag> findBySlug(String slug);
 
-    Tags findByTitleAndSlug(String title, String slug);
+    Tag findByTitleAndSlug(String title, String slug);
 
-    List<Tags> findByTitleIn(List<String> title);
+    List<Tag> findByTitleIn(List<String> tags);
 
     @Query(
-            value = "SELECT t FROM Tags t INNER JOIN BlogTag blogTag ON blogTag.id.tagId = t.id WHERE blogTag.id.blogId = ?1"
+            value = "SELECT t FROM Tag t INNER JOIN BlogTag blogTag ON blogTag.id.tagId = t.id WHERE blogTag.id.blogId = ?1"
     )
-    List<Tags> findLinkedTags(Integer blogId);
+    List<Tag> findLinkedTags(Integer blogId);
 }

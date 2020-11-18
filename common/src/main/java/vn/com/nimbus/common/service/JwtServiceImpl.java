@@ -7,7 +7,7 @@ import io.jsonwebtoken.SignatureAlgorithm;
 import org.springframework.stereotype.Service;
 import vn.com.nimbus.common.config.ConfigData;
 import vn.com.nimbus.common.config.ConfigLoader;
-import vn.com.nimbus.data.domain.Users;
+import vn.com.nimbus.data.domain.User;
 import vn.com.nimbus.common.model.constant.KeyConstant;
 
 import java.security.KeyFactory;
@@ -28,7 +28,7 @@ public class JwtServiceImpl implements JwtService {
 
 
     @Override
-    public String createJwt(Users user) {
+    public String createJwt(User user) {
         ConfigData.OauthKey oauthConfig = ConfigLoader.getInstance().configData.getOauthKey();
 
         Map<String, Object> payload = this.generateTokenPayload(user);
@@ -62,7 +62,7 @@ public class JwtServiceImpl implements JwtService {
     }
 
 
-    private Map<String, Object> generateTokenPayload(Users user) {
+    private Map<String, Object> generateTokenPayload(User user) {
         Map<String, Object> payload = new HashMap<>();
         payload.put(KeyConstant.USER_ID, user.getId());
         return payload;

@@ -5,8 +5,8 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.PropertyNamingStrategy;
 import lombok.extern.slf4j.Slf4j;
-import vn.com.nimbus.common.exception.AppException;
-import vn.com.nimbus.common.exception.AppExceptionCode;
+import vn.com.nimbus.common.model.error.ErrorCode;
+import vn.com.nimbus.common.model.exception.BaseException;
 
 import java.io.IOException;
 
@@ -18,7 +18,7 @@ public class JsonParseService<V> {
             return mapper.readValue(data, clazz);
         } catch (IOException e) {
             log.error("ERROR PARSE JSON OBJECT {}", data);
-            throw new AppException(AppExceptionCode.INTERNAL_SERVER_ERROR);
+            throw new BaseException(ErrorCode.INTERNAL_SERVER_ERROR);
         }
     }
 

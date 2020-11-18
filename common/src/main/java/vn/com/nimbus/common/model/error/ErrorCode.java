@@ -14,6 +14,9 @@ public class ErrorCode {
     public static final BusinessErrorCode RESOURCE_NOT_FOUND = new BusinessErrorCode(
             404_000, "Resource not found", HttpStatus.NOT_FOUND);
 
+    public static final BusinessErrorCode RESOURCE_CONFLICT = new BusinessErrorCode(
+            409_000, "Resource is conflict", HttpStatus.CONFLICT);
+
     private ErrorCode() {
     }
 }

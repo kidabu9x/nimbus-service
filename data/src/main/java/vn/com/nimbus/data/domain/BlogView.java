@@ -16,26 +16,23 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+import java.io.Serializable;
 import java.time.LocalDateTime;
 
 @Entity
 @Getter
 @Setter
-@Table(name = "blog_views")
+@Table(name = "blog_view")
 @EntityListeners(AuditingEntityListener.class)
-public class BlogView {
-
+public class BlogView implements Serializable {
+    private static final long serialVersionUID = -1214368768277227244L;
     @Id
     @Column(name = "id", updatable = false)
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
+    private Long id;
 
     @Column(name = "blog_id")
-    private Integer blogId;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "blog_id", insertable = false, updatable = false)
-    private Blogs blog;
+    private Long blogId;
 
     @Column(name = "created_at", updatable = false)
     @CreatedDate

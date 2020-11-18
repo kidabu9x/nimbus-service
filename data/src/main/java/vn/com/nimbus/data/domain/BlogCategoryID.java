@@ -12,11 +12,13 @@ import java.util.Objects;
 @Setter
 @Getter
 public class BlogCategoryID implements Serializable {
+    private static final long serialVersionUID = -8247396434213551162L;
+
     @Column(name = "category_id")
-    private Integer categoryId;
+    private Long categoryId;
 
     @Column(name = "blog_id")
-    private Integer blogId;
+    private Long blogId;
 
     @Override
     public boolean equals(Object o) {

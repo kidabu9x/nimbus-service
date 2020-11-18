@@ -25,4 +25,9 @@
                  path="/sql/2020_04_13_add_id_ref_for_users_table.sql"/>
     </changeSet>
 
+    <changeSet id="2020_11_18_refactor_database" author="duongnk" context="auto">
+        <sqlFile encoding="utf8" endDelimiter=";"
+                 path="/sql/2020_11_18_refactor_database.sql"/>
+    </changeSet>
+
 </databaseChangeLog>

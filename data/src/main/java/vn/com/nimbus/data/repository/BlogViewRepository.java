@@ -16,7 +16,7 @@ public interface BlogViewRepository extends JpaRepository<BlogView, Integer> {
 
     @Query(
             value = "SELECT b.id " +
-                    "FROM Blogs b " +
+                    "FROM Blog b " +
                     "LEFT JOIN BlogView bv ON b.id = bv.blogId " +
                     "WHERE b.status = 'PUBLISHED' AND b.id NOT IN ?1 " +
                     "GROUP BY b.id " +
@@ -26,7 +26,7 @@ public interface BlogViewRepository extends JpaRepository<BlogView, Integer> {
 
     @Query(
             value = "SELECT b.id " +
-                    "FROM Blogs b " +
+                    "FROM Blog b " +
                     "LEFT JOIN BlogCategory bc ON b.id = bc.id.blogId " +
                     "LEFT JOIN BlogView bv ON b.id = bv.blogId " +
                     "WHERE bc.id.categoryId = ?1 AND b.status = 'PUBLISHED' " +

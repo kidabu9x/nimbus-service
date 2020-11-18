@@ -5,24 +5,16 @@ import lombok.Setter;
 
 import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+import java.io.Serializable;
 
 @Entity
 @Table(name = "blog_category")
 @Getter
 @Setter
-public class BlogCategory {
+public class BlogCategory implements Serializable {
+    private static final long serialVersionUID = 4751211558221004658L;
     @EmbeddedId
     private BlogCategoryID id;
-
-    @ManyToOne
-    @JoinColumn(name = "category_id", insertable = false, updatable = false)
-    private Categories category;
-
-    @ManyToOne
-    @JoinColumn(name = "blog_id", insertable = false, updatable = false)
-    private Blogs blog;
 
 }

@@ -6,8 +6,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import vn.com.nimbus.data.domain.BlogTag;
 import vn.com.nimbus.data.domain.BlogTagID;
-import vn.com.nimbus.data.domain.Blogs;
-import vn.com.nimbus.data.domain.Tags;
+import vn.com.nimbus.data.domain.Blog;
+import vn.com.nimbus.data.domain.Tag;
 import vn.com.nimbus.data.repository.BlogTagRepository;
 import vn.com.nimbus.data.repository.TagRepository;
 
@@ -31,23 +31,23 @@ public class TagServiceImpl implements TagService {
     private final Slugify slugify = new Slugify();
 
     @Override
-    public List<Tags> getTags() {
+    public List<Tag> getTags() {
         return null;
     }
 
     @Override
     @Transactional
-    public List<Tags> saveTags(Blogs blog, List<String> tagsList) {
+    public List<Tag> saveTags(Blog blog, List<String> tagsList) {
         Integer blogId = blog.getId();
 
         List<String> reqTagStr = tagsList.stream().map(String::trim).collect(Collectors.toList());
-        List<Tags> linkedTags = tagRepository.findLinkedTags(blogId);
-        List<String> linkedTagStr = linkedTags.stream().map(Tags::getTitle).collect(Collectors.toList());
+        List<Tag> linkedTags = tagRepository.findLinkedTags(blogId);
+        List<String> linkedTagStr = linkedTags.stream().map(Tag::getTitle).collect(Collectors.toList());
 
         List<String> newTagStr = reqTagStr.stream().filter(t -> !linkedTagStr.contains(t)).collect(Collectors.toList());
         List<String> oldTagStr = linkedTagStr.stream().filter(t -> !reqTagStr.contains(t)).collect(Collectors.toList());
 
-        List<Tags> savedTags = this.saveTags(newTagStr);
+        List<Tag> savedTags = this.saveTags(newTagStr);
         List<BlogTag> addIds = savedTags.stream().map(t -> {
             BlogTagID id = new BlogTagID();
             id.setTagId(t.getId());
@@ -70,13 +70,13 @@ public class TagServiceImpl implements TagService {
         }).collect(Collectors.toList());
         blogTagRepository.deleteAll(removeIds);
 
-        List<Tags> keepTags = linkedTags.stream().filter(t -> !newTagStr.contains(t.getTitle()) && oldTagStr.contains(t.getTitle())).collect(Collectors.toList());
+        List<Tag> keepTags = linkedTags.stream().filter(t -> !newTagStr.contains(t.getTitle()) && oldTagStr.contains(t.getTitle())).collect(Collectors.toList());
 
         return Stream.concat(savedTags.stream(), keepTags.stream()).collect(Collectors.toList());
     }
 
-    private List<Tags> saveTags(List<String> tagStrs) {
-        List<Tags> tags = new ArrayList<>();
+    private List<Tag> saveTags(List<String> tagStrs) {
+        List<Tag> tags = new ArrayList<>();
         Map<String, Integer> tagCount = new HashMap<>();
         for (String tagStr: tagStrs) {
             String slug = slugify.slugify(tagStr);
@@ -85,12 +85,12 @@ public class TagServiceImpl implements TagService {
             else
                 tagCount.put(slug, 0);
 
-            Tags tag = tagRepository.findByTitleAndSlug(tagStr, slug);
+            Tag tag = tagRepository.findByTitleAndSlug(tagStr, slug);
             if (tag != null) {
                 tags.add(tag);
                 continue;
             }
-            tag = new Tags();
+            tag = new Tag();
             Integer count = tagRepository.countBySlugContains(slug);
             Integer requestCount = tagCount.get(slug);
             if ((count + requestCount) > 0)
