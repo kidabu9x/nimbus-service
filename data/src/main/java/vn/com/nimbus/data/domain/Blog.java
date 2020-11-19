@@ -1,35 +1,34 @@
 package vn.com.nimbus.data.domain;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+import vn.com.nimbus.data.domain.base.BlogExtraData;
 import vn.com.nimbus.data.domain.constant.BlogStatus;
+import vn.com.nimbus.data.domain.converter.JsonAttributeConverter;
 
 import javax.persistence.Column;
+import javax.persistence.Convert;
 import javax.persistence.Entity;
 import javax.persistence.EntityListeners;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
-import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.JoinTable;
-import javax.persistence.ManyToMany;
-import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import java.io.Serializable;
 import java.time.LocalDateTime;
-import java.util.Set;
 
 @Entity
 @Table(name = "blog")
-@Getter
-@Setter
 @EntityListeners(AuditingEntityListener.class)
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
 public class Blog implements Serializable {
     private static final long serialVersionUID = 601568770707488920L;
     @Id
@@ -54,7 +53,8 @@ public class Blog implements Serializable {
     private String thumbnail;
 
     @Column(name = "extra_data")
-    private String extraData;
+    @Convert(converter = JsonAttributeConverter.BlogExtraDataConverter.class)
+    private BlogExtraData extraData;
 
     @Column(name = "created_at", updatable = false)
     @CreatedDate

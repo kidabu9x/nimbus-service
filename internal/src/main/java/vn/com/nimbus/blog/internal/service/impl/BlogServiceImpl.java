@@ -1,8 +1,5 @@
 package vn.com.nimbus.blog.internal.service.impl;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.PropertyNamingStrategy;
 import com.github.slugify.Slugify;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,9 +16,7 @@ import vn.com.nimbus.blog.internal.model.response.BlogResponse;
 import vn.com.nimbus.blog.internal.service.BlogService;
 import vn.com.nimbus.common.model.error.ErrorCode;
 import vn.com.nimbus.common.model.exception.BaseException;
-import vn.com.nimbus.common.model.extra.BlogExtraData;
 import vn.com.nimbus.common.model.paging.LimitOffsetPageable;
-import vn.com.nimbus.common.service.JsonParseService;
 import vn.com.nimbus.common.utils.DateToTimestampUtil;
 import vn.com.nimbus.data.domain.Blog;
 import vn.com.nimbus.data.domain.BlogAuthor;
@@ -141,23 +136,7 @@ public class BlogServiceImpl implements BlogService {
                 .map(BlogCategoryID::getCategoryId)
                 .collect(Collectors.toList());
         response.setCategories(categoryIds);
-
-        BlogExtraData extraData;
-        if (blog.getExtraData() != null) {
-            JsonParseService<BlogExtraData> jsonParseService = new JsonParseService<>();
-            extraData = jsonParseService.toEntityData(blog.getExtraData(), BlogExtraData.class);
-            if (StringUtils.isEmpty(extraData.getFacebookPixelId())) {
-                extraData.setFacebookPixelId("");
-            }
-            if (StringUtils.isEmpty(extraData.getGoogleAnalyticsId())) {
-                extraData.setGoogleAnalyticsId("");
-            }
-        } else {
-            extraData = new BlogExtraData();
-            extraData.setFacebookPixelId("");
-            extraData.setGoogleAnalyticsId("");
-        }
-        response.setExtraData(extraData);
+        response.setExtraData(blog.getExtraData());
 
         return response;
     }
@@ -219,20 +198,6 @@ public class BlogServiceImpl implements BlogService {
 
         if (StringUtils.isEmpty(blog.getSlug())) {
             blog.setSlug(this.generateSlug(blog.getTitle()));
-        }
-        if (request.getExtraData() != null) {
-            try {
-                BlogExtraData extraData = new BlogExtraData();
-                extraData.setFacebookPixelId(request.getExtraData().getFacebookPixelId());
-                extraData.setGoogleAnalyticsId(request.getExtraData().getGoogleAnalyticsId());
-                ObjectMapper mapper = new ObjectMapper();
-                mapper.setPropertyNamingStrategy(PropertyNamingStrategy.SNAKE_CASE);
-                String extraDataStr = mapper.writeValueAsString(extraData);
-                blog.setExtraData(extraDataStr);
-            } catch (JsonProcessingException e) {
-                log.error("Fail to parse blog extra data: {}", request.getExtraData());
-                throw new BaseException(ErrorCode.INTERNAL_SERVER_ERROR);
-            }
         }
         blog = blogRepository.save(blog);
 

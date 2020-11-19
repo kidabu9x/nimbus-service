@@ -20,7 +20,6 @@ import vn.com.nimbus.common.model.error.ErrorCode;
 import vn.com.nimbus.common.model.exception.BaseException;
 import vn.com.nimbus.common.model.paging.LimitOffsetPageable;
 import vn.com.nimbus.common.model.paging.Paging;
-import vn.com.nimbus.common.utils.ParseExtraDataUtils;
 import vn.com.nimbus.data.domain.Blog;
 import vn.com.nimbus.data.domain.BlogAuthor;
 import vn.com.nimbus.data.domain.BlogAuthorID;
@@ -242,7 +241,6 @@ public class BlogServiceImpl implements BlogService {
                     TagMapper tagMapper = TagMapper.INSTANCE;
                     detail.setTags(tags.stream().map(tagMapper::toResponse).collect(Collectors.toList()));
                 }
-                detail.setExtraData(ParseExtraDataUtils.parseBlogExtraData(blog));
                 response.setBlog(detail);
 
                 blogs = Collections.singletonList(blog);

@@ -2,7 +2,7 @@ package vn.com.nimbus.blog.api.model.response;
 
 import lombok.Getter;
 import lombok.Setter;
-import vn.com.nimbus.common.model.extra.BlogExtraData;
+import vn.com.nimbus.data.domain.base.BlogExtraData;
 
 import java.util.List;
 

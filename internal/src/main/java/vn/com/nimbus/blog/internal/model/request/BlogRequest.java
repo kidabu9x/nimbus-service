@@ -3,7 +3,7 @@ package vn.com.nimbus.blog.internal.model.request;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import lombok.Setter;
-import vn.com.nimbus.common.model.extra.BlogExtraData;
+import vn.com.nimbus.data.domain.base.BlogExtraData;
 import vn.com.nimbus.data.domain.constant.BlogStatus;
 
 import javax.validation.constraints.NotEmpty;

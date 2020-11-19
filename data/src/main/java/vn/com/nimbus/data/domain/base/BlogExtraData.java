@@ -1,4 +1,4 @@
-package vn.com.nimbus.common.model.extra;
+package vn.com.nimbus.data.domain.base;
 
 import lombok.Getter;
 import lombok.Setter;
