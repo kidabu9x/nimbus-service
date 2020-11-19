@@ -14,21 +14,21 @@ import java.util.List;
 
 @Repository
 public interface BlogCategoryRepository extends JpaRepository<BlogCategory, BlogCategoryID> {
-    @Query(
-            value = "SELECT t FROM Category t INNER JOIN BlogCategory blogCategory ON blogCategory.id.categoryId = t.id WHERE blogCategory.id.blogId = ?1"
-    )
-    List<Category> findLinkedCategories(Integer blogId);
 
-    List<BlogCategory> findByBlogId(Integer blogId);
+    List<BlogCategory> findById_BlogId(Long id);
+
+    List<BlogCategory> findById_CategoryId(Long id);
 
     @Query(
-            value = "SELECT bc FROM BlogCategory bc INNER JOIN Blog b ON b.id = bc.id.blogId WHERE bc.id.categoryId = ?1 AND b.status = ?2",
-            countQuery = "SELECT count(bc.id) FROM BlogCategory bc INNER JOIN Blog b ON b.id = bc.id.blogId WHERE bc.id.categoryId = ?1 AND b.status = ?2"
+            value = "SELECT bc " +
+                    "FROM BlogCategory bc " +
+                    "INNER JOIN Blog b ON b.id = bc.id.blogId " +
+                    "WHERE bc.id.categoryId = ?1 AND b.status = ?2",
+            countQuery = "SELECT count(bc.id) " +
+                    "FROM BlogCategory bc " +
+                    "INNER JOIN Blog b ON b.id = bc.id.blogId " +
+                    "WHERE bc.id.categoryId = ?1 AND b.status = ?2"
     )
-    Page<BlogCategory> findByCategoryId(Integer categoryId, BlogStatus blogStatus, Pageable pageable);
-
-    void deleteByBlogId(Integer blogId);
-
-    void deleteByCategoryId(Integer categoryId);
+    Page<BlogCategory> findByCategoryId(Long categoryId, BlogStatus blogStatus, Pageable pageable);
 
 }

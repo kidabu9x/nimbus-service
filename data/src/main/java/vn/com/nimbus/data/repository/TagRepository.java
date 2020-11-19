@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
-public interface TagRepository extends JpaRepository<Tag, Integer> {
+public interface TagRepository extends JpaRepository<Tag, Long> {
     Integer countBySlugContains(String candidate);
 
     Optional<Tag> findBySlug(String slug);
@@ -21,5 +21,6 @@ public interface TagRepository extends JpaRepository<Tag, Integer> {
     @Query(
             value = "SELECT t FROM Tag t INNER JOIN BlogTag blogTag ON blogTag.id.tagId = t.id WHERE blogTag.id.blogId = ?1"
     )
-    List<Tag> findLinkedTags(Integer blogId);
+    List<Tag> findLinkedTags(Long blogId);
+
 }

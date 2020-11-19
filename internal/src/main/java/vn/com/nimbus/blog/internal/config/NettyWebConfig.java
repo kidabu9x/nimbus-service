@@ -1,4 +1,4 @@
-package vn.com.nimbus.blog.api.config;
+package vn.com.nimbus.blog.internal.config;
 
 import org.springframework.boot.web.embedded.netty.NettyReactiveWebServerFactory;
 import org.springframework.boot.web.embedded.netty.NettyServerCustomizer;
@@ -11,7 +11,7 @@ public class NettyWebConfig implements WebServerFactoryCustomizer<NettyReactiveW
 
     @Override
     public void customize(NettyReactiveWebServerFactory factory) {
-        factory.addServerCustomizers(new PortCustomizer(ApiPublicConfigLoader.apiInternalConfig.getPort(), ApiPublicConfigLoader.apiInternalConfig.getHost()));
+        factory.addServerCustomizers(new PortCustomizer(ApiInternalConfigLoader.apiInternalConfig.getPort(), ApiInternalConfigLoader.apiInternalConfig.getHost()));
     }
 
     private static class PortCustomizer implements NettyServerCustomizer {

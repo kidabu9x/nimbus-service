@@ -14,8 +14,8 @@ public class FeatureResponse extends BasePublicResponse {
     @Getter
     @Setter
     public static class Feature {
-        BasePublicResponse.Category category;
-        List<BasePublicResponse.Blog> blogs;
+        private CategoryResponse category;
+        private List<BlogResponse> blogs;
     }
 
 }

@@ -14,6 +14,7 @@ import org.springframework.data.domain.Page;
 import vn.com.nimbus.common.model.error.BusinessErrorCode;
 import vn.com.nimbus.common.model.error.FieldViolation;
 import vn.com.nimbus.common.model.exception.BaseException;
+import vn.com.nimbus.common.model.paging.Paging;
 
 import java.io.Serializable;
 import java.util.List;
@@ -30,6 +31,16 @@ public class BaseResponse<T> {
     public static <T> BaseResponse<T> ofSucceeded(T data) {
         BaseResponse<T> response = new BaseResponse<>();
         response.data = data;
+        response.meta.code = OK_CODE;
+        return response;
+    }
+
+    public static <T> BaseResponse<T> ofSucceeded(Paging<T> data) {
+        BaseResponse<T> response = new BaseResponse<>();
+        response.data = data.getItem();
+        response.meta.page = data.getPageable().getPage();
+        response.meta.size = data.getPageable().getPageSize();
+        response.meta.total = data.getPageable().getTotal();
         response.meta.code = OK_CODE;
         return response;
     }

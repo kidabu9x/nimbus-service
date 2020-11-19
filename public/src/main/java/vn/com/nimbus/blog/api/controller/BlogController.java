@@ -7,11 +7,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Mono;
+import vn.com.nimbus.blog.api.service.BlogService;
 import vn.com.nimbus.blog.api.model.response.BasePublicResponse;
 import vn.com.nimbus.blog.api.model.response.CategoryResponse;
 import vn.com.nimbus.blog.api.model.response.FeatureResponse;
-import vn.com.nimbus.blog.api.service.BlogPublicService;
 import vn.com.nimbus.common.model.paging.LimitOffsetPageable;
+import vn.com.nimbus.common.model.paging.Paging;
 import vn.com.nimbus.common.model.response.BaseResponse;
 
 import java.util.List;
@@ -19,10 +20,10 @@ import java.util.List;
 @RestController
 @RequestMapping("/v1/")
 public class BlogController {
-    private final BlogPublicService blogService;
+    private final BlogService blogService;
 
     @Autowired
-    public BlogController(BlogPublicService blogService) {
+    public BlogController(BlogService blogService) {
         this.blogService = blogService;
     }
 
@@ -35,7 +36,7 @@ public class BlogController {
     }
 
     @GetMapping("/search")
-    public Mono<BaseResponse<List<BasePublicResponse>>> searchBlog(
+    public Mono<BaseResponse<BasePublicResponse>> searchBlog(
             @RequestParam(name = "query", required = false, defaultValue = "") String search,
             @RequestParam(name = "limit", required = false, defaultValue = "10") Integer limit,
             @RequestParam(name = "offset", required = false, defaultValue = "0") Integer offset

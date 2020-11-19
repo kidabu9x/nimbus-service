@@ -13,14 +13,17 @@ import java.util.List;
 
 @Repository
 public interface BlogTagRepository extends JpaRepository<BlogTag, BlogTagID> {
-    @Query(
-            value = "SELECT t FROM BlogTag t WHERE t.id.blogId = ?1"
-    )
-    List<BlogTag> findByBlogId(Integer id);
+    List<BlogTag> findById_BlogId(Long blogId);
 
     @Query(
-            value = "SELECT bt FROM BlogTag bt INNER JOIN Blog b ON b.id = bt.id.blogId WHERE bt.id.tagId = ?1 AND b.status = ?2",
-            countQuery = "SELECT count(bt.id) FROM BlogTag bt INNER JOIN Blog b ON b.id = bt.id.blogId WHERE bt.id.tagId = ?1 AND b.status = ?2"
+            value = "SELECT bt " +
+                    "FROM BlogTag bt " +
+                    "INNER JOIN Blog b ON b.id = bt.id.blogId " +
+                    "WHERE bt.id.tagId = ?1 AND b.status = ?2",
+            countQuery = "SELECT count(bt.id) " +
+                    "FROM BlogTag bt " +
+                    "INNER JOIN Blog b ON b.id = bt.id.blogId " +
+                    "WHERE bt.id.tagId = ?1 AND b.status = ?2"
     )
-    Page<BlogTag> findByTag(Integer tagId, BlogStatus blogStatus, Pageable pageable);
+    Page<BlogTag> findByTag(Long tagId, BlogStatus blogStatus, Pageable pageable);
 }

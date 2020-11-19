@@ -7,9 +7,9 @@ import java.io.Serializable;
 
 @Getter
 @Setter
-public class CategoryResponse implements Serializable {
-    private static final long serialVersionUID = -7055864014034887150L;
-    private Long id;
+public class TagResponse implements Serializable {
+    private static final long serialVersionUID = 6253872379224258761L;
+    private Integer id;
     private String title;
     private String slug;
 }

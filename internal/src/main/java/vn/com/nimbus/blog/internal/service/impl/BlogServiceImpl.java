@@ -1,0 +1,322 @@
+package vn.com.nimbus.blog.internal.service.impl;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.PropertyNamingStrategy;
+import com.github.slugify.Slugify;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
+import org.springframework.util.StringUtils;
+import vn.com.nimbus.blog.internal.model.mapper.BlogMapper;
+import vn.com.nimbus.blog.internal.model.request.BlogRequest;
+import vn.com.nimbus.blog.internal.model.response.BlogDetailResponse;
+import vn.com.nimbus.blog.internal.model.response.BlogResponse;
+import vn.com.nimbus.blog.internal.service.BlogService;
+import vn.com.nimbus.common.model.error.ErrorCode;
+import vn.com.nimbus.common.model.exception.BaseException;
+import vn.com.nimbus.common.model.extra.BlogExtraData;
+import vn.com.nimbus.common.model.paging.LimitOffsetPageable;
+import vn.com.nimbus.common.service.JsonParseService;
+import vn.com.nimbus.common.utils.DateToTimestampUtil;
+import vn.com.nimbus.data.domain.Blog;
+import vn.com.nimbus.data.domain.BlogAuthor;
+import vn.com.nimbus.data.domain.BlogAuthorID;
+import vn.com.nimbus.data.domain.BlogCategory;
+import vn.com.nimbus.data.domain.BlogCategoryID;
+import vn.com.nimbus.data.domain.BlogContent;
+import vn.com.nimbus.data.domain.BlogTag;
+import vn.com.nimbus.data.domain.BlogTagID;
+import vn.com.nimbus.data.domain.BlogView;
+import vn.com.nimbus.data.domain.Tag;
+import vn.com.nimbus.data.domain.User;
+import vn.com.nimbus.data.domain.constant.BlogContentType;
+import vn.com.nimbus.data.domain.constant.BlogStatus;
+import vn.com.nimbus.data.repository.BlogAuthorRepository;
+import vn.com.nimbus.data.repository.BlogCategoryRepository;
+import vn.com.nimbus.data.repository.BlogContentRepository;
+import vn.com.nimbus.data.repository.BlogRepository;
+import vn.com.nimbus.data.repository.BlogTagRepository;
+import vn.com.nimbus.data.repository.BlogViewRepository;
+import vn.com.nimbus.data.repository.TagRepository;
+import vn.com.nimbus.data.repository.UserRepository;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
+
+@Service
+@Slf4j
+public class BlogServiceImpl implements BlogService {
+    private final BlogRepository blogRepository;
+    private final UserRepository userRepository;
+    private final BlogContentRepository blogContentRepository;
+    private final TagRepository tagRepository;
+    private final BlogTagRepository blogTagRepository;
+    private final BlogCategoryRepository blogCategoryRepository;
+    private final BlogAuthorRepository blogAuthorRepository;
+    private final BlogViewRepository blogViewRepository;
+
+    private final Slugify slugify = new Slugify();
+
+    @Autowired
+    public BlogServiceImpl(
+            BlogRepository blogRepository,
+            UserRepository userRepository,
+            BlogContentRepository blogContentRepository,
+            TagRepository tagRepository,
+            BlogTagRepository blogTagRepository,
+            BlogCategoryRepository blogCategoryRepository, BlogAuthorRepository blogAuthorRepository, BlogViewRepository blogViewRepository) {
+        this.blogRepository = blogRepository;
+        this.userRepository = userRepository;
+        this.blogContentRepository = blogContentRepository;
+        this.tagRepository = tagRepository;
+        this.blogTagRepository = blogTagRepository;
+        this.blogCategoryRepository = blogCategoryRepository;
+        this.blogAuthorRepository = blogAuthorRepository;
+        this.blogViewRepository = blogViewRepository;
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Page<BlogResponse> getBlogs(String title, Long categoryId, Integer limit, Integer offset) {
+        LimitOffsetPageable limitOffsetPageable = new LimitOffsetPageable();
+        limitOffsetPageable.setLimit(limit);
+        limitOffsetPageable.setOffset(offset);
+
+        Page<Blog> data;
+        if (categoryId != null) {
+            data = blogRepository.findByCategoryIdAndTitleContains(title, categoryId, PageRequest.of(offset, limit));
+        } else {
+            data = blogRepository.findByTitleContains(title, PageRequest.of(offset, limit));
+        }
+        return data.map(BlogMapper.INSTANCE::toResponse);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public BlogDetailResponse getBlog(Long blogId) {
+        if (blogId == null) {
+            throw new BaseException(ErrorCode.INVALID_PARAMETERS);
+        }
+        Optional<Blog> blogOpt = blogRepository.findById(blogId);
+        if (blogOpt.isEmpty())
+            throw new BaseException(ErrorCode.RESOURCE_NOT_FOUND, "blog not found by id: " + blogId);
+        return this.buildBlogResponse(blogOpt.get());
+    }
+
+    private BlogDetailResponse buildBlogResponse(Blog blog) {
+        log.info("Build blog detail, blog id : {}", blog.getId());
+        BlogDetailResponse response = new BlogDetailResponse();
+        response.setId(blog.getId());
+        response.setTitle(blog.getTitle());
+        response.setSlug(blog.getSlug());
+        response.setDescription(blog.getDescription());
+        response.setThumbnail(blog.getThumbnail());
+        response.setUpdatedAt(DateToTimestampUtil.toSecond(blog.getUpdatedAt()));
+        response.setStatus(blog.getStatus());
+
+        final Long blogId = blog.getId();
+        BlogContent content = blogContentRepository.findByBlogId(blogId);
+        response.setContent(content.getContent());
+
+        List<BlogTag> blogTags = blogTagRepository.findById_BlogId(blogId);
+        List<Long> tagIds = blogTags.stream()
+                .map(BlogTag::getId)
+                .map(BlogTagID::getTagId)
+                .collect(Collectors.toList());
+        List<Tag> tags = tagRepository.findAllById(tagIds);
+        List<String> strTags = tags.stream().map(Tag::getTitle).collect(Collectors.toList());
+        response.setTags(strTags);
+
+        List<BlogCategory> blogCategories = blogCategoryRepository.findById_BlogId(blogId);
+        List<Long> categoryIds = blogCategories.stream()
+                .map(BlogCategory::getId)
+                .map(BlogCategoryID::getCategoryId)
+                .collect(Collectors.toList());
+        response.setCategories(categoryIds);
+
+        BlogExtraData extraData;
+        if (blog.getExtraData() != null) {
+            JsonParseService<BlogExtraData> jsonParseService = new JsonParseService<>();
+            extraData = jsonParseService.toEntityData(blog.getExtraData(), BlogExtraData.class);
+            if (StringUtils.isEmpty(extraData.getFacebookPixelId())) {
+                extraData.setFacebookPixelId("");
+            }
+            if (StringUtils.isEmpty(extraData.getGoogleAnalyticsId())) {
+                extraData.setGoogleAnalyticsId("");
+            }
+        } else {
+            extraData = new BlogExtraData();
+            extraData.setFacebookPixelId("");
+            extraData.setGoogleAnalyticsId("");
+        }
+        response.setExtraData(extraData);
+
+        return response;
+    }
+
+    @Override
+    @Transactional
+    public boolean deleteBlog(Long blogId) {
+        Optional<Blog> blogOpt = blogRepository.findById(blogId);
+        if (blogOpt.isEmpty()) {
+            throw new BaseException(ErrorCode.RESOURCE_NOT_FOUND);
+        }
+
+        BlogContent content = blogContentRepository.findByBlogId(blogId);
+        blogContentRepository.delete(content);
+
+        List<BlogTag> tags = blogTagRepository.findById_BlogId(blogId);
+        blogTagRepository.deleteAll(tags);
+
+        List<BlogCategory> categories = blogCategoryRepository.findById_BlogId(blogId);
+        blogCategoryRepository.deleteAll(categories);
+
+        List<BlogView> views = blogViewRepository.findByBlogId(blogId);
+        blogViewRepository.deleteAll(views);
+
+        List<BlogAuthor> authors = blogAuthorRepository.findById_BlogId(blogId);
+        blogAuthorRepository.deleteAll(authors);
+
+        Blog blog = blogOpt.get();
+        blogRepository.delete(blog);
+        return true;
+    }
+
+    @Override
+    @Transactional
+    public BlogDetailResponse saveBlog(BlogRequest request) {
+        if (request == null) {
+            throw new BaseException(ErrorCode.INVALID_PARAMETERS);
+        }
+        Blog blog = new Blog();
+        if (request.getId() != null) {
+            Optional<Blog> blogOpt = blogRepository.findById(request.getId());
+            if (blogOpt.isEmpty()) {
+                throw new BaseException(ErrorCode.RESOURCE_NOT_FOUND);
+            }
+            blog = blogOpt.get();
+        }
+
+        Optional<User> userOpt = userRepository.findById(request.getUserId());
+        if (userOpt.isEmpty()) {
+            throw new BaseException(ErrorCode.RESOURCE_NOT_FOUND);
+        }
+
+        if (blog.getStatus() == null) {
+            blog.setStatus(request.getStatus() != null ? request.getStatus() : BlogStatus.DISABLED);
+        }
+        blog.setTitle(request.getTitle());
+        blog.setThumbnail(request.getThumbnail());
+        blog.setDescription(request.getDescription());
+
+        if (StringUtils.isEmpty(blog.getSlug())) {
+            blog.setSlug(this.generateSlug(blog.getTitle()));
+        }
+        if (request.getExtraData() != null) {
+            try {
+                BlogExtraData extraData = new BlogExtraData();
+                extraData.setFacebookPixelId(request.getExtraData().getFacebookPixelId());
+                extraData.setGoogleAnalyticsId(request.getExtraData().getGoogleAnalyticsId());
+                ObjectMapper mapper = new ObjectMapper();
+                mapper.setPropertyNamingStrategy(PropertyNamingStrategy.SNAKE_CASE);
+                String extraDataStr = mapper.writeValueAsString(extraData);
+                blog.setExtraData(extraDataStr);
+            } catch (JsonProcessingException e) {
+                log.error("Fail to parse blog extra data: {}", request.getExtraData());
+                throw new BaseException(ErrorCode.INTERNAL_SERVER_ERROR);
+            }
+        }
+        blog = blogRepository.save(blog);
+
+        final Long blogId = blog.getId();
+
+        this.saveContent(request, blogId);
+        this.saveTags(blogId, request.getTags());
+        this.saveCategories(blogId, request.getCategories());
+        this.saveAuthor(blogId, request.getUserId());
+
+        return this.getBlog(blog.getId());
+    }
+
+    private void saveContent(BlogRequest request, Long blogId) {
+        BlogContent content = blogContentRepository.findByBlogId(blogId);
+        if (content == null) {
+            content = new BlogContent();
+            content.setPosition(0);
+            content.setType(BlogContentType.HTML);
+            content.setBlogId(blogId);
+        }
+        content.setContent(request.getContent());
+        blogContentRepository.save(content);
+    }
+
+    private void saveTags(Long blogId, Set<String> setTags) {
+        List<String> reqTags = CollectionUtils.isEmpty(setTags) ? new ArrayList<>() : setTags.stream().map(String::trim).collect(Collectors.toList());
+
+        List<Tag> tags = tagRepository.findByTitleIn(reqTags);
+
+        if (tags.size() != reqTags.size()) {
+            List<String> existTags = tags.stream().map(Tag::getTitle).collect(Collectors.toList());
+            List<String> newTags = reqTags.stream().filter(t -> !existTags.contains(t)).collect(Collectors.toList());
+            for (String newTag : newTags) {
+                String slug = slugify.slugify(newTag);
+                Tag tag = new Tag();
+                Integer count = tagRepository.countBySlugContains(slug);
+                if (count > 0) {
+                    slug = slug.concat("-").concat(Integer.toString(count));
+                }
+                tag.setTitle(newTag);
+                tag.setSlug(slug);
+                tags.add(tag);
+            }
+            tags = tagRepository.saveAll(tags);
+        }
+
+        List<BlogTag> oldLinked = blogTagRepository.findById_BlogId(blogId);
+        blogTagRepository.deleteAll(oldLinked);
+
+        List<Long> tagIds = tags.stream().map(Tag::getId).collect(Collectors.toList());
+        List<BlogTag> newLinked = tagIds.stream().map(id -> new BlogTag(new BlogTagID(id, blogId))).collect(Collectors.toList());
+        blogTagRepository.deleteAll(newLinked);
+    }
+
+    private void saveCategories(final Long blogId, Set<Long> setCategories) {
+        List<Long> reqCatIds = CollectionUtils.isEmpty(setCategories) ? new ArrayList<>() : new ArrayList<>(setCategories);
+
+        List<BlogCategory> oldLinked = blogCategoryRepository.findById_BlogId(blogId);
+        blogCategoryRepository.deleteAll(oldLinked);
+
+        List<BlogCategory> newLinked = reqCatIds.stream().map(id -> new BlogCategory(new BlogCategoryID(id, blogId))).collect(Collectors.toList());
+        blogCategoryRepository.saveAll(newLinked);
+    }
+
+    private void saveAuthor(final Long blogId, Long userId) {
+        List<BlogAuthor> currentAuthors = blogAuthorRepository.findById_BlogId(blogId);
+        List<Long> currentAuthorIds = currentAuthors
+                .stream()
+                .map(BlogAuthor::getId)
+                .map(BlogAuthorID::getAuthorId)
+                .collect(Collectors.toList());
+
+        if (!currentAuthorIds.contains(userId)) {
+            blogAuthorRepository.save(new BlogAuthor(new BlogAuthorID(userId, blogId)));
+        }
+    }
+
+    private String generateSlug(String title) {
+        String slug = slugify.slugify(title);
+        Integer count = blogRepository.countBySlugContains(slug);
+        if (count > 0)
+            slug = slug.concat("-").concat(Integer.toString(count));
+
+        return slug;
+    }
+}

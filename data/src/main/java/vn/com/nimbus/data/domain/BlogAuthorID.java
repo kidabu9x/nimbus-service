@@ -14,11 +14,11 @@ import java.io.Serializable;
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
-public class BlogTagID implements Serializable {
-    private static final long serialVersionUID = -4270383711182089580L;
-
-    @Column(name = "tag_id")
-    private Long tagId;
+public class BlogAuthorID implements Serializable {
+    private static final long serialVersionUID = -1760412042089743639L;
+    // TODO: need confirm this when test
+    @Column(name = "user_id")
+    private Long authorId;
 
     @Column(name = "blog_id")
     private Long blogId;

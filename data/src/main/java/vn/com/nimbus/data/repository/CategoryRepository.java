@@ -7,9 +7,7 @@ import vn.com.nimbus.data.domain.Category;
 import java.util.List;
 
 @Repository
-public interface CategoryRepository extends JpaRepository<Category, Integer> {
-    List<Category> findAllByIdIn(List<Integer> ids);
-
+public interface CategoryRepository extends JpaRepository<Category, Long> {
     Category findByTitle(String title);
 
     Category findBySlug(String slug);

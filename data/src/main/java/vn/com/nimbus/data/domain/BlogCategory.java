@@ -1,6 +1,8 @@
 package vn.com.nimbus.data.domain;
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.EmbeddedId;
@@ -12,6 +14,8 @@ import java.io.Serializable;
 @Table(name = "blog_category")
 @Getter
 @Setter
+@AllArgsConstructor
+@NoArgsConstructor
 public class BlogCategory implements Serializable {
     private static final long serialVersionUID = 4751211558221004658L;
     @EmbeddedId
