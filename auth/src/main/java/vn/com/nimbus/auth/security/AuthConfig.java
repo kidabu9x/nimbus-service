@@ -29,7 +29,7 @@ public class AuthConfig {
                 .authenticationEntryPoint((swe, e) -> Mono.fromRunnable(() -> swe.getResponse().setStatusCode(HttpStatus.FORBIDDEN)))
                 .and()
                 .authorizeExchange()
-                .pathMatchers("/health","/login", "/v2/api-docs", "/swagger-resources/**", "/swagger-ui.html", "/webjars/**").permitAll()
+                .pathMatchers("/health","/oauth", "/v2/api-docs", "/swagger-resources/**", "/swagger-ui.html", "/webjars/**").permitAll()
                 .anyExchange().authenticated()
                 .and().build();
     }
