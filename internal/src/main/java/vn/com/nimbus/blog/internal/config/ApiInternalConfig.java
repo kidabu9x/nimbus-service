@@ -12,7 +12,7 @@ public class ApiInternalConfig {
 
     @Getter
     @Setter
-    public class Security {
+    public static class Security {
         private String jwtMobilePublicKey;
     }
 }

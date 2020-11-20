@@ -108,14 +108,9 @@ public class BlogServiceImpl implements BlogService {
 
     private BlogDetailResponse buildBlogResponse(Blog blog) {
         log.info("Build blog detail, blog id : {}", blog.getId());
-        BlogDetailResponse response = new BlogDetailResponse();
-        response.setId(blog.getId());
-        response.setTitle(blog.getTitle());
-        response.setSlug(blog.getSlug());
-        response.setDescription(blog.getDescription());
-        response.setThumbnail(blog.getThumbnail());
-        response.setUpdatedAt(DateToTimestampUtil.toSecond(blog.getUpdatedAt()));
-        response.setStatus(blog.getStatus());
+        BlogMapper mapper = BlogMapper.INSTANCE;
+
+        BlogDetailResponse response = mapper.toDetailResponse(blog);
 
         final Long blogId = blog.getId();
         BlogContent content = blogContentRepository.findByBlogId(blogId);
@@ -136,7 +131,6 @@ public class BlogServiceImpl implements BlogService {
                 .map(BlogCategoryID::getCategoryId)
                 .collect(Collectors.toList());
         response.setCategories(categoryIds);
-        response.setExtraData(blog.getExtraData());
 
         return response;
     }

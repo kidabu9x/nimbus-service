@@ -19,9 +19,9 @@ public class ApiFilter extends BaseFilter implements WebFilter {
     @Override
     public Mono<Void> filter(ServerWebExchange serverWebExchange, WebFilterChain webFilterChain) {
         Map<String, String> headers = serverWebExchange.getRequest().getHeaders().toSingleValueMap();
-        String requestId = getRequestId(serverWebExchange, headers);
+        String requestId = this.getRequestId(serverWebExchange, headers);
 
-        Marker markers = addHeaderExtra(headers, serverWebExchange, requestId);
+        Marker markers = this.addHeaderExtra(headers, serverWebExchange, requestId);
         long startTime = System.currentTimeMillis();
         serverWebExchange.getResponse()
                 .getHeaders().setContentType(MediaType.APPLICATION_JSON);

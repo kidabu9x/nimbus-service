@@ -112,7 +112,7 @@ public class AppConfig {
             entityManagerFactoryBean.setDataSource(haDatasource());
         else entityManagerFactoryBean.setDataSource(masterDataSource());
         entityManagerFactoryBean.setPersistenceProviderClass(HibernatePersistenceProvider.class);
-        entityManagerFactoryBean.setPackagesToScan("vn.com.nimbus.common.data.domain");
+        entityManagerFactoryBean.setPackagesToScan("vn.com.nimbus.data.domain");
         entityManagerFactoryBean.setJpaProperties(hibProperties());
         entityManagerFactoryBean.setJpaVendorAdapter(getHibernateJpaVendorAdapter());
 
