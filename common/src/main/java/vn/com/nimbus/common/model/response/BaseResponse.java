@@ -1,13 +1,7 @@
 package vn.com.nimbus.common.model.response;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.ToString;
 import lombok.experimental.Accessors;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -16,7 +10,6 @@ import vn.com.nimbus.common.model.error.FieldViolation;
 import vn.com.nimbus.common.model.exception.BaseException;
 import vn.com.nimbus.common.model.paging.Paging;
 
-import java.io.Serializable;
 import java.util.List;
 
 @Data

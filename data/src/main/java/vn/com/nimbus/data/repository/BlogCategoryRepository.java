@@ -7,7 +7,6 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 import vn.com.nimbus.data.domain.BlogCategory;
 import vn.com.nimbus.data.domain.BlogCategoryID;
-import vn.com.nimbus.data.domain.Category;
 import vn.com.nimbus.data.domain.constant.BlogStatus;
 
 import java.util.List;

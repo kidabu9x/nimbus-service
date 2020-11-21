@@ -5,7 +5,6 @@ import net.logstash.logback.marker.Markers;
 import org.apache.logging.log4j.util.Strings;
 import org.slf4j.Marker;
 import org.springframework.http.MediaType;
-import org.springframework.util.StringUtils;
 import org.springframework.web.server.ServerWebExchange;
 import vn.com.nimbus.common.model.constant.KeyConstant;
 import vn.com.nimbus.common.utils.AppUtils;

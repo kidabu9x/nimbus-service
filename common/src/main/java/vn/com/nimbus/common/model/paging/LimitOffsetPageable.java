@@ -1,7 +1,6 @@
 package vn.com.nimbus.common.model.paging;
 
 import lombok.AllArgsConstructor;
-import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 
