@@ -11,7 +11,7 @@ CREATE TABLE IF NOT EXISTS users
     CONSTRAINT users_pk PRIMARY KEY (id)
 );
 
-CREATE UNIQUE INDEX users_email_uindex ON user (email);
+CREATE UNIQUE INDEX users_email_uindex ON users (email);
 
 CREATE TABLE IF NOT EXISTS blogs
 (
@@ -45,7 +45,7 @@ CREATE TABLE IF NOT EXISTS blog_user
     CONSTRAINT blog_authors_blogs_id_fk
         FOREIGN KEY (blog_id) references blogs (id),
     CONSTRAINT blog_authors_users_id_fk
-        FOREIGN KEY (user_id) references user (id)
+        FOREIGN KEY (user_id) references users (id)
 );
 
 CREATE TABLE tags

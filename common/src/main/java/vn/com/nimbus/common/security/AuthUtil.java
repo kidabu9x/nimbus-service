@@ -36,6 +36,7 @@ public interface AuthUtil {
             return null;
         }
 
+
         // Get user details from jwt
         var userDetails = authenticationProvider.getUserDetails(claims);
         if (userDetails == null) {
@@ -46,6 +47,6 @@ public interface AuthUtil {
     }
 
     private boolean validateToken(Claims claims) {
-        return !claims.getExpiration().before(new Date());
+        return !claims.getExpiration().after(new Date());
     }
 }

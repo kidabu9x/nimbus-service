@@ -29,7 +29,10 @@ public class SecurityConfig {
                 .csrf().disable()
                 .httpBasic().disable()
                 .exceptionHandling()
-                .authenticationEntryPoint((swe, e) -> Mono.fromRunnable(() -> swe.getResponse().setStatusCode(HttpStatus.FORBIDDEN)))
+                .authenticationEntryPoint((swe, e) -> {
+                    e.printStackTrace();
+                    return Mono.fromRunnable(() -> swe.getResponse().setStatusCode(HttpStatus.FORBIDDEN));
+                })
                 .and()
                 .addFilterAt(new JWTAuthWebFilter(jwtUtil, authenticationProvider), SecurityWebFiltersOrder.FIRST)
                 .authorizeExchange()
