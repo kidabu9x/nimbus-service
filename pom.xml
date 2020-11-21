@@ -41,6 +41,7 @@
         <mockito.version>2.25.1</mockito.version>
         <slugify.version>2.4</slugify.version>
         <jackson-core.version>2.11.3</jackson-core.version>
+        <swagger.version>2.10.5</swagger.version>
     </properties>
 
     <dependencyManagement>
@@ -168,6 +169,22 @@
                 <groupId>com.fasterxml.jackson.datatype</groupId>
                 <artifactId>jackson-datatype-jsr310</artifactId>
                 <version>${jackson-core.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>io.springfox</groupId>
+                <artifactId>springfox-swagger-ui</artifactId>
+                <version>${swagger.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.springfox</groupId>
+                <artifactId>springfox-swagger2</artifactId>
+                <version>${swagger.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.springfox</groupId>
+                <artifactId>springfox-spring-webflux</artifactId>
+                <version>${swagger.version}</version>
             </dependency>
 
         </dependencies>

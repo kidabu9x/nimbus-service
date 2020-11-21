@@ -21,7 +21,7 @@ public class JWTAuthWebFilter implements WebFilter {
     private AuthUtil jwtUtil;
     private AuthenticationProvider authenticationProvider;
 
-    JWTAuthWebFilter(AuthUtil jwtUtil, AuthenticationProvider authenticationProvider) {
+    public JWTAuthWebFilter(AuthUtil jwtUtil, AuthenticationProvider authenticationProvider) {
         this.jwtUtil = jwtUtil;
         this.authenticationProvider = authenticationProvider;
     }

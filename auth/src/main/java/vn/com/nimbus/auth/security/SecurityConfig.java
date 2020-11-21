@@ -1,4 +1,4 @@
-package vn.com.nimbus.common.security;
+package vn.com.nimbus.auth.security;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.http.HttpMethod;
@@ -9,6 +9,9 @@ import org.springframework.security.config.web.server.SecurityWebFiltersOrder;
 import org.springframework.security.config.web.server.ServerHttpSecurity;
 import org.springframework.security.web.server.SecurityWebFilterChain;
 import reactor.core.publisher.Mono;
+import vn.com.nimbus.common.security.AuthUtil;
+import vn.com.nimbus.common.security.AuthenticationProvider;
+import vn.com.nimbus.common.security.JWTAuthWebFilter;
 
 import javax.annotation.Resource;
 
@@ -29,10 +32,7 @@ public class SecurityConfig {
                 .csrf().disable()
                 .httpBasic().disable()
                 .exceptionHandling()
-                .authenticationEntryPoint((swe, e) -> {
-                    e.printStackTrace();
-                    return Mono.fromRunnable(() -> swe.getResponse().setStatusCode(HttpStatus.FORBIDDEN));
-                })
+                .authenticationEntryPoint((swe, e) -> Mono.fromRunnable(() -> swe.getResponse().setStatusCode(HttpStatus.FORBIDDEN)))
                 .and()
                 .addFilterAt(new JWTAuthWebFilter(jwtUtil, authenticationProvider), SecurityWebFiltersOrder.FIRST)
                 .authorizeExchange()

@@ -17,28 +17,10 @@ import vn.com.nimbus.blog.internal.service.BlogService;
 import vn.com.nimbus.common.model.error.ErrorCode;
 import vn.com.nimbus.common.model.exception.BaseException;
 import vn.com.nimbus.common.model.paging.LimitOffsetPageable;
-import vn.com.nimbus.common.utils.DateToTimestampUtil;
-import vn.com.nimbus.data.domain.Blog;
-import vn.com.nimbus.data.domain.BlogAuthor;
-import vn.com.nimbus.data.domain.BlogAuthorID;
-import vn.com.nimbus.data.domain.BlogCategory;
-import vn.com.nimbus.data.domain.BlogCategoryID;
-import vn.com.nimbus.data.domain.BlogContent;
-import vn.com.nimbus.data.domain.BlogTag;
-import vn.com.nimbus.data.domain.BlogTagID;
-import vn.com.nimbus.data.domain.BlogView;
-import vn.com.nimbus.data.domain.Tag;
-import vn.com.nimbus.data.domain.User;
+import vn.com.nimbus.data.domain.*;
 import vn.com.nimbus.data.domain.constant.BlogContentType;
 import vn.com.nimbus.data.domain.constant.BlogStatus;
-import vn.com.nimbus.data.repository.BlogAuthorRepository;
-import vn.com.nimbus.data.repository.BlogCategoryRepository;
-import vn.com.nimbus.data.repository.BlogContentRepository;
-import vn.com.nimbus.data.repository.BlogRepository;
-import vn.com.nimbus.data.repository.BlogTagRepository;
-import vn.com.nimbus.data.repository.BlogViewRepository;
-import vn.com.nimbus.data.repository.TagRepository;
-import vn.com.nimbus.data.repository.UserRepository;
+import vn.com.nimbus.data.repository.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -57,6 +39,7 @@ public class BlogServiceImpl implements BlogService {
     private final BlogCategoryRepository blogCategoryRepository;
     private final BlogAuthorRepository blogAuthorRepository;
     private final BlogViewRepository blogViewRepository;
+    private final CategoryRepository categoryRepository;
 
     private final Slugify slugify = new Slugify();
 
@@ -67,7 +50,11 @@ public class BlogServiceImpl implements BlogService {
             BlogContentRepository blogContentRepository,
             TagRepository tagRepository,
             BlogTagRepository blogTagRepository,
-            BlogCategoryRepository blogCategoryRepository, BlogAuthorRepository blogAuthorRepository, BlogViewRepository blogViewRepository) {
+            BlogCategoryRepository blogCategoryRepository,
+            BlogAuthorRepository blogAuthorRepository,
+            BlogViewRepository blogViewRepository,
+            CategoryRepository categoryRepository
+    ) {
         this.blogRepository = blogRepository;
         this.userRepository = userRepository;
         this.blogContentRepository = blogContentRepository;
@@ -76,6 +63,7 @@ public class BlogServiceImpl implements BlogService {
         this.blogCategoryRepository = blogCategoryRepository;
         this.blogAuthorRepository = blogAuthorRepository;
         this.blogViewRepository = blogViewRepository;
+        this.categoryRepository = categoryRepository;
     }
 
     @Override
@@ -244,11 +232,18 @@ public class BlogServiceImpl implements BlogService {
 
         List<Long> tagIds = tags.stream().map(Tag::getId).collect(Collectors.toList());
         List<BlogTag> newLinked = tagIds.stream().map(id -> new BlogTag(new BlogTagID(id, blogId))).collect(Collectors.toList());
-        blogTagRepository.deleteAll(newLinked);
+        blogTagRepository.saveAll(newLinked);
     }
 
     private void saveCategories(final Long blogId, Set<Long> setCategories) {
         List<Long> reqCatIds = CollectionUtils.isEmpty(setCategories) ? new ArrayList<>() : new ArrayList<>(setCategories);
+
+        if (!CollectionUtils.isEmpty(reqCatIds)) {
+            List<Category> existCat = categoryRepository.findAllById(reqCatIds);
+            if (existCat.size() != reqCatIds.size()) {
+                throw new BaseException(ErrorCode.RESOURCE_NOT_FOUND, "Some categories not found");
+            }
+        }
 
         List<BlogCategory> oldLinked = blogCategoryRepository.findById_BlogId(blogId);
         blogCategoryRepository.deleteAll(oldLinked);

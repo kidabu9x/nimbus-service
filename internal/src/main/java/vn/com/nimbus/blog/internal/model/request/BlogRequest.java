@@ -18,6 +18,7 @@ public class BlogRequest implements Serializable {
     @JsonIgnore
     private Long id;
 
+    @JsonIgnore
     private Long userId;
 
     private String description;
