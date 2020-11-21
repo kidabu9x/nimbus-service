@@ -11,7 +11,6 @@ public class Permissions {
     }
 
     public static Mono<UserPrincipal> getCurrentUser() {
-        System.out.println("permissions");
         return ReactiveSecurityContextHolder.getContext()
                 .map(s -> s.getAuthentication().getPrincipal())
                 .cast(UserPrincipal.class);

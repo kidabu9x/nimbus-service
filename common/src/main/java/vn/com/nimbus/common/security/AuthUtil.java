@@ -6,6 +6,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.web.server.ServerWebExchange;
 
+import java.util.Collections;
 import java.util.Date;
 
 public interface AuthUtil {
@@ -43,7 +44,7 @@ public interface AuthUtil {
             return null;
         }
 
-        return new UsernamePasswordAuthenticationToken(userDetails, authToken);
+        return new UsernamePasswordAuthenticationToken(userDetails, authToken, Collections.emptyList());
     }
 
     private boolean validateToken(Claims claims) {

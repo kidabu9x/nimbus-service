@@ -1,6 +1,7 @@
 package vn.com.nimbus.auth.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -30,7 +31,7 @@ public class AuthController {
                 .map(BaseResponse::ofSucceeded);
     }
 
-    @PostMapping("/profile")
+    @GetMapping("/profile")
     public Mono<BaseResponse<ProfileResponse>> getProfile() {
         return Permissions.getCurrentUser()
                 .map(u -> authService.getProfile(u.getId())).map(BaseResponse::ofSucceeded);
