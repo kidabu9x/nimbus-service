@@ -9,7 +9,7 @@ import java.io.Serializable;
 @Setter
 public class TagResponse implements Serializable {
     private static final long serialVersionUID = 6253872379224258761L;
-    private Integer id;
+    private Long id;
     private String title;
     private String slug;
 }

@@ -1,19 +1,17 @@
 package vn.com.nimbus.data.domain;
 
 import lombok.AllArgsConstructor;
-import lombok.Getter;
+import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 import javax.persistence.Column;
 import javax.persistence.Embeddable;
 import java.io.Serializable;
 
 @Embeddable
-@Setter
-@Getter
 @AllArgsConstructor
 @NoArgsConstructor
+@Data
 public class BlogAuthorID implements Serializable {
     private static final long serialVersionUID = -1760412042089743639L;
     // TODO: need confirm this when test

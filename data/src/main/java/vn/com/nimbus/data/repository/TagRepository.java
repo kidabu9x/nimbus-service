@@ -12,7 +12,7 @@ import java.util.Optional;
 public interface TagRepository extends JpaRepository<Tag, Long> {
     Integer countBySlugContains(String candidate);
 
-    Optional<Tag> findBySlug(String slug);
+    Tag findBySlug(String slug);
 
     Tag findByTitleAndSlug(String title, String slug);
 

@@ -3,9 +3,7 @@ package vn.com.nimbus.blog.api.controller;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
-import vn.com.nimbus.blog.api.model.response.BasePublicResponse;
-import vn.com.nimbus.blog.api.model.response.CategoryResponse;
-import vn.com.nimbus.blog.api.model.response.FeatureResponse;
+import vn.com.nimbus.blog.api.model.response.*;
 import vn.com.nimbus.blog.api.service.BlogService;
 import vn.com.nimbus.common.model.paging.LimitOffsetPageable;
 import vn.com.nimbus.common.model.response.BaseResponse;
@@ -31,7 +29,7 @@ public class BlogController {
     }
 
     @GetMapping("/search")
-    public Mono<BaseResponse<BasePublicResponse>> searchBlog(
+    public Mono<BaseResponse<SearchResponse>> searchBlog(
             @RequestParam(name = "query", required = false, defaultValue = "") String search,
             @RequestParam(name = "limit", required = false, defaultValue = "10") Integer limit,
             @RequestParam(name = "offset", required = false, defaultValue = "0") Integer offset
@@ -52,7 +50,16 @@ public class BlogController {
     }
 
     @GetMapping("/{slug}")
-    public Mono<BaseResponse<Object>> getBySlug(
+    public Mono<BaseResponse<BlogDetailResponse>> getBlogBySlug(
+            @PathVariable String slug
+    ) {
+        return Mono
+                .just(blogService.getBlog(slug))
+                .map(BaseResponse::ofSucceeded);
+    }
+
+    @GetMapping("/category/{slug}")
+    public Mono<BaseResponse<CategoryDetailResponse>> getCategoryBySlug(
             @PathVariable String slug,
             @RequestParam(name = "limit", required = false, defaultValue = "10") Integer limit,
             @RequestParam(name = "offset", required = false, defaultValue = "0") Integer offset
@@ -61,7 +68,21 @@ public class BlogController {
         limitOffsetPageable.setLimit(limit);
         limitOffsetPageable.setOffset(offset);
         return Mono
-                .just(blogService.getBlog(slug, limitOffsetPageable))
+                .just(blogService.getCategory(slug, limitOffsetPageable))
+                .map(BaseResponse::ofSucceeded);
+    }
+
+    @GetMapping("/tag/{slug}")
+    public Mono<BaseResponse<TagDetailResponse>> getTagBySlug(
+            @PathVariable String slug,
+            @RequestParam(name = "limit", required = false, defaultValue = "10") Integer limit,
+            @RequestParam(name = "offset", required = false, defaultValue = "0") Integer offset
+    ) {
+        LimitOffsetPageable limitOffsetPageable = new LimitOffsetPageable();
+        limitOffsetPageable.setLimit(limit);
+        limitOffsetPageable.setOffset(offset);
+        return Mono
+                .just(blogService.getTag(slug, limitOffsetPageable))
                 .map(BaseResponse::ofSucceeded);
     }
 
