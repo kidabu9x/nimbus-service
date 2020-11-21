@@ -13,6 +13,6 @@ public class AuthConfig {
     @Getter
     @Setter
     public static class Security {
-        private String jwtMobilePublicKey;
+        private String jwtPublicKey;
     }
 }

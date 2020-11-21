@@ -7,15 +7,14 @@ import io.jsonwebtoken.SignatureAlgorithm;
 import org.springframework.stereotype.Service;
 import vn.com.nimbus.common.config.ConfigData;
 import vn.com.nimbus.common.config.ConfigLoader;
-import vn.com.nimbus.data.domain.User;
 import vn.com.nimbus.common.model.constant.KeyConstant;
+import vn.com.nimbus.data.domain.User;
 
 import java.security.KeyFactory;
 import java.security.NoSuchAlgorithmException;
-import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.spec.InvalidKeySpecException;
-import java.security.spec.PKCS8EncodedKeySpec;
+import java.security.spec.X509EncodedKeySpec;
 import java.util.Base64;
 import java.util.Date;
 import java.util.HashMap;
@@ -35,7 +34,8 @@ public class JwtServiceImpl implements JwtService {
 
         long nowMillis = System.currentTimeMillis();
         Date now = new Date(nowMillis);
-        JwtBuilder builder = Jwts.builder().setId(user.getId().toString())
+        JwtBuilder builder = Jwts.builder()
+                .setId(user.getId().toString())
                 .setIssuedAt(now)
                 .addClaims(payload)
                 .signWith(SignatureAlgorithm.HS256, SECRET);
@@ -65,33 +65,7 @@ public class JwtServiceImpl implements JwtService {
     private Map<String, Object> generateTokenPayload(User user) {
         Map<String, Object> payload = new HashMap<>();
         payload.put(KeyConstant.USER_ID, user.getId());
+        payload.put(KeyConstant.EMAIL, user.getEmail());
         return payload;
-    }
-
-
-    private PrivateKey getPrivateKey(ConfigData.OauthKey oauthKey) throws NoSuchAlgorithmException, InvalidKeySpecException {
-        KeyFactory kf = KeyFactory.getInstance("RSA");
-        PKCS8EncodedKeySpec keySpecPKCS8 = new PKCS8EncodedKeySpec(this.pemToDer(oauthKey.getPrivateKey()));
-
-        return kf.generatePrivate(keySpecPKCS8);
-    }
-
-    private PublicKey getPublicKey(ConfigData.OauthKey oauthKey) throws NoSuchAlgorithmException, InvalidKeySpecException {
-        PKCS8EncodedKeySpec spec = new PKCS8EncodedKeySpec(this.pemToDer(oauthKey.getPrivateKey()));
-        KeyFactory kf = KeyFactory.getInstance("RSA");
-        return kf.generatePublic(spec);
-    }
-
-
-    private byte[] pemToDer(String pem) {
-        return Base64.getDecoder().decode(stripBeginEnd(pem));
-    }
-
-    private String stripBeginEnd(String pem) {
-        String stripped = pem.replaceAll("-----BEGIN (.*)-----", "");
-        stripped = stripped.replaceAll("-----END (.*)----", "");
-        stripped = stripped.replaceAll("\r\n", "");
-        stripped = stripped.replaceAll("\n", "");
-        return stripped.trim();
     }
 }

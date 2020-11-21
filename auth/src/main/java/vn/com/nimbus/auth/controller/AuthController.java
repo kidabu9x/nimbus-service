@@ -7,8 +7,10 @@ import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Mono;
 import vn.com.nimbus.auth.model.request.OauthRequest;
 import vn.com.nimbus.auth.model.response.AuthResponse;
+import vn.com.nimbus.auth.model.response.ProfileResponse;
 import vn.com.nimbus.auth.service.AuthService;
 import vn.com.nimbus.common.model.response.BaseResponse;
+import vn.com.nimbus.common.permission.Permissions;
 
 import javax.validation.Valid;
 
@@ -26,5 +28,11 @@ public class AuthController {
         return Mono
                 .just(authService.oauth(request))
                 .map(BaseResponse::ofSucceeded);
+    }
+
+    @PostMapping("/profile")
+    public Mono<BaseResponse<ProfileResponse>> getProfile() {
+        return Permissions.getCurrentUser()
+                .map(u -> authService.getProfile(u.getId())).map(BaseResponse::ofSucceeded);
     }
 }

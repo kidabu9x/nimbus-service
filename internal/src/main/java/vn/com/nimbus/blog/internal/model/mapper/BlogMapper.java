@@ -1,7 +1,6 @@
 package vn.com.nimbus.blog.internal.model.mapper;
 
 import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;
 import vn.com.nimbus.blog.internal.model.response.BlogDetailResponse;
 import vn.com.nimbus.blog.internal.model.response.BlogResponse;

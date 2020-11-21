@@ -14,5 +14,8 @@ public interface KeyConstant {
 
     String BEARER = "Bearer";
     String USER_ID = "user_id";
-
+    String EMAIL = "email";
+    String USER_AGENT = "User-Agent";
+    String CF_CONNECTING_IP = "CF-Connecting-IP";
+    int LONG_RUN_REQUEST = 2_000;
 }
