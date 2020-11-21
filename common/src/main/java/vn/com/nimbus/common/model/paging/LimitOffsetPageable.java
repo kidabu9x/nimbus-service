@@ -3,9 +3,11 @@ package vn.com.nimbus.common.model.paging;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 
 @Setter
 @AllArgsConstructor
+@ToString
 public class LimitOffsetPageable {
 
     public static final int DEFAULT_PAGE_LIMIT = 10;
@@ -13,7 +15,6 @@ public class LimitOffsetPageable {
 
     private int limit;
     private int offset;
-    @Getter
     private Long total;
 
     public LimitOffsetPageable() {
@@ -38,10 +39,14 @@ public class LimitOffsetPageable {
     }
 
     public int getOffset() {
-        return offset < 0 ? 0 : offset;
+        return Math.max(offset, 0);
     }
 
     public int getLimit() {
         return limit < 0 ? DEFAULT_PAGE_LIMIT : limit;
+    }
+
+    public Long getTotal() {
+        return total;
     }
 }

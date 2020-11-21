@@ -38,4 +38,9 @@ public class Paging<T> implements Serializable {
         this(pageable);
         this.item = item;
     }
+
+    public Paging(T item, Pageable pageable) {
+        this(pageable);
+        this.item = item;
+    }
 }

@@ -38,9 +38,9 @@ public class BaseResponse<T> {
     public static <T> BaseResponse<T> ofSucceeded(Paging<T> data) {
         BaseResponse<T> response = new BaseResponse<>();
         response.data = data.getItem();
-        response.meta.page = data.getPageable().getPage();
-        response.meta.size = data.getPageable().getPageSize();
-        response.meta.total = data.getPageable().getTotal();
+        response.meta.page = data.getLimitOffsetPageable().getOffset();
+        response.meta.size = data.getLimitOffsetPageable().getLimit();
+        response.meta.total = data.getLimitOffsetPageable().getTotal();
         response.meta.code = OK_CODE;
         return response;
     }
