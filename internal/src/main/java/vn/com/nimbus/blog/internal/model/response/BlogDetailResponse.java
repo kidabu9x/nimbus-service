@@ -14,7 +14,6 @@ public class BlogDetailResponse implements Serializable {
     private static final long serialVersionUID = 4844482821641360869L;
     private Long id;
     private String title;
-    private String slug;
     private String description;
     private String thumbnail;
     private BlogStatus status;

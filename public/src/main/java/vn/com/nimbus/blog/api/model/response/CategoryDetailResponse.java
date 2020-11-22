@@ -11,6 +11,7 @@ import java.util.List;
 public class CategoryDetailResponse implements Serializable {
     private static final long serialVersionUID = -8859841232722079115L;
 
+    private String type = "CATEGORY";
     private CategoryResponse category;
     private List<BlogResponse> blogs;
     private List<BlogResponse> highlights;

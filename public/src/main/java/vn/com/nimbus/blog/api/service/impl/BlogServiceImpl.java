@@ -19,10 +19,12 @@ import vn.com.nimbus.blog.api.model.response.SearchResponse;
 import vn.com.nimbus.blog.api.model.response.TagDetailResponse;
 import vn.com.nimbus.blog.api.model.response.TagResponse;
 import vn.com.nimbus.blog.api.service.BlogService;
+import vn.com.nimbus.common.model.dto.SlugPoolDto;
 import vn.com.nimbus.common.model.error.ErrorCode;
 import vn.com.nimbus.common.model.exception.BaseException;
 import vn.com.nimbus.common.model.paging.LimitOffsetPageable;
 import vn.com.nimbus.common.model.paging.Paging;
+import vn.com.nimbus.common.service.SlugPoolService;
 import vn.com.nimbus.data.domain.Blog;
 import vn.com.nimbus.data.domain.BlogAuthor;
 import vn.com.nimbus.data.domain.BlogAuthorID;
@@ -35,6 +37,9 @@ import vn.com.nimbus.data.domain.Category;
 import vn.com.nimbus.data.domain.Tag;
 import vn.com.nimbus.data.domain.User;
 import vn.com.nimbus.data.domain.constant.BlogStatus;
+import vn.com.nimbus.data.domain.constant.SlugPoolType;
+import vn.com.nimbus.data.dto.output.BlogDto;
+import vn.com.nimbus.data.dto.output.CategoryDto;
 import vn.com.nimbus.data.repository.BlogAuthorRepository;
 import vn.com.nimbus.data.repository.BlogCategoryRepository;
 import vn.com.nimbus.data.repository.BlogContentRepository;
@@ -49,6 +54,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -64,6 +70,7 @@ public class BlogServiceImpl implements BlogService {
     private final BlogAuthorRepository blogAuthorRepository;
     private final BlogContentRepository blogContentRepository;
     private final UserRepository userRepository;
+    private final SlugPoolService slugPoolService;
 
     public BlogServiceImpl(
             BlogRepository blogRepository,
@@ -74,7 +81,8 @@ public class BlogServiceImpl implements BlogService {
             TagRepository tagRepository,
             BlogAuthorRepository blogAuthorRepository,
             BlogContentRepository blogContentRepository,
-            UserRepository userRepository
+            UserRepository userRepository,
+            SlugPoolService slugPoolService
     ) {
         this.blogRepository = blogRepository;
         this.categoryRepository = categoryRepository;
@@ -85,92 +93,95 @@ public class BlogServiceImpl implements BlogService {
         this.blogAuthorRepository = blogAuthorRepository;
         this.blogContentRepository = blogContentRepository;
         this.userRepository = userRepository;
+        this.slugPoolService = slugPoolService;
     }
 
     @Override
-    public BlogDetailResponse getBlog(String slug) {
+    public Paging<Object> getBySlug(String slug, LimitOffsetPageable limitOffsetPageable) {
         if (StringUtils.isEmpty(slug)) {
             throw new BaseException(ErrorCode.INVALID_PARAMETERS);
         }
-        Blog blog = blogRepository.findBySlugAndStatus(slug, BlogStatus.PUBLISHED);
-        if (blog == null) {
-            throw new BaseException(ErrorCode.RESOURCE_NOT_FOUND);
-        }
-        final Long blogId = blog.getId();
+        SlugPoolDto slugPoolDto = slugPoolService.get(slug);
+        SlugPoolType type = slugPoolDto.getType();
+        if (type.equals(SlugPoolType.BLOG)) {
+            Optional<Blog> blogOpt = blogRepository.findById(slugPoolDto.getTargetId());
+            if (blogOpt.isEmpty() || !blogOpt.get().getStatus().equals(BlogStatus.PUBLISHED)) {
+                throw new BaseException(ErrorCode.RESOURCE_NOT_FOUND);
+            }
+            final Blog blog = blogOpt.get();
+            final Long blogId = blog.getId();
 
-        BlogMapper mapper = BlogMapper.INSTANCE;
-        BlogDetailResponse detail = mapper.toDetailResponse(blog);
-        BlogContent content = blogContentRepository.findByBlogId(blogId);
-        detail.setContent(content.getContent());
+            BlogMapper mapper = BlogMapper.INSTANCE;
+            BlogDetailResponse detail = mapper.toDetailResponse(blog);
+            BlogContent content = blogContentRepository.findByBlogId(blogId);
+            detail.setContent(content.getContent());
 
-        List<BlogAuthor> authors = blogAuthorRepository.findById_BlogId(blogId);
-        List<Long> authorIds = authors.stream()
-                .map(BlogAuthor::getId)
-                .map(BlogAuthorID::getAuthorId)
-                .collect(Collectors.toList());
-        List<User> users = userRepository.findAllById(authorIds);
-        List<BlogResponse.Author> resAuthors = users.stream().map(mapper::toAuthorResponse).collect(Collectors.toList());
-        detail.setAuthors(resAuthors);
+            List<BlogAuthor> authors = blogAuthorRepository.findById_BlogId(blogId);
+            List<Long> authorIds = authors.stream()
+                    .map(BlogAuthor::getId)
+                    .map(BlogAuthorID::getAuthorId)
+                    .collect(Collectors.toList());
+            List<User> users = userRepository.findAllById(authorIds);
+            List<BlogResponse.Author> resAuthors = users.stream().map(mapper::toAuthorResponse).collect(Collectors.toList());
+            detail.setAuthors(resAuthors);
 
-        List<BlogCategory> blogCategories = blogCategoryRepository.findById_BlogId(blogId);
-        if (!CollectionUtils.isEmpty(blogCategories)) {
-            List<Long> categoryIds = blogCategories.stream()
+            List<BlogCategory> blogCategories = blogCategoryRepository.findById_BlogId(blogId);
+            if (!CollectionUtils.isEmpty(blogCategories)) {
+                List<Long> categoryIds = blogCategories.stream()
+                        .map(BlogCategory::getId)
+                        .map(BlogCategoryID::getCategoryId)
+                        .collect(Collectors.toList());
+
+                List<Category> categories = categoryRepository.findAllById(categoryIds);
+                CategoryMapper categoryMapper = CategoryMapper.INSTANCE;
+                detail.setCategories(categories.stream().map(categoryMapper::toResponse).collect(Collectors.toList()));
+            }
+
+            List<BlogTag> blogTags = blogTagRepository.findById_BlogId(blogId);
+            detail.setTags(new ArrayList<>());
+            if (!CollectionUtils.isEmpty(blogTags)) {
+                List<Long> tagIds = blogTags.stream()
+                        .map(BlogTag::getId)
+                        .map(BlogTagID::getTagId)
+                        .collect(Collectors.toList());
+
+                List<Tag> tags = tagRepository.findAllById(tagIds);
+                TagMapper tagMapper = TagMapper.INSTANCE;
+                detail.setTags(tags.stream().map(tagMapper::toResponse).collect(Collectors.toList()));
+            }
+
+            List<BlogDto> mostViewedBlogs = this.getMostViewedBlogs(List.of(blog.getId()));
+            detail.setHighlights(this.extractBlogs(mostViewedBlogs));
+
+            limitOffsetPageable.setTotal(0L);
+            return new Paging<>(detail, limitOffsetPageable);
+        } else {
+            Optional<Category> categoryOpt = categoryRepository.findById(slugPoolDto.getTargetId());
+            if (categoryOpt.isEmpty()) {
+                throw new BaseException(ErrorCode.RESOURCE_NOT_FOUND);
+            }
+            final Category category = categoryOpt.get();
+            CategoryResponse catRes = CategoryMapper.INSTANCE.toResponse(category);
+            CategoryDetailResponse response = new CategoryDetailResponse();
+            response.setCategory(catRes);
+
+            Page<BlogCategory> pageCat = blogCategoryRepository.findByCategoryId(
+                    category.getId(),
+                    BlogStatus.PUBLISHED,
+                    PageRequest.of(limitOffsetPageable.getOffset(), limitOffsetPageable.getLimit())
+            );
+            List<Long> blogIds = pageCat.getContent()
+                    .stream()
                     .map(BlogCategory::getId)
-                    .map(BlogCategoryID::getCategoryId)
+                    .map(BlogCategoryID::getBlogId)
                     .collect(Collectors.toList());
-
-            List<Category> categories = categoryRepository.findAllById(categoryIds);
-            CategoryMapper categoryMapper = CategoryMapper.INSTANCE;
-            detail.setCategories(categories.stream().map(categoryMapper::toResponse).collect(Collectors.toList()));
+            List<BlogDto> blogs = blogRepository.findDtoByIds(blogIds);
+            response.setBlogs(this.extractBlogs(blogs));
+            List<BlogDto> mostViewedBlogs = this.getMostViewedBlogs(blogIds);
+            response.setHighlights(this.extractBlogs(mostViewedBlogs));
+            limitOffsetPageable.setTotal(pageCat.getTotalElements());
+            return new Paging<>(response, limitOffsetPageable);
         }
-
-        List<BlogTag> blogTags = blogTagRepository.findById_BlogId(blogId);
-        if (!CollectionUtils.isEmpty(blogTags)) {
-            List<Long> tagIds = blogTags.stream()
-                    .map(BlogTag::getId)
-                    .map(BlogTagID::getTagId)
-                    .collect(Collectors.toList());
-
-            List<Tag> tags = tagRepository.findAllById(tagIds);
-            TagMapper tagMapper = TagMapper.INSTANCE;
-            detail.setTags(tags.stream().map(tagMapper::toResponse).collect(Collectors.toList()));
-        }
-
-        List<Blog> mostViewedBlogs = this.getMostViewedBlogs(List.of(blog.getId()));
-        detail.setHighlights(this.extractBlogs(mostViewedBlogs));
-
-        return detail;
-    }
-
-    @Override
-    public Paging<CategoryDetailResponse> getCategory(String slug, LimitOffsetPageable limitOffsetPageable) {
-        if (StringUtils.isEmpty(slug)) {
-            throw new BaseException(ErrorCode.INVALID_PARAMETERS);
-        }
-        Category category = categoryRepository.findBySlug(slug);
-        if (category == null) {
-            throw new BaseException(ErrorCode.RESOURCE_NOT_FOUND);
-        }
-        CategoryResponse response = CategoryMapper.INSTANCE.toResponse(category);
-        CategoryDetailResponse detail = new CategoryDetailResponse();
-        detail.setCategory(response);
-
-        Page<BlogCategory> pageCat = blogCategoryRepository.findByCategoryId(
-                category.getId(),
-                BlogStatus.PUBLISHED,
-                PageRequest.of(limitOffsetPageable.getOffset(), limitOffsetPageable.getLimit())
-        );
-        List<Long> blogIds = pageCat.getContent()
-                .stream()
-                .map(BlogCategory::getId)
-                .map(BlogCategoryID::getBlogId)
-                .collect(Collectors.toList());
-        List<Blog> blogs = blogRepository.findByIdIn(blogIds);
-        detail.setBlogs(this.extractBlogs(blogs));
-        List<Blog> mostViewedBlogs = this.getMostViewedBlogs(blogIds);
-        detail.setHighlights(this.extractBlogs(mostViewedBlogs));
-        limitOffsetPageable.setTotal(pageCat.getTotalElements());
-        return new Paging<>(detail, limitOffsetPageable);
     }
 
     @Override
@@ -188,6 +199,7 @@ public class BlogServiceImpl implements BlogService {
         response.setTitle(tag.getTitle());
 
         TagDetailResponse detail = new TagDetailResponse();
+        detail.setTag(response);
         Page<BlogTag> pageCat = blogTagRepository.findByTag(
                 tag.getId(),
                 BlogStatus.PUBLISHED,
@@ -199,16 +211,16 @@ public class BlogServiceImpl implements BlogService {
                 .map(BlogTag::getId)
                 .map(BlogTagID::getBlogId)
                 .collect(Collectors.toList());
-        List<Blog> blogs = blogRepository.findByIdIn(blogIds);
+        List<BlogDto> blogs = blogRepository.findDtoByIds(blogIds);
         detail.setBlogs(this.extractBlogs(blogs));
-        List<Blog> mostViewedBlogs = this.getMostViewedBlogs(blogIds);
+        List<BlogDto> mostViewedBlogs = this.getMostViewedBlogs(blogIds);
         detail.setHighlights(this.extractBlogs(mostViewedBlogs));
         return new Paging<>(detail, limitOffsetPageable);
     }
 
     @Override
     public Paging<SearchResponse> searchBlog(String title, LimitOffsetPageable limitOffsetPageable) {
-        Page<Blog> blogsPage = blogRepository.findByStatusAndTitleContains(
+        Page<BlogDto> blogsPage = blogRepository.findByStatusAndTitleContains(
                 BlogStatus.PUBLISHED,
                 title,
                 PageRequest.of(limitOffsetPageable.getOffset(), limitOffsetPageable.getLimit())
@@ -239,12 +251,15 @@ public class BlogServiceImpl implements BlogService {
         Page<Category> page = categoryRepository.findAll(PageRequest.of(0, 10));
         List<Category> categories = page.getContent();
 
-        List<Blog> mostViewBlogs = this.getMostViewedBlogs(Collections.emptyList());
+        List<BlogDto> mostViewBlogs = this.getMostViewedBlogs(Collections.emptyList());
         List<BlogResponse> highLights = this.extractBlogs(mostViewBlogs);
         response.setHighlights(highLights);
 
-        List<Blog> allBlogs = new ArrayList<>(mostViewBlogs);
-        List<Long> allBlogIds = mostViewBlogs.stream().map(Blog::getId).collect(Collectors.toList());
+        List<BlogDto> allBlogs = new ArrayList<>(mostViewBlogs);
+        List<Long> allBlogIds = mostViewBlogs.stream()
+                .map(BlogDto::getBlog)
+                .map(Blog::getId)
+                .collect(Collectors.toList());
         List<FeatureResponse.Feature> features = new ArrayList<>();
         categories.forEach(category -> {
             List<Long> ids = blogViewRepository.getMostViewsByCategoryId(category.getId(), pageable);
@@ -259,8 +274,8 @@ public class BlogServiceImpl implements BlogService {
                 }
             });
 
-            List<Blog> blogs = blogRepository.findByIdIn(fetchIds);
-            List<Blog> existBlogs = allBlogs.stream().filter(b -> existIds.contains(b.getId())).collect(Collectors.toList());
+            List<BlogDto> blogs = blogRepository.findDtoByIds(fetchIds);
+            List<BlogDto> existBlogs = allBlogs.stream().filter(b -> existIds.contains(b.getBlog().getId())).collect(Collectors.toList());
 
             allBlogIds.addAll(fetchIds);
             allBlogs.addAll(blogs);
@@ -278,13 +293,17 @@ public class BlogServiceImpl implements BlogService {
 
     @Override
     public List<CategoryResponse> getCategories() {
-        List<Category> categories = categoryRepository.findAllByOrderByCreatedAt();
-        return categories.stream().map(CategoryMapper.INSTANCE::toResponse).collect(Collectors.toList());
+        List<CategoryDto> categories = categoryRepository.findAllDto();
+        return categories.stream().map(dto -> {
+            CategoryResponse response = CategoryMapper.INSTANCE.toResponse(dto.getCategory());
+            response.setSlug(dto.getSlug());
+            return response;
+        }).collect(Collectors.toList());
     }
 
-    private List<BlogResponse> extractBlogs(List<Blog> blogs) {
+    private List<BlogResponse> extractBlogs(List<BlogDto> blogs) {
         BlogMapper mapper = BlogMapper.INSTANCE;
-        List<Long> blogIds = blogs.stream().map(Blog::getId).collect(Collectors.toList());
+        List<Long> blogIds = blogs.stream().map(BlogDto::getBlog).map(Blog::getId).collect(Collectors.toList());
         List<BlogAuthor> authors = blogAuthorRepository.findById_BlogIdIn(blogIds);
         List<Long> authorIds = authors.stream()
                 .map(BlogAuthor::getId)
@@ -293,9 +312,10 @@ public class BlogServiceImpl implements BlogService {
         List<User> users = userRepository.findAllById(authorIds);
 
         return blogs.stream()
-                .sorted(Comparator.comparing(Blog::getUpdatedAt))
-                .map(blog -> {
+                .map(blogDto -> {
+                    Blog blog = blogDto.getBlog();
                     BlogResponse res = mapper.toResponse(blog);
+                    res.setSlug(blogDto.getSlug());
 
                     List<Long> blogAuthorIds = authors.stream()
                             .filter(blogAuthor -> blogAuthor.getId().getBlogId().equals(blog.getId()))
@@ -311,16 +331,17 @@ public class BlogServiceImpl implements BlogService {
                     res.setAuthors(resAuthors);
                     return res;
                 })
+                .sorted(Comparator.comparing(BlogResponse::getUpdatedAt))
                 .collect(Collectors.toList());
     }
 
-    private List<Blog> getMostViewedBlogs(List<Long> excludeIds) {
+    private List<BlogDto> getMostViewedBlogs(List<Long> excludeIds) {
         if (CollectionUtils.isEmpty(excludeIds)) {
             excludeIds = Collections.singletonList(-1L);
         }
 
         List<Long> page = blogViewRepository.getMostViews(excludeIds, PageRequest.of(0, 5));
-        return blogRepository.findByIdIn(page);
+        return blogRepository.findDtoByIds(page);
     }
 
 }

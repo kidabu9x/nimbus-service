@@ -8,6 +8,5 @@ import lombok.Setter;
 public class CategoryResponse {
     private Long id;
     private String title;
-    private String slug;
     private Long totalBlogs;
 }

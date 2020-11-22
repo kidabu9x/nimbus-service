@@ -1,21 +1,23 @@
 package vn.com.nimbus.blog.internal.service.impl;
 
-import com.github.slugify.Slugify;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import vn.com.nimbus.blog.internal.model.request.CategoryRequest;
 import vn.com.nimbus.blog.internal.model.response.CategoryResponse;
 import vn.com.nimbus.blog.internal.service.CategoryService;
+import vn.com.nimbus.common.model.dto.SlugPoolDto;
 import vn.com.nimbus.common.model.error.ErrorCode;
 import vn.com.nimbus.common.model.exception.BaseException;
+import vn.com.nimbus.common.service.SlugPoolService;
 import vn.com.nimbus.data.domain.BlogCategory;
 import vn.com.nimbus.data.domain.Category;
+import vn.com.nimbus.data.domain.constant.SlugPoolType;
 import vn.com.nimbus.data.repository.BlogCategoryRepository;
 import vn.com.nimbus.data.repository.CategoryRepository;
 
-import javax.annotation.Resource;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -23,13 +25,21 @@ import java.util.stream.Collectors;
 @Service
 @Slf4j
 public class CategoryServiceImpl implements CategoryService {
-    @Resource
-    private CategoryRepository categoryRepository;
+    private final CategoryRepository categoryRepository;
+    private final BlogCategoryRepository blogCategoryRepository;
+    private final SlugPoolService slugPoolService;
 
-    @Resource
-    private BlogCategoryRepository blogCategoryRepository;
+    @Autowired
+    public CategoryServiceImpl(
+            CategoryRepository categoryRepository,
+            BlogCategoryRepository blogCategoryRepository,
+            SlugPoolService slugPoolService
+    ) {
+        this.categoryRepository = categoryRepository;
+        this.blogCategoryRepository = blogCategoryRepository;
+        this.slugPoolService = slugPoolService;
+    }
 
-    private final Slugify slugify = new Slugify();
 
     @Override
     @Transactional(readOnly = true)
@@ -72,16 +82,15 @@ public class CategoryServiceImpl implements CategoryService {
             }
         }
 
-        String slug = slugify.slugify(request.getTitle());
-        Long duplicate = categoryRepository.countBySlugContains(slug);
-        if (duplicate > 0) {
-            slug = slug.concat("-").concat(duplicate.toString());
-        }
-
         category = new Category();
         category.setTitle(request.getTitle());
-        category.setSlug(slug);
         category = categoryRepository.save(category);
+
+        SlugPoolDto slugPoolDto = new SlugPoolDto();
+        slugPoolDto.setTargetId(category.getId());
+        slugPoolDto.setTitle(category.getTitle());
+        slugPoolDto.setType(SlugPoolType.CATEGORY);
+        slugPoolService.save(slugPoolDto);
 
         return this.buildResponse(category);
     }
@@ -96,6 +105,12 @@ public class CategoryServiceImpl implements CategoryService {
         }
         List<BlogCategory> categories = blogCategoryRepository.findById_CategoryId(id);
         blogCategoryRepository.deleteAll(categories);
+
+        SlugPoolDto slugPoolDto = new SlugPoolDto();
+        slugPoolDto.setTargetId(id);
+        slugPoolDto.setType(SlugPoolType.CATEGORY);
+        slugPoolService.delete(slugPoolDto);
+
         categoryRepository.delete(opt.get());
         return true;
     }
@@ -103,7 +118,6 @@ public class CategoryServiceImpl implements CategoryService {
     private CategoryResponse buildResponse(Category category) {
         CategoryResponse response = new CategoryResponse();
         response.setId(category.getId());
-        response.setSlug(category.getSlug());
         response.setTitle(category.getTitle());
         response.setTotalBlogs(0L);
         return response;

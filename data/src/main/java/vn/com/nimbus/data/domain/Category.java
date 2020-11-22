@@ -41,9 +41,4 @@ public class Category implements Serializable {
     @Column(name = "updated_at")
     @LastModifiedDate
     private LocalDateTime updatedAt;
-
-//    @ManyToMany(fetch = FetchType.LAZY)
-//    @JoinTable(name = "blog_category", joinColumns = @JoinColumn(name = "category_id"),
-//            inverseJoinColumns = @JoinColumn(name = "blog_id"))
-//    private Set<Blogs> blogs;
 }

@@ -10,6 +10,8 @@ import java.util.List;
 @Getter
 public class BlogDetailResponse extends BlogResponse {
     private static final long serialVersionUID = -7728854346124996350L;
+
+    private String type = "BLOG";
     private String description;
     private String content;
     private BlogExtraData extraData;

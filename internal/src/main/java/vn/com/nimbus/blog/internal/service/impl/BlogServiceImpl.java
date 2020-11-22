@@ -8,15 +8,16 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
-import org.springframework.util.StringUtils;
 import vn.com.nimbus.blog.internal.model.mapper.BlogMapper;
 import vn.com.nimbus.blog.internal.model.request.BlogRequest;
 import vn.com.nimbus.blog.internal.model.response.BlogDetailResponse;
 import vn.com.nimbus.blog.internal.model.response.BlogResponse;
 import vn.com.nimbus.blog.internal.service.BlogService;
+import vn.com.nimbus.common.model.dto.SlugPoolDto;
 import vn.com.nimbus.common.model.error.ErrorCode;
 import vn.com.nimbus.common.model.exception.BaseException;
 import vn.com.nimbus.common.model.paging.LimitOffsetPageable;
+import vn.com.nimbus.common.service.SlugPoolService;
 import vn.com.nimbus.data.domain.Blog;
 import vn.com.nimbus.data.domain.BlogAuthor;
 import vn.com.nimbus.data.domain.BlogAuthorID;
@@ -31,6 +32,7 @@ import vn.com.nimbus.data.domain.Tag;
 import vn.com.nimbus.data.domain.User;
 import vn.com.nimbus.data.domain.constant.BlogContentType;
 import vn.com.nimbus.data.domain.constant.BlogStatus;
+import vn.com.nimbus.data.domain.constant.SlugPoolType;
 import vn.com.nimbus.data.repository.BlogAuthorRepository;
 import vn.com.nimbus.data.repository.BlogCategoryRepository;
 import vn.com.nimbus.data.repository.BlogContentRepository;
@@ -59,6 +61,7 @@ public class BlogServiceImpl implements BlogService {
     private final BlogAuthorRepository blogAuthorRepository;
     private final BlogViewRepository blogViewRepository;
     private final CategoryRepository categoryRepository;
+    private final SlugPoolService slugPoolService;
 
     private final Slugify slugify = new Slugify();
 
@@ -72,7 +75,8 @@ public class BlogServiceImpl implements BlogService {
             BlogCategoryRepository blogCategoryRepository,
             BlogAuthorRepository blogAuthorRepository,
             BlogViewRepository blogViewRepository,
-            CategoryRepository categoryRepository
+            CategoryRepository categoryRepository,
+            SlugPoolService slugPoolService
     ) {
         this.blogRepository = blogRepository;
         this.userRepository = userRepository;
@@ -83,6 +87,7 @@ public class BlogServiceImpl implements BlogService {
         this.blogAuthorRepository = blogAuthorRepository;
         this.blogViewRepository = blogViewRepository;
         this.categoryRepository = categoryRepository;
+        this.slugPoolService = slugPoolService;
     }
 
     @Override
@@ -165,6 +170,11 @@ public class BlogServiceImpl implements BlogService {
         List<BlogAuthor> authors = blogAuthorRepository.findById_BlogId(blogId);
         blogAuthorRepository.deleteAll(authors);
 
+        SlugPoolDto slugPoolDto = new SlugPoolDto();
+        slugPoolDto.setTargetId(blogId);
+        slugPoolDto.setType(SlugPoolType.BLOG);
+        slugPoolService.delete(slugPoolDto);
+
         Blog blog = blogOpt.get();
         blogRepository.delete(blog);
         return true;
@@ -197,10 +207,13 @@ public class BlogServiceImpl implements BlogService {
         blog.setThumbnail(request.getThumbnail());
         blog.setDescription(request.getDescription());
 
-        if (StringUtils.isEmpty(blog.getSlug())) {
-            blog.setSlug(this.generateSlug(blog.getTitle()));
-        }
         blog = blogRepository.save(blog);
+
+        SlugPoolDto slugPoolDto = new SlugPoolDto();
+        slugPoolDto.setTargetId(blog.getId());
+        slugPoolDto.setType(SlugPoolType.BLOG);
+        slugPoolDto.setTitle(blog.getTitle());
+        slugPoolService.save(slugPoolDto);
 
         final Long blogId = blog.getId();
 
@@ -282,14 +295,5 @@ public class BlogServiceImpl implements BlogService {
         if (!currentAuthorIds.contains(userId)) {
             blogAuthorRepository.save(new BlogAuthor(new BlogAuthorID(userId, blogId)));
         }
-    }
-
-    private String generateSlug(String title) {
-        String slug = slugify.slugify(title);
-        Integer count = blogRepository.countBySlugContains(slug);
-        if (count > 0)
-            slug = slug.concat("-").concat(Integer.toString(count));
-
-        return slug;
     }
 }

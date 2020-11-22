@@ -7,7 +7,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Mono;
-import vn.com.nimbus.blog.api.model.response.BlogDetailResponse;
 import vn.com.nimbus.blog.api.model.response.CategoryDetailResponse;
 import vn.com.nimbus.blog.api.model.response.CategoryResponse;
 import vn.com.nimbus.blog.api.model.response.FeatureResponse;
@@ -59,16 +58,7 @@ public class BlogController {
     }
 
     @GetMapping("/{slug}")
-    public Mono<BaseResponse<BlogDetailResponse>> getBlogBySlug(
-            @PathVariable String slug
-    ) {
-        return Mono
-                .just(blogService.getBlog(slug))
-                .map(BaseResponse::ofSucceeded);
-    }
-
-    @GetMapping("/category/{slug}")
-    public Mono<BaseResponse<CategoryDetailResponse>> getCategoryBySlug(
+    public Mono<BaseResponse<Object>> getBySlug(
             @PathVariable String slug,
             @RequestParam(name = "limit", required = false, defaultValue = "10") Integer limit,
             @RequestParam(name = "offset", required = false, defaultValue = "0") Integer offset
@@ -77,7 +67,7 @@ public class BlogController {
         limitOffsetPageable.setLimit(limit);
         limitOffsetPageable.setOffset(offset);
         return Mono
-                .just(blogService.getCategory(slug, limitOffsetPageable))
+                .just(blogService.getBySlug(slug, limitOffsetPageable))
                 .map(BaseResponse::ofSucceeded);
     }
 

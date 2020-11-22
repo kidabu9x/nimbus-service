@@ -1,4 +1,4 @@
-package vn.com.nimbus.common.service;
+package vn.com.nimbus.common.service.impl;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtBuilder;
@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import vn.com.nimbus.common.config.ConfigData;
 import vn.com.nimbus.common.config.ConfigLoader;
 import vn.com.nimbus.common.model.constant.KeyConstant;
+import vn.com.nimbus.common.service.JwtService;
 import vn.com.nimbus.data.domain.User;
 
 import java.util.Date;

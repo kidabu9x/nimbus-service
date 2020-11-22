@@ -1,7 +1,5 @@
 package vn.com.nimbus.blog.api.service;
 
-import vn.com.nimbus.blog.api.model.response.BlogDetailResponse;
-import vn.com.nimbus.blog.api.model.response.CategoryDetailResponse;
 import vn.com.nimbus.blog.api.model.response.CategoryResponse;
 import vn.com.nimbus.blog.api.model.response.FeatureResponse;
 import vn.com.nimbus.blog.api.model.response.SearchResponse;
@@ -12,9 +10,7 @@ import vn.com.nimbus.common.model.paging.Paging;
 import java.util.List;
 
 public interface BlogService {
-    BlogDetailResponse getBlog(String slug);
-
-    Paging<CategoryDetailResponse> getCategory(String slug, LimitOffsetPageable limitOffsetPageable);
+    Paging<Object> getBySlug(String slug, LimitOffsetPageable limitOffsetPageable);
 
     Paging<TagDetailResponse> getTag(String slug, LimitOffsetPageable limitOffsetPageable);
 

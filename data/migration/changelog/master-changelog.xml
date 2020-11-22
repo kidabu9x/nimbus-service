@@ -30,4 +30,9 @@
                  path="/sql/2020_11_18_refactor_database.sql"/>
     </changeSet>
 
+    <changeSet id="2020_11_22_create_slug_pool" author="duongnk" context="auto">
+        <sqlFile encoding="utf8" endDelimiter=";"
+                 path="/sql/2020_11_22_create_slug_pool.sql"/>
+    </changeSet>
+
 </databaseChangeLog>
