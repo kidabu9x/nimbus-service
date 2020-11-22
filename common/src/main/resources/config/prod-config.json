@@ -3,7 +3,7 @@
     "is_use_ha": true,
     "master": {
       "driver_class_name": "com.mysql.cj.jdbc.Driver",
-      "url": "jdbc:mysql://localhost:3306/blog_service?useUnicode=true&characterEncoding=utf-8&useSSL=false",
+      "url": "jdbc:mysql://127.0.0.1:3306/blog_service?useUnicode=true&characterEncoding=utf-8&useSSL=false",
       "username": "kidabu9x",
       "password": "Dota199x@",
       "maximum_pool_size": 20,
@@ -11,7 +11,7 @@
     },
     "slave": {
       "driver_class_name": "com.mysql.cj.jdbc.Driver",
-      "url": "jdbc:mysql://localhost:3306/blog_service?useUnicode=true&characterEncoding=utf-8&useSSL=false",
+      "url": "jdbc:mysql://127.0.0.1:3306/blog_service?useUnicode=true&characterEncoding=utf-8&useSSL=false",
       "username": "kidabu9x",
       "password": "Dota199x@",
       "maximum_pool_size": 20,
