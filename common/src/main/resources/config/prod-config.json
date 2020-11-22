@@ -3,17 +3,17 @@
     "is_use_ha": true,
     "master": {
       "driver_class_name": "com.mysql.cj.jdbc.Driver",
-      "url": "{{JDBC_MASTER_URL}}?useUnicode=true&characterEncoding=utf-8&useSSL=false",
-      "username": "{{JDBC_MASTER_USERNAME}}",
-      "password": "{{JDBC_MASTER_PASSWORD}}",
+      "url": "jdbc:mysql://localhost:3306/blog_service?useUnicode=true&characterEncoding=utf-8&useSSL=false",
+      "username": "kidabu9x",
+      "password": "Dota199x@",
       "maximum_pool_size": 20,
       "minimum_idle": 5
     },
     "slave": {
       "driver_class_name": "com.mysql.cj.jdbc.Driver",
-      "url": "{{JDBC_SLAVE_URL}}?useUnicode=true&characterEncoding=utf-8&useSSL=false",
-      "username": "{{JDBC_SLAVE_USERNAME}}",
-      "password": "{{JDBC_SLAVE_PASSWORD}}",
+      "url": "jdbc:mysql://localhost:3306/blog_service?useUnicode=true&characterEncoding=utf-8&useSSL=false",
+      "username": "kidabu9x",
+      "password": "Dota199x@",
       "maximum_pool_size": 20,
       "minimum_idle": 5
     }
