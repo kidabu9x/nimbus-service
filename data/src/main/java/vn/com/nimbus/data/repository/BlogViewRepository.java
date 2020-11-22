@@ -10,10 +10,6 @@ import java.util.List;
 
 @Repository
 public interface BlogViewRepository extends JpaRepository<BlogView, Integer> {
-    void deleteByBlogId(Long blogId);
-
-    long countByBlogId(Long blogId);
-
     List<BlogView> findByBlogId(Long blogId);
 
     @Query(
