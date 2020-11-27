@@ -2,7 +2,7 @@ create table hachium_category
 (
     id bigint not null,
     url varchar(1000) not null,
-    name varchar(255) not null
+    title varchar(255) not null
 );
 
 create unique index hachium_category_id_uindex
@@ -11,7 +11,6 @@ create unique index hachium_category_id_uindex
 alter table hachium_category
     add constraint hachium_category_pk
         primary key (id);
-
 
 create table hachium_course
 (
@@ -27,11 +26,11 @@ create table hachium_course
         primary key (id)
 );
 
-CREATE TABLE category_mapping
+CREATE TABLE hachium_category_mapping
 (
     category_id bigint not null,
     hachium_category_id bigint not null,
-    CONSTRAINT category_mapping
+    CONSTRAINT hachium_category_mapping
         PRIMARY KEY (category_id, hachium_category_id)
 );
 

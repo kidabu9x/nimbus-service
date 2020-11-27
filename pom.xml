@@ -43,6 +43,7 @@
         <jackson-core.version>2.11.3</jackson-core.version>
         <swagger.version>2.10.5</swagger.version>
         <jsoup.version>1.10.2</jsoup.version>
+        <shedlock.version>4.15.1</shedlock.version>
     </properties>
 
     <dependencyManagement>
@@ -194,6 +195,17 @@
                 <version>${jsoup.version}</version>
             </dependency>
 
+            <dependency>
+                <groupId>net.javacrumbs.shedlock</groupId>
+                <artifactId>shedlock-spring</artifactId>
+                <version>${shedlock.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>net.javacrumbs.shedlock</groupId>
+                <artifactId>shedlock-provider-jdbc-template</artifactId>
+                <version>${shedlock.version}</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
     <build>
