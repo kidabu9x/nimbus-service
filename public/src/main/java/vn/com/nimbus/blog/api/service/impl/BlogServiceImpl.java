@@ -327,7 +327,9 @@ public class BlogServiceImpl implements BlogService {
                 if (!CollectionUtils.isEmpty(blogCategories)) {
                     List<Long> categoryIds = blogCategories.stream().map(BlogCategory::getId).map(BlogCategoryID::getCategoryId).collect(Collectors.toList());
                     List<HachiumCategoryMapping> mappings = hachiumCategoryMappingRepository.findById_CategoryIdIn(categoryIds);
-                    return this.getHachiumCourseResponses(mappings);
+                    if (!CollectionUtils.isEmpty(mappings)) {
+                        return this.getHachiumCourseResponses(mappings);
+                    }
                 }
             } else {
                 Optional<Category> categoryOpt = categoryRepository.findById(slugPoolDto.getTargetId());
@@ -336,7 +338,9 @@ public class BlogServiceImpl implements BlogService {
                 }
                 final Category category = categoryOpt.get();
                 List<HachiumCategoryMapping> mappings = hachiumCategoryMappingRepository.findById_CategoryId(category.getId());
-                return this.getHachiumCourseResponses(mappings);
+                if (!CollectionUtils.isEmpty(mappings)) {
+                    return this.getHachiumCourseResponses(mappings);
+                }
             }
         }
 
