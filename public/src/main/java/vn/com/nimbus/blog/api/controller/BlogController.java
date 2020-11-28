@@ -7,9 +7,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Mono;
-import vn.com.nimbus.blog.api.model.response.CategoryDetailResponse;
 import vn.com.nimbus.blog.api.model.response.CategoryResponse;
 import vn.com.nimbus.blog.api.model.response.FeatureResponse;
+import vn.com.nimbus.blog.api.model.response.HachiumCourseResponse;
 import vn.com.nimbus.blog.api.model.response.SearchResponse;
 import vn.com.nimbus.blog.api.model.response.TagDetailResponse;
 import vn.com.nimbus.blog.api.service.BlogService;
@@ -82,6 +82,15 @@ public class BlogController {
         limitOffsetPageable.setOffset(offset);
         return Mono
                 .just(blogService.getTag(slug, limitOffsetPageable))
+                .map(BaseResponse::ofSucceeded);
+    }
+
+    @GetMapping("/course")
+    public Mono<BaseResponse<List<HachiumCourseResponse>>> getRelatedHachiumCourse(
+            @RequestParam(name = "slug", required = false) String slug
+    ) {
+        return Mono
+                .just(blogService.getCourses(slug))
                 .map(BaseResponse::ofSucceeded);
     }
 

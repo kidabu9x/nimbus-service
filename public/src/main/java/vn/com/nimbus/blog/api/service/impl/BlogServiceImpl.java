@@ -1,6 +1,7 @@
 package vn.com.nimbus.blog.api.service.impl;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -9,12 +10,14 @@ import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 import vn.com.nimbus.blog.api.model.mapper.BlogMapper;
 import vn.com.nimbus.blog.api.model.mapper.CategoryMapper;
+import vn.com.nimbus.blog.api.model.mapper.HachiumCourseMapper;
 import vn.com.nimbus.blog.api.model.mapper.TagMapper;
 import vn.com.nimbus.blog.api.model.response.BlogDetailResponse;
 import vn.com.nimbus.blog.api.model.response.BlogResponse;
 import vn.com.nimbus.blog.api.model.response.CategoryDetailResponse;
 import vn.com.nimbus.blog.api.model.response.CategoryResponse;
 import vn.com.nimbus.blog.api.model.response.FeatureResponse;
+import vn.com.nimbus.blog.api.model.response.HachiumCourseResponse;
 import vn.com.nimbus.blog.api.model.response.SearchResponse;
 import vn.com.nimbus.blog.api.model.response.TagDetailResponse;
 import vn.com.nimbus.blog.api.model.response.TagResponse;
@@ -34,6 +37,9 @@ import vn.com.nimbus.data.domain.BlogContent;
 import vn.com.nimbus.data.domain.BlogTag;
 import vn.com.nimbus.data.domain.BlogTagID;
 import vn.com.nimbus.data.domain.Category;
+import vn.com.nimbus.data.domain.HachiumCategoryMapping;
+import vn.com.nimbus.data.domain.HachiumCategoryMappingID;
+import vn.com.nimbus.data.domain.HachiumCourse;
 import vn.com.nimbus.data.domain.Tag;
 import vn.com.nimbus.data.domain.User;
 import vn.com.nimbus.data.domain.constant.BlogStatus;
@@ -47,6 +53,8 @@ import vn.com.nimbus.data.repository.BlogRepository;
 import vn.com.nimbus.data.repository.BlogTagRepository;
 import vn.com.nimbus.data.repository.BlogViewRepository;
 import vn.com.nimbus.data.repository.CategoryRepository;
+import vn.com.nimbus.data.repository.HachiumCategoryMappingRepository;
+import vn.com.nimbus.data.repository.HachiumCourseRepository;
 import vn.com.nimbus.data.repository.TagRepository;
 import vn.com.nimbus.data.repository.UserRepository;
 
@@ -71,7 +79,10 @@ public class BlogServiceImpl implements BlogService {
     private final BlogContentRepository blogContentRepository;
     private final UserRepository userRepository;
     private final SlugPoolService slugPoolService;
+    private final HachiumCategoryMappingRepository hachiumCategoryMappingRepository;
+    private final HachiumCourseRepository hachiumCourseRepository;
 
+    @Autowired
     public BlogServiceImpl(
             BlogRepository blogRepository,
             CategoryRepository categoryRepository,
@@ -82,7 +93,9 @@ public class BlogServiceImpl implements BlogService {
             BlogAuthorRepository blogAuthorRepository,
             BlogContentRepository blogContentRepository,
             UserRepository userRepository,
-            SlugPoolService slugPoolService
+            SlugPoolService slugPoolService,
+            HachiumCategoryMappingRepository hachiumCategoryMappingRepository,
+            HachiumCourseRepository hachiumCourseRepository
     ) {
         this.blogRepository = blogRepository;
         this.categoryRepository = categoryRepository;
@@ -94,6 +107,8 @@ public class BlogServiceImpl implements BlogService {
         this.blogContentRepository = blogContentRepository;
         this.userRepository = userRepository;
         this.slugPoolService = slugPoolService;
+        this.hachiumCategoryMappingRepository = hachiumCategoryMappingRepository;
+        this.hachiumCourseRepository = hachiumCourseRepository;
     }
 
     @Override
@@ -117,11 +132,7 @@ public class BlogServiceImpl implements BlogService {
             detail.setContent(content.getContent());
 
             List<BlogAuthor> authors = blogAuthorRepository.findById_BlogId(blogId);
-            List<Long> authorIds = authors.stream()
-                    .map(BlogAuthor::getId)
-                    .map(BlogAuthorID::getAuthorId)
-                    .collect(Collectors.toList());
-            List<User> users = userRepository.findAllById(authorIds);
+            List<User> users = this.getAuthors(authors);
             List<BlogResponse.Author> resAuthors = users.stream().map(mapper::toAuthorResponse).collect(Collectors.toList());
             detail.setAuthors(resAuthors);
 
@@ -301,15 +312,59 @@ public class BlogServiceImpl implements BlogService {
         }).collect(Collectors.toList());
     }
 
+    @Override
+    public List<HachiumCourseResponse> getCourses(String slug) {
+        if (!StringUtils.isEmpty(slug)) {
+            SlugPoolDto slugPoolDto = slugPoolService.get(slug);
+            SlugPoolType type = slugPoolDto.getType();
+            if (type.equals(SlugPoolType.BLOG)) {
+                Optional<Blog> blogOpt = blogRepository.findById(slugPoolDto.getTargetId());
+                if (blogOpt.isEmpty() || !blogOpt.get().getStatus().equals(BlogStatus.PUBLISHED)) {
+                    throw new BaseException(ErrorCode.RESOURCE_NOT_FOUND);
+                }
+                final Blog blog = blogOpt.get();
+                List<BlogCategory> blogCategories = blogCategoryRepository.findById_BlogId(blog.getId());
+                if (!CollectionUtils.isEmpty(blogCategories)) {
+                    List<Long> categoryIds = blogCategories.stream().map(BlogCategory::getId).map(BlogCategoryID::getCategoryId).collect(Collectors.toList());
+                    List<HachiumCategoryMapping> mappings = hachiumCategoryMappingRepository.findById_CategoryIdIn(categoryIds);
+                    return this.getHachiumCourseResponses(mappings);
+                }
+            } else {
+                Optional<Category> categoryOpt = categoryRepository.findById(slugPoolDto.getTargetId());
+                if (categoryOpt.isEmpty()) {
+                    throw new BaseException(ErrorCode.RESOURCE_NOT_FOUND);
+                }
+                final Category category = categoryOpt.get();
+                List<HachiumCategoryMapping> mappings = hachiumCategoryMappingRepository.findById_CategoryId(category.getId());
+                return this.getHachiumCourseResponses(mappings);
+            }
+        }
+
+        Page<HachiumCourse> coursePage = hachiumCourseRepository.findAll(PageRequest.of(0, 5));
+        return coursePage
+                .get()
+                .map(HachiumCourseMapper.INSTANCE::toResponse)
+                .collect(Collectors.toList());
+    }
+
+    private List<HachiumCourseResponse> getHachiumCourseResponses(List<HachiumCategoryMapping> mappings) {
+        if (!CollectionUtils.isEmpty(mappings)) {
+            List<Long> hachiumCategoryIds = mappings.stream().map(HachiumCategoryMapping::getId).map(HachiumCategoryMappingID::getHachiumCategoryId).collect(Collectors.toList());
+            List<HachiumCourse> courses = hachiumCourseRepository.findByHachiumCategoryIdIn(hachiumCategoryIds);
+            return courses
+                    .subList(0, Math.min(courses.size(), 5))
+                    .stream()
+                    .map(HachiumCourseMapper.INSTANCE::toResponse)
+                    .collect(Collectors.toList());
+        }
+        return null;
+    }
+
     private List<BlogResponse> extractBlogs(List<BlogDto> blogs) {
         BlogMapper mapper = BlogMapper.INSTANCE;
         List<Long> blogIds = blogs.stream().map(BlogDto::getBlog).map(Blog::getId).collect(Collectors.toList());
         List<BlogAuthor> authors = blogAuthorRepository.findById_BlogIdIn(blogIds);
-        List<Long> authorIds = authors.stream()
-                .map(BlogAuthor::getId)
-                .map(BlogAuthorID::getAuthorId)
-                .collect(Collectors.toList());
-        List<User> users = userRepository.findAllById(authorIds);
+        List<User> users = this.getAuthors(authors);
 
         return blogs.stream()
                 .map(blogDto -> {
@@ -333,6 +388,14 @@ public class BlogServiceImpl implements BlogService {
                 })
                 .sorted(Comparator.comparing(BlogResponse::getUpdatedAt))
                 .collect(Collectors.toList());
+    }
+
+    private List<User> getAuthors(List<BlogAuthor> authors) {
+        List<Long> authorIds = authors.stream()
+                .map(BlogAuthor::getId)
+                .map(BlogAuthorID::getAuthorId)
+                .collect(Collectors.toList());
+        return userRepository.findAllById(authorIds);
     }
 
     private List<BlogDto> getMostViewedBlogs(List<Long> excludeIds) {

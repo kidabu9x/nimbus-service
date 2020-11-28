@@ -8,6 +8,7 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import vn.com.nimbus.blog.internal.service.HachiumService;
 import vn.com.nimbus.data.domain.HachiumCategory;
 import vn.com.nimbus.data.domain.HachiumCourse;
@@ -16,7 +17,9 @@ import vn.com.nimbus.data.repository.HachiumCourseRepository;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Service
 @Slf4j
@@ -34,7 +37,8 @@ public class HachiumServiceImpl implements HachiumService {
     }
 
     @Override
-    public void syncData() {
+    @Transactional
+    public boolean syncData() {
         try {
             final String blogUrl = "https://nimbus.com.vn/courses";
             Document doc = Jsoup.connect(blogUrl).get();
@@ -54,11 +58,13 @@ public class HachiumServiceImpl implements HachiumService {
 
             hachiumCategoryRepository.saveAll(categories);
 
+            Map<String, HachiumCourse> mapUrlAndCourse = new HashMap<>();
+            List<String> urls = new ArrayList<>();
+
             categories.forEach(category -> {
                 try {
                     Document courseHtml = Jsoup.connect(category.getUrl()).get();
                     Elements courseDivs = courseHtml.getElementsByClass("col-xs-12 col-md-4");
-                    List<HachiumCourse> courses = new ArrayList<>();
                     courseDivs.forEach(div -> {
 
                         Element linkTag = div.select("a").first();
@@ -97,15 +103,34 @@ public class HachiumServiceImpl implements HachiumService {
                         course.setPrice(price);
                         course.setHachiumCategoryId(category.getId());
 
-                        courses.add(course);
+                        mapUrlAndCourse.put(course.getUrl(), course);
+                        urls.add(course.getUrl());
                     });
                 } catch (IOException e) {
                     log.warn(e.getMessage());
                     e.printStackTrace();
                 }
             });
+
+            List<HachiumCourse> existCourses = hachiumCourseRepository.findByUrlIn(urls);
+            List<HachiumCourse> deleteCourses = new ArrayList<>();
+            for (HachiumCourse existCourse : existCourses) {
+                HachiumCourse course = mapUrlAndCourse.get(existCourse.getUrl());
+                if (course == null) {
+                    deleteCourses.add(existCourse);
+                    continue;
+                }
+                course.setId(existCourse.getId());
+            }
+            List<HachiumCourse> courses = new ArrayList<>(mapUrlAndCourse.values());
+
+            hachiumCourseRepository.deleteAll(deleteCourses);
+            hachiumCourseRepository.saveAll(courses);
+
+            return true;
         } catch (Exception e) {
             e.printStackTrace();
+            return false;
         }
     }
 }

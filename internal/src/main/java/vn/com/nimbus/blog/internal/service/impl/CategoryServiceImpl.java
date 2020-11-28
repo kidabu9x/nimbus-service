@@ -14,9 +14,14 @@ import vn.com.nimbus.common.model.exception.BaseException;
 import vn.com.nimbus.common.service.SlugPoolService;
 import vn.com.nimbus.data.domain.BlogCategory;
 import vn.com.nimbus.data.domain.Category;
+import vn.com.nimbus.data.domain.HachiumCategory;
+import vn.com.nimbus.data.domain.HachiumCategoryMapping;
+import vn.com.nimbus.data.domain.HachiumCategoryMappingID;
 import vn.com.nimbus.data.domain.constant.SlugPoolType;
 import vn.com.nimbus.data.repository.BlogCategoryRepository;
 import vn.com.nimbus.data.repository.CategoryRepository;
+import vn.com.nimbus.data.repository.HachiumCategoryMappingRepository;
+import vn.com.nimbus.data.repository.HachiumCategoryRepository;
 
 import java.util.List;
 import java.util.Optional;
@@ -28,18 +33,23 @@ public class CategoryServiceImpl implements CategoryService {
     private final CategoryRepository categoryRepository;
     private final BlogCategoryRepository blogCategoryRepository;
     private final SlugPoolService slugPoolService;
+    private final HachiumCategoryRepository hachiumCategoryRepository;
+    private final HachiumCategoryMappingRepository hachiumCategoryMappingRepository;
 
     @Autowired
     public CategoryServiceImpl(
             CategoryRepository categoryRepository,
             BlogCategoryRepository blogCategoryRepository,
-            SlugPoolService slugPoolService
+            SlugPoolService slugPoolService,
+            HachiumCategoryRepository hachiumCategoryRepository,
+            HachiumCategoryMappingRepository hachiumCategoryMappingRepository
     ) {
         this.categoryRepository = categoryRepository;
         this.blogCategoryRepository = blogCategoryRepository;
         this.slugPoolService = slugPoolService;
+        this.hachiumCategoryRepository = hachiumCategoryRepository;
+        this.hachiumCategoryMappingRepository = hachiumCategoryMappingRepository;
     }
-
 
     @Override
     @Transactional(readOnly = true)
@@ -91,6 +101,21 @@ public class CategoryServiceImpl implements CategoryService {
         slugPoolDto.setTitle(category.getTitle());
         slugPoolDto.setType(SlugPoolType.CATEGORY);
         slugPoolService.save(slugPoolDto);
+
+        if (request.getHachiumCategoryId() != null) {
+            final Long hachiumCategoryId = request.getHachiumCategoryId();
+            final Long categoryId = category.getId();
+            Optional<HachiumCategory> hachiumCategoryOpt = hachiumCategoryRepository.findById(hachiumCategoryId);
+            if (hachiumCategoryOpt.isEmpty()) {
+                throw new BaseException(ErrorCode.RESOURCE_NOT_FOUND, "Not found hachium category");
+            }
+            List<HachiumCategoryMapping> mappings = hachiumCategoryMappingRepository.findById_CategoryId(categoryId);
+            HachiumCategoryMappingID mappingID = new HachiumCategoryMappingID(categoryId, hachiumCategoryId);
+            Optional<HachiumCategoryMapping> mappingOpt = mappings.stream().filter(m -> m.getId().getHachiumCategoryId().equals(hachiumCategoryId)).findAny();
+            if (mappingOpt.isEmpty()) {
+                hachiumCategoryMappingRepository.save(new HachiumCategoryMapping(mappingID));
+            }
+        }
 
         return this.buildResponse(category);
     }

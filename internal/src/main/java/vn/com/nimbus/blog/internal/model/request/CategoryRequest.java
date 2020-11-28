@@ -16,4 +16,6 @@ public class CategoryRequest {
     @NotEmpty
     @Size(min = 1, max=50)
     private String title;
+
+    private Long hachiumCategoryId;
 }

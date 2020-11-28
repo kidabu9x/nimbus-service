@@ -2,6 +2,7 @@ package vn.com.nimbus.blog.api.service;
 
 import vn.com.nimbus.blog.api.model.response.CategoryResponse;
 import vn.com.nimbus.blog.api.model.response.FeatureResponse;
+import vn.com.nimbus.blog.api.model.response.HachiumCourseResponse;
 import vn.com.nimbus.blog.api.model.response.SearchResponse;
 import vn.com.nimbus.blog.api.model.response.TagDetailResponse;
 import vn.com.nimbus.common.model.paging.LimitOffsetPageable;
@@ -19,4 +20,6 @@ public interface BlogService {
     FeatureResponse getFeature();
 
     List<CategoryResponse> getCategories();
+
+    List<HachiumCourseResponse> getCourses(String slug);
 }
