@@ -5,6 +5,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
@@ -98,10 +100,13 @@ public class BlogServiceImpl implements BlogService {
         limitOffsetPageable.setOffset(offset);
 
         Page<Blog> data;
+
+        Pageable pageable = PageRequest.of(offset, limit, Sort.by("createdAt").descending());
+
         if (categoryId != null) {
-            data = blogRepository.findByCategoryIdAndTitleContains(title, categoryId, PageRequest.of(offset, limit));
+            data = blogRepository.findByCategoryIdAndTitleContains(title, categoryId, pageable);
         } else {
-            data = blogRepository.findByTitleContains(title, PageRequest.of(offset, limit));
+            data = blogRepository.findByTitleContains(title, pageable);
         }
         return data.map(BlogMapper.INSTANCE::toResponse);
     }
@@ -200,9 +205,7 @@ public class BlogServiceImpl implements BlogService {
             throw new BaseException(ErrorCode.RESOURCE_NOT_FOUND);
         }
 
-        if (blog.getStatus() == null) {
-            blog.setStatus(request.getStatus() != null ? request.getStatus() : BlogStatus.DISABLED);
-        }
+        blog.setStatus(request.getStatus() != null ? request.getStatus() : BlogStatus.DISABLED);
         blog.setTitle(request.getTitle());
         blog.setThumbnail(request.getThumbnail());
         blog.setDescription(request.getDescription());
