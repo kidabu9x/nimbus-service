@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: nimbus-service-common
+data:
+  VERSION: $IMAGE_TAG
+  JDBC_MASTER_URL: jdbc:mysql://35.189.33.66/nimbus_service
+  JDBC_MASTER_USERNAME: nimbus_uat
+  JDBC_MASTER_PASSWORD: kCnS9WM4
+  JDBC_SLAVE_URL: jdbc:mysql://35.189.33.66/nimbus_service
+  JDBC_SLAVE_USERNAME: nimbus_uat
+  JDBC_SLAVE_PASSWORD: kCnS9WM4
+  ENVIRONMENT: uat

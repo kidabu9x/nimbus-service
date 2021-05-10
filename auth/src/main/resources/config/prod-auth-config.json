@@ -1,0 +1,7 @@
+{
+  "port" : 48082,
+  "host" : "0.0.0.0",
+  "security" : {
+    "jwt_public_key" : "-----BEGIN PUBLIC KEY-----\nMIICIjANBgkqhkiG9w0BAQEFAAOCAg8AMIICCgKCAgEAstKpYuR1uxUyr3xwjWsd\n3lxMY79ME1ZQlALyHsRao3lP4F419bD9Q4Rvv8S3Irb6cpFLZgFn+U1/6alNuMjk\nwc4gQD01Eg23OJXtzaXmxg+b4TrLZJadOXHEGczOb4qIofTM4SP+tSNcLSxJJDdJ\nYyFOiZ6UqZi7dNlM6aGU5GKxGnK4ND2FpuaI5rv3isyCV71BRk9kv8wzKYTy3dO+\noTl0EZ0vHDWA8rXqL17WKsrHdx0u0dLzOSCUv4JEezbnRxDgM/ZvszuOFq8nOqBv\nE2viM1u9Tvq6xPmpMV1tRfG3Y7uK6rZhqorGVHwwbftovAdU/lFqduif4NNhJ3Vq\n8/d6L6CPZH/aojUDAlXGketoiW3aOVZF3ESDKRUHWc5s9PJ//QQSkVWipmeYHCex\nvogTsqBswzHhP1yaXaNA/xJNWUuCtq8r82C40RFkjQC5eAUHUvqlHmBdLk2VN+Zm\nSDuoqMOke2X+6SwahB6DxMke+9grzxhMYgebgLwij6SRoBnG7Kxgh1ozGguRIu+1\nQpFjkyJ3fwf+tlD9qcSaWleXwDQ3s52Hu31S+BDEL5/R1KsGBhQJiSEfkmqhIOfE\nw+rRjoO4BNhJYiipcDuBobZb6OiLXrARWVDSjRiavHACCweLQ5Pj48NfubR41exF\nHtz3bmTMDHrBMXdSJqv974kCAwEAAQ==\n-----END PUBLIC KEY-----"
+  }
+}

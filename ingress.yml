@@ -1,0 +1,23 @@
+apiVersion: networking.k8s.io/v1beta1
+kind: Ingress
+metadata:
+  name: nimbus-ingress
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    ingress.kubernetes.io/enable-cors: "true"
+spec:
+  rules:
+    - host: auth-uat.nimbus.com.vn
+      http:
+        paths:
+          - path: /*
+            backend:
+              serviceName: nimbus-auth
+              servicePort: 80
+    - host: api-internal-uat.nimbus.com.vn
+      http:
+        paths:
+          - path: /*
+            backend:
+              serviceName: nimbus-blog-internal
+              servicePort: 80

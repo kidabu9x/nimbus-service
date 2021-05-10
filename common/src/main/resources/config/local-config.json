@@ -1,0 +1,38 @@
+{
+  "db_connection": {
+    "is_use_ha": false,
+    "master": {
+      "driver_class_name": "com.mysql.cj.jdbc.Driver",
+      "url": "jdbc:mysql://127.0.0.1:53326/blog_service?useUnicode=true&characterEncoding=utf-8&useSSL=false",
+      "username": "root",
+      "password": "",
+      "maximum_pool_size": 20,
+      "minimum_idle": 5
+    },
+    "slave": {
+      "driver_class_name": "com.mysql.cj.jdbc.Driver",
+      "url": "jdbc:mysql://127.0.0.1:53326/blog_service?useUnicode=true&characterEncoding=utf-8&useSSL=false",
+      "username": "root",
+      "password": "",
+      "maximum_pool_size": 20,
+      "minimum_idle": 5
+    }
+  },
+  "oauth_key": {
+    "public_key": "-----BEGIN PUBLIC KEY-----\nMIIDAzCCAeugAwIBAgIURjMHkmjNbO+oIvpV7n1GfC+a6tgwDQYJKoZIhvcNAQEL\nBQAwETEPMA0GA1UEAwwGdW51c2VkMB4XDTIwMDQxMzA2MzMwM1oXDTIwMDUxMzA2\nMzMwM1owETEPMA0GA1UEAwwGdW51c2VkMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8A\nMIIBCgKCAQEArziD5jm1bHhfQNihKJfADdEH22SU8d1e4BNCw+hcDnJj9qlY6TB/\nQmFjn9+5iCMdf3M7ULoLDrtaggDq33Wb4v2ZxORBc2ZzMXz7qb9PeeJDIh/vhLQu\nfOTH1O6+3TgnODxxLA7IPxSZOAJ0nNNj45Xtj+WrWo/ExLK/Q49njfRYkzioRt+4\nrC7Yy4pCDzdgJU6apD45WCsRvGydHNJra7DVpjRctyB1c9VJ3fseqCnH6ZKVrhIz\nYLtn52HS1lsly1XJe1D5S2+BXVg2ZGid6NK4JNlifeRrZdKcO14giuKETRB2RNCH\nAvEIjKQfxz6l8ZuYkgn8wvSRzUSBmWwdgwIDAQABo1MwUTAdBgNVHQ4EFgQUnmZS\nZFCfYpAH0VHbkPeAXnW3K+QwHwYDVR0jBBgwFoAUnmZSZFCfYpAH0VHbkPeAXnW3\nK+QwDwYDVR0TAQH/BAUwAwEB/zANBgkqhkiG9w0BAQsFAAOCAQEAoB515gbffY8c\n7qdjpRZxZXQBasy+Zqbr90AjnSakWuFfDjj28n2WzUs+pYozacxKa0QKdxLcUScQ\nfs5Ww7Z/8CKsw4Y6JVuM+3JRDblDhdvUYe6DJeTBZxF9wmRWfWaWSOlsMKy0uacd\nu6CEMDQubYvMVURMWV6/f/r5uDlfcSVR5NYYJAzwWHDBGi+5TaFqhAe3esnNyvBn\n5vJM2O+MKP3rRAiFSUG3yysxiYGCc+5Dqhdfr5yoh/LCpq+p/VxDilkYVqSOo6+D\nTbuAEiar/vL5URE6I9R9AV7iTCx7aSJBTSSozxw1kyDGXrVagJd20KWp5bN0zN5U\nTyUDMvUq5g==\n-----END PUBLIC KEY-----",
+    "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQCvOIPmObVseF9A\n2KEol8AN0QfbZJTx3V7gE0LD6FwOcmP2qVjpMH9CYWOf37mIIx1/cztQugsOu1qC\nAOrfdZvi/ZnE5EFzZnMxfPupv0954kMiH++EtC585MfU7r7dOCc4PHEsDsg/FJk4\nAnSc02Pjle2P5ataj8TEsr9Dj2eN9FiTOKhG37isLtjLikIPN2AlTpqkPjlYKxG8\nbJ0c0mtrsNWmNFy3IHVz1Und+x6oKcfpkpWuEjNgu2fnYdLWWyXLVcl7UPlLb4Fd\nWDZkaJ3o0rgk2WJ95Gtl0pw7XiCK4oRNEHZE0IcC8QiMpB/HPqXxm5iSCfzC9JHN\nRIGZbB2DAgMBAAECggEBAJgjAus3+h1nWpVMQomjUP7uGttUNrrWUdVPA+5j5uIo\nUkFOAsPd9vDk7IJY15ernaYWoE7UalttMwWj1EsXq7VoKkY5Rdb0AlrawQw+7rvO\nSCnt/qKDa8XHQvbQIOqlIfCDEmSFpTqYIPzvrN6p8JYfjHgfmytznw6GgOkhL3Gh\nYfejUFvQpIL3XaWN0VZp8Ep09LFcmAA0Mc4Dy/5jAagyQ/jw+K8Ohs4vNAXxAR4w\nihu7+dhiIyFzXjb9MCzO+6RfF8cTiWuVCY64oZKv2dV8YlqWnCoOS44QeB9JowBc\njfQVge9R5OZoQ4Ac1ja81+M+apP/CqC8D3KxigKa/mECgYEA2sQCXWTkw3VJXnFf\nq9l1tJzdjZ1J8RCuS0ElM0CCADogbF4aGwRBiGcGVKcGXPMWI5Vo16mad7lWO/JG\nVhQ0IruPJys7dhep4acgL5T9vfVPK+PWG4x5UBY4fedx8GxfSeIet6KDhShaYbr8\nKWXvcgFiXHdjoqVUL3MqHHSERhMCgYEAzQsuUgyDQ3qRtLnAhqt39Qix1rFVrVM5\nX3zXhGmFRqJ//C2j8As5M4IjqE0U2x7jNKEVqBjm1vNSFHeYf0FbjWoJyKEKP+Ov\nbiTolqbQKjME5WCBUagI9xx+na7ufp2gRqyhZP6XeMaoXmBRlj2qGsH6acU6Cd/o\nX9/KwK/SeNECgYBV9voa6x+98uPO2exHYl+PhqjFEk7RDMYAymus1SeAoVbGXsAR\nZ728tQdW0n98nQVRHFAjlwEdFNZfHhgnkS7fiyZ4tNNb13apNnw+VmTTdYcT7ybe\nknfFUcYHK6CpYlybcuCxNopKFA5YIxsdxXGvMf4N6dhcPG11a+LbZanowwKBgCON\nE7vwJXY2szq1ljcDVeorVsJVvvgtXN48hBWWQiBsHmq38xu0pndS0iHlM3+GjHhc\nkaeyoZuVVp7r2Yn+6APN5eJeYauQK6OaTKWKSL94Vxn6MJHa46sMyrtGUF2tsNNw\nLQ+YwOSU9S5f3uWAzZSUG3npU1XQ97Zf1ASyt3hxAoGAMfxdDahQxTM9ub5BY5r0\nTnRUMr+OeYuCZMfKghM1son/h/ga/jkrPLg8DOo1BIM+SkgUrX11FvHkJN5tCkqv\nNJt+4xpoP8rzmUzgbaGS301UvoRu8GmkFjqECk1ZFsDOfc+L4lt+XpOocUt3Gcym\nO6vMCdWjAf3JSqy0axydVYg=\n-----END PRIVATE KEY-----",
+    "ttl": "604800000"
+  },
+  "cloudinary_config": {
+    "cloud_name": "nimbus-education",
+    "api_key": "355379485188139",
+    "api_secret": "KDH3CTcyMn6pNOiHoBNUlnDIYgs",
+    "folder": "blogs/uat",
+    "supported_file_formats": ["png", "jpg"]
+  },
+  "google_oauth_config": {
+    "client_id":"272986815164-aoc8jm80ph216ebcsi27abrjc6nmbp07.apps.googleusercontent.com",
+    "project_id":"nimbus-authentication",
+    "client_secret":"0DCM9C91jVdlkBXxgQ0EtXyS"
+  }
+}

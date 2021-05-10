@@ -1,0 +1,48 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.1.xsd">
+
+    <!-- database init scripts -->
+    <changeSet id="init-db" author="duongnk" context="auto">
+        <sqlFile encoding="utf8" endDelimiter=";"
+                 path="/sql/init.sql"/>
+    </changeSet>
+
+    <changeSet id="2020_04_10_add_position_for_blog_content" author="duongnk" context="auto">
+        <sqlFile encoding="utf8" endDelimiter=";"
+                 path="/sql/2020_04_10_add_position_for_blog_content.sql"/>
+    </changeSet>
+
+    <changeSet id="2020_04_11_add_blog_views_and_blog_description" author="duongnk" context="auto">
+        <sqlFile encoding="utf8" endDelimiter=";"
+                 path="/sql/2020_04_11_add_blog_views_and_blog_description.sql"/>
+    </changeSet>
+
+    <changeSet id="2020_04_13_add_id_ref_for_users_table" author="duongnk" context="auto">
+        <sqlFile encoding="utf8" endDelimiter=";"
+                 path="/sql/2020_04_13_add_id_ref_for_users_table.sql"/>
+    </changeSet>
+
+    <changeSet id="2020_11_18_refactor_database" author="duongnk" context="auto">
+        <sqlFile encoding="utf8" endDelimiter=";"
+                 path="/sql/2020_11_18_refactor_database.sql"/>
+    </changeSet>
+
+    <changeSet id="2020_11_22_create_slug_pool" author="duongnk" context="auto">
+        <sqlFile encoding="utf8" endDelimiter=";"
+                 path="/sql/2020_11_22_create_slug_pool.sql"/>
+    </changeSet>
+
+    <changeSet id="2020_11_24_hachium" author="duongnk" context="auto">
+        <sqlFile encoding="utf8" endDelimiter=";"
+                 path="/sql/2020_11_24_hachium.sql"/>
+    </changeSet>
+
+    <changeSet id="2020_11_27_shedlock" author="duongnk" context="auto">
+        <sqlFile encoding="utf8" endDelimiter=";"
+                 path="/sql/2020_11_27_shedlock.sql"/>
+    </changeSet>
+
+</databaseChangeLog>

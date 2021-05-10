@@ -1,21 +1,28 @@
-version: '3'
+version: '3.2'
 services:
-  api:
-    hostname: nimbus-public.local
-    container_name: nimbus-api
-    ports:
-      - 48080:8080
-    build: api
+  liquibase:
+    build: data
     depends_on:
       - mysql
-    env_file:
-      - .env
+    links:
+      - mysql
     environment:
-      ENVIRONMENT: docker
+      ENVIRONMENT: local
+      JDBC_MASTER_URL: jdbc:mysql://mysql/blog_service?useUnicode=true&characterEncoding=utf-8
+      JDBC_MASTER_USERNAME: root
+      JDBC_MASTER_PASSWORD:
 
   mysql:
-    hostname: mysql.local
-    container_name: nimbus-mysql
-    build: docker/images/mysql
+    image: mysql:8.0.18
+    command: --init-file="/tmp/init.sql"
+    volumes:
+      - database:/var/lib/mysql
+      - ./data/init.sql:/tmp/init.sql
+    environment:
+      MYSQL_ROOT_PASSWORD: ""
+      MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
     ports:
-      - 43320:3306
+      - 53326:3306
+
+volumes:
+  database:
