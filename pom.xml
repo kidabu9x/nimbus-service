@@ -42,7 +42,7 @@
         <slugify.version>2.4</slugify.version>
         <jackson-core.version>2.11.3</jackson-core.version>
         <swagger.version>2.10.5</swagger.version>
-        <jsoup.version>1.10.2</jsoup.version>
+        <jsoup.version>1.15.3</jsoup.version>
         <shedlock.version>4.15.1</shedlock.version>
     </properties>
 
